@@ -1,0 +1,62 @@
+<div class="min-h-screen bg-[#f0fdf4] font-display text-slate-800 p-6 lg:p-10">
+
+  <div class="max-w-5xl mx-auto space-y-10">
+    <div class="flex justify-between items-center">
+      <div class="flex items-center gap-5">
+        <button (click)="goBack()" class="size-11 flex items-center justify-center rounded-full bg-white border border-emerald-100 text-slate-400 hover:text-emerald-500 shadow-sm transition-all">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <div>
+          <h1 class="text-3xl font-black uppercase tracking-tight text-emerald-900">Financial <span class="text-emerald-500">Center</span></h1>
+          <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Fees, Wallet & Refunds</p>
+        </div>
+      </div>
+
+      <div class="bg-gradient-to-br from-emerald-500 to-teal-600 p-6 rounded-[2rem] text-white shadow-lg shadow-emerald-200 w-full md:w-80 relative overflow-hidden">
+        <div class="absolute -right-4 -top-4 size-20 bg-white/20 rounded-full blur-xl"></div>
+        <p class="text-xs font-black uppercase tracking-widest text-emerald-100 mb-1">E-Wallet Balance</p>
+        <h2 class="text-4xl font-black">RM {{walletBalance.toFixed(2)}}</h2>
+        <button class="mt-4 w-full py-2 bg-white/20 hover:bg-white/30 rounded-xl text-[10px] font-black uppercase tracking-widest transition-colors backdrop-blur-sm border border-white/20">Top Up Wallet</button>
+      </div>
+    </div>
+
+    <section class="space-y-4">
+      <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight ml-2">Fee Payments</h3>
+      <div class="bg-white rounded-[2.5rem] border border-emerald-100 overflow-hidden shadow-sm">
+        <div *ngFor="let bill of bills" class="p-6 border-b border-emerald-50 last:border-0 flex items-center justify-between hover:bg-emerald-50/20 transition-colors">
+          <div class="flex items-center gap-4">
+            <div class="p-3 rounded-2xl" [ngClass]="bill.status === 'Paid' ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'">
+              <span class="material-symbols-outlined text-2xl">{{ bill.status === 'Paid' ? 'check_circle' : 'pending' }}</span>
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-800">{{bill.title}}</h4>
+              <p class="text-xs font-bold text-slate-400 mt-0.5">Due: {{bill.dueDate}}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-6">
+            <span class="text-lg font-black text-slate-700">RM {{bill.amount}}</span>
+            <button *ngIf="bill.status === 'Unpaid'" (click)="payBill(bill)" class="px-6 py-2 bg-emerald-500 text-white rounded-xl text-xs font-black uppercase shadow-lg hover:bg-emerald-600 hover:scale-105 transition-all">Pay Now</button>
+            <span *ngIf="bill.status === 'Paid'" class="px-4 py-1.5 bg-slate-100 text-slate-500 rounded-lg text-[10px] font-black uppercase">Paid</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="space-y-4">
+      <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight ml-2">Refund Requests</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div *ngFor="let refund of refunds" class="bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm flex justify-between items-center">
+          <div>
+            <h4 class="font-bold text-slate-700">{{refund.item}}</h4>
+            <p class="text-xs text-slate-400 font-bold mt-1">{{refund.date}}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-lg font-black text-slate-800">RM {{refund.amount}}</p>
+            <span class="text-[10px] font-black uppercase px-2 py-1 rounded mt-1 inline-block" [ngClass]="refund.status === 'Approved' ? 'bg-emerald-100 text-emerald-700' : 'bg-orange-100 text-orange-700'">{{refund.status}}</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>

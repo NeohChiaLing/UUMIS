@@ -1,0 +1,150 @@
+<div class="flex h-screen bg-[#f8fcfa] font-display text-[#0e1b13] overflow-hidden relative">
+
+  <div *ngIf="showEditModal" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/30 backdrop-blur-sm p-6 animate-fade-in">
+    <div class="bg-white w-full max-w-sm p-8 rounded-[2rem] shadow-2xl space-y-6">
+      <div class="flex justify-between items-center">
+        <h4 class="text-xl font-black text-emerald-900 uppercase">
+          {{ editMode === 'PAID' ? 'Edit Total Paid' : 'Calculate Outstanding' }}
+        </h4>
+        <button (click)="showEditModal = false" class="text-gray-400 hover:text-red-500"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="space-y-5">
+        <div *ngIf="editMode === 'PAID'">
+          <label class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Set Total Paid Amount (RM)</label>
+          <input type="number" [(ngModel)]="inputVal1" class="w-full mt-1 p-3 bg-gray-50 border border-gray-200 rounded-xl text-lg font-bold text-[#0e1b13] outline-none focus:ring-2 focus:ring-emerald-500">
+          <p class="text-[10px] text-gray-400 mt-2 italic">* This will not affect Outstanding amount.</p>
+        </div>
+        <div *ngIf="editMode === 'DUE'" class="space-y-4">
+          <div><label class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Original Total Outstanding (RM)</label><input type="number" [(ngModel)]="inputVal1" placeholder="0.00" class="w-full mt-1 p-3 bg-gray-50 border border-gray-200 rounded-xl text-lg font-bold text-[#0e1b13] outline-none focus:ring-2 focus:ring-emerald-500"></div>
+          <div><label class="text-[10px] font-black text-gray-400 uppercase tracking-wider">Less: Paid Amount (RM)</label><input type="number" [(ngModel)]="inputVal2" placeholder="0.00" class="w-full mt-1 p-3 bg-red-50 border border-red-100 rounded-xl text-lg font-bold text-red-700 outline-none focus:ring-2 focus:ring-red-500"></div>
+          <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 flex justify-between items-center"><span class="text-xs font-bold text-gray-500 uppercase">Result:</span><span class="text-xl font-black text-emerald-600">RM {{(inputVal1 - inputVal2) | number:'1.2-2'}}</span></div>
+          <p class="text-[10px] text-gray-400 italic">* This updates Outstanding only. Total Paid remains unchanged.</p>
+        </div>
+      </div>
+      <button (click)="saveUpdate()" class="w-full py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-lg hover:bg-emerald-600 transition-all uppercase tracking-widest text-xs">Save Value</button>
+    </div>
+  </div>
+
+  <div *ngIf="showAddPaymentModal" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/30 backdrop-blur-sm p-6 animate-fade-in">
+    <div class="bg-white w-full max-w-md p-8 rounded-[2rem] shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center border-b border-gray-100 pb-4">
+        <h4 class="text-xl font-black text-emerald-900 uppercase">{{ isEditingTxn ? 'Edit Transaction' : 'Add Transaction' }}</h4>
+        <button (click)="showAddPaymentModal = false" class="text-gray-400 hover:text-red-500"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <div class="space-y-4">
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="text-[10px] font-bold text-gray-400 uppercase">Date</label><input type="date" [(ngModel)]="newTxn.date" class="w-full mt-1 p-2.5 bg-gray-50 border-none rounded-xl text-sm font-bold"></div>
+          <div><label class="text-[10px] font-bold text-gray-400 uppercase">Method</label><select [(ngModel)]="newTxn.method" class="w-full mt-1 p-2.5 bg-gray-50 border-none rounded-xl text-sm font-bold"><option>Cash</option><option>Credit Card</option><option>Bank Transfer</option></select></div>
+        </div>
+        <div><label class="text-[10px] font-bold text-gray-400 uppercase">Description</label><input type="text" [(ngModel)]="newTxn.desc" class="w-full mt-1 p-3 bg-gray-50 border-none rounded-xl text-sm font-bold"></div>
+        <div><label class="text-[10px] font-bold text-gray-400 uppercase">Amount (RM)</label><input type="number" [(ngModel)]="newTxn.amount" class="w-full mt-1 p-3 bg-gray-50 border-none rounded-xl text-lg font-black text-emerald-700"></div>
+        <div><label class="text-[10px] font-bold text-gray-400 uppercase">Receipt</label><div (click)="fileInput.click()" class="mt-1 w-full border-2 border-dashed border-gray-200 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50"><span class="material-symbols-outlined text-gray-400">upload_file</span><span class="text-xs font-bold text-gray-500 mt-1">{{ newTxn.receiptFile || 'Select File' }}</span><input #fileInput type="file" class="hidden" (change)="onReceiptSelected($event)" accept=".pdf,.jpg,.png"></div></div>
+      </div>
+      <button *ngIf="!isEditingTxn" (click)="submitNewPayment()" class="w-full py-4 bg-[#30e87a] text-[#0e1b13] font-black rounded-xl shadow-lg hover:brightness-105 transition-all uppercase tracking-widest text-xs">Submit</button>
+      <button *ngIf="isEditingTxn" (click)="updateTransaction()" class="w-full py-4 bg-blue-500 text-white font-black rounded-xl shadow-lg hover:brightness-105 transition-all uppercase tracking-widest text-xs">Update</button>
+    </div>
+  </div>
+
+  <div *ngIf="showDownloadConfirm" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm p-6 animate-fade-in">
+    <div class="bg-white w-full max-w-sm p-8 rounded-[2rem] shadow-2xl text-center space-y-6">
+      <div class="size-16 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto"><span class="material-symbols-outlined text-3xl">download</span></div>
+      <div><h4 class="text-xl font-black text-emerald-900 uppercase">Download Receipt?</h4></div>
+      <div class="flex gap-3"><button (click)="showDownloadConfirm = false" class="flex-1 py-3 bg-gray-100 text-gray-500 font-bold rounded-xl">Cancel</button><button (click)="confirmDownload()" class="flex-1 py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-lg">Yes</button></div>
+    </div>
+  </div>
+
+  <section class="w-64 flex-none border-r border-[#e7f3ec] bg-white flex flex-col h-full overflow-hidden">
+
+    <div class="p-5 border-b border-[#e7f3ec] flex items-center gap-3">
+      <button (click)="goBack()" class="size-8 flex-none flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 transition-all shadow-sm">
+        <span class="material-symbols-outlined text-lg">arrow_back</span>
+      </button>
+      <div>
+        <h2 class="text-[#0e1b13] text-lg font-bold leading-tight">Years</h2>
+        <p class="text-[#4e976b] text-[10px] mt-0.5">Select View</p>
+      </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-3 space-y-2">
+      <button *ngFor="let year of academicYears" (click)="selectYear(year)" [class]="selectedYear === year ? 'bg-[#30e87a] text-[#0e1b13] shadow-md' : 'bg-white hover:bg-[#dcfce7] text-[#0e1b13]'" class="w-full flex items-center justify-between p-3 rounded-xl border border-transparent transition-all text-left">
+        <span class="block text-sm font-bold">{{ year }}</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="w-72 flex-none border-r border-[#e7f3ec] bg-[#e0f2fe]/20 flex flex-col h-full overflow-hidden">
+    <div class="p-4 border-b border-[#e7f3ec] bg-white/50 sticky top-0"><h3 class="font-bold text-[#0e1b13] mb-3">{{ selectedYear }} Students</h3><input class="w-full p-2 bg-white border rounded-lg text-sm" placeholder="Search..."></div>
+    <div class="flex-1 overflow-y-auto p-3 space-y-2">
+      <div *ngFor="let student of students" (click)="selectStudent(student)" [class]="selectedStudent?.id === student.id ? 'border-[#30e87a] ring-1 ring-[#30e87a] bg-white' : 'border-transparent bg-white/60'" class="p-4 border-2 rounded-xl shadow-sm cursor-pointer relative transition-all">
+        <div class="flex flex-col gap-1"><h4 class="text-sm font-bold text-[#0e1b13]">{{ student.name }}</h4><p class="text-xs text-[#4e976b] font-mono">ID: {{ student.id }}</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="flex-1 flex flex-col h-full overflow-hidden relative bg-white">
+    <div class="p-8 pb-4" *ngIf="selectedStudent">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[#f8fcfa] p-6 rounded-[2rem] border border-[#e7f3ec]">
+        <div>
+          <h1 class="text-3xl font-black text-[#0e1b13]">{{ selectedStudent.name }}</h1>
+          <div class="flex items-center gap-3 mt-2 text-sm text-[#4e976b]"><span class="font-mono bg-white px-2 py-0.5 rounded border border-[#e7f3ec]">{{ selectedStudent.id }}</span><span>Class {{ selectedStudent.class }}</span></div>
+        </div>
+
+        <div class="flex gap-8 items-center pr-4">
+          <div class="text-right group cursor-pointer" (click)="openEditTotalPaid()" title="Edit Total Paid">
+            <div class="flex items-center justify-end gap-2"><p class="text-[10px] text-[#4e976b] font-black uppercase tracking-widest">Total Paid</p><span class="material-symbols-outlined text-[14px] text-gray-300 group-hover:text-[#30e87a] transition-colors">edit</span></div>
+            <p class="text-2xl font-black text-[#0e1b13] group-hover:text-[#30e87a] transition-colors">RM {{ selectedStudent.totalPaid | number:'1.2-2' }}</p>
+          </div>
+          <div class="w-px h-12 bg-[#d0e7d9]"></div>
+          <div class="text-right group cursor-pointer" (click)="openEditOutstanding()" title="Calculate Outstanding">
+            <div class="flex items-center justify-end gap-2"><p class="text-[10px] text-[#4e976b] font-black uppercase tracking-widest">Outstanding</p><span class="material-symbols-outlined text-[14px] text-gray-300 group-hover:text-[#30e87a] transition-colors">edit</span></div>
+            <p class="text-2xl font-black text-[#30e87a] group-hover:text-emerald-600 transition-colors">RM {{ selectedStudent.due | number:'1.2-2' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-8 py-2 flex items-center justify-between">
+      <h2 class="text-lg font-black text-[#0e1b13] uppercase">Transaction History</h2>
+      <button (click)="openAddPayment()" class="flex items-center gap-2 px-5 py-2.5 bg-[#30e87a] text-[#0e1b13] rounded-xl text-sm font-bold shadow-lg hover:scale-105 transition-all"><span class="material-symbols-outlined text-[20px]">add</span> Add Payment</button>
+    </div>
+
+    <div class="flex-1 overflow-auto px-8 pb-8 mt-4">
+      <div class="bg-white border border-[#e7f3ec] rounded-[1.5rem] shadow-sm overflow-hidden">
+        <table class="w-full text-left border-collapse">
+          <thead>
+          <tr class="bg-[#f8fcfa] border-b border-[#e7f3ec]">
+            <th class="p-5 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Date</th>
+            <th class="p-5 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Desc</th>
+            <th class="p-5 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Amount (RM)</th>
+            <th class="p-5 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Status / Action</th>
+            <th class="p-5 text-[10px] font-black text-[#4e976b] uppercase tracking-widest text-right">Actions</th>
+          </tr>
+          </thead>
+          <tbody class="divide-y divide-[#e7f3ec]">
+          <tr *ngFor="let txn of transactions" class="group hover:bg-gray-50 transition-colors">
+            <td class="p-5 text-sm font-bold">{{ txn.date }}</td>
+            <td class="p-5 text-sm font-bold">{{ txn.desc }}<br><span class="text-[10px] text-gray-400 font-normal">{{ txn.inv }}</span></td>
+            <td class="p-5 text-sm font-black text-[#0e1b13]">RM {{ txn.amount | number:'1.2-2' }}</td>
+            <td class="p-5 flex items-center gap-3">
+              <span [ngClass]="{'bg-green-100 text-green-800': txn.status==='Completed', 'bg-orange-100 text-orange-800': txn.status==='Pending', 'bg-red-100 text-red-800': txn.status==='Rejected'}" class="px-2 py-1 rounded text-[10px] font-black uppercase w-20 text-center block">{{ txn.status }}</span>
+              <div class="flex gap-1 opacity-20 group-hover:opacity-100 transition-opacity">
+                <button (click)="changeStatus(txn, 'Completed')" class="size-6 bg-green-500 text-white rounded-full flex items-center justify-center hover:scale-110 transition-all"><span class="material-symbols-outlined text-[14px]">check</span></button>
+                <button (click)="changeStatus(txn, 'Rejected')" class="size-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:scale-110 transition-all"><span class="material-symbols-outlined text-[14px]">close</span></button>
+              </div>
+            </td>
+            <td class="p-5 text-right">
+              <div class="flex items-center justify-end gap-2">
+                <button (click)="uploadReceipt(txn)" class="size-9 bg-blue-50 text-blue-500 rounded-xl hover:bg-blue-500 hover:text-white transition-all"><span class="material-symbols-outlined text-[18px]">upload_file</span></button>
+                <button (click)="askDownload(txn)" [class.opacity-50]="!txn.receiptFile" class="size-9 bg-emerald-50 text-emerald-500 rounded-xl hover:bg-emerald-500 hover:text-white transition-all"><span class="material-symbols-outlined text-[18px]">download</span></button>
+                <button (click)="openEditTransaction(txn)" class="size-9 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-500 hover:text-white transition-all"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+                <button (click)="deleteTransaction(txn.id)" class="size-9 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="mt-6 flex justify-end"><button (click)="submitChanges()" class="flex items-center gap-2 px-8 py-3 bg-[#0e1b13] text-white rounded-xl text-sm font-bold shadow-lg hover:scale-105 transition-all"><span class="material-symbols-outlined text-[18px]">save</span> Save Changes</button></div>
+    </div>
+  </section>
+</div>

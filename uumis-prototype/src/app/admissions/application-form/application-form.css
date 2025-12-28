@@ -1,0 +1,20 @@
+/* This styles the main dropdown box */
+select {
+  background-color: #112117 !important; /* Matches your form input color */
+  color: white !important;
+  border: 1px solid #244732 !important;
+}
+
+/* This styles the actual list that pops out */
+select option {
+  background-color: #1a2c22; /* Use the slightly lighter green from your sections */
+  color: white;
+  padding: 10px;
+}
+
+/* Removes the default appearance to allow for more custom styling */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}

@@ -1,0 +1,129 @@
+<div class="flex h-screen bg-[#f8fcfa] font-display text-[#0e1b13] overflow-hidden relative">
+
+  <div *ngIf="showPreviewModal" class="fixed inset-0 z-[120] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6 animate-fade-in" (click)="closePreview()">
+    <div class="bg-transparent w-full max-w-4xl h-[85vh] flex flex-col items-center justify-center relative" (click)="$event.stopPropagation()">
+
+      <button (click)="closePreview()" class="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors flex items-center gap-2">
+        <span class="text-sm font-bold uppercase tracking-widest">Close Preview</span>
+        <span class="material-symbols-outlined text-3xl">close</span>
+      </button>
+
+      <div class="w-full h-full bg-white rounded-xl overflow-hidden shadow-2xl flex items-center justify-center">
+        <img *ngIf="previewType === 'image'" [src]="previewContent" class="w-full h-full object-contain">
+        <iframe *ngIf="previewType === 'pdf'" [src]="previewContent" class="w-full h-full border-none"></iframe>
+      </div>
+
+      <p class="text-white/80 mt-4 font-bold text-lg">{{ previewTitle }}</p>
+    </div>
+  </div>
+
+  <div *ngIf="showDownloadConfirm" class="fixed inset-0 z-[120] flex items-center justify-center bg-black/30 backdrop-blur-sm p-6 animate-fade-in">
+    <div class="bg-white w-full max-w-sm p-8 rounded-[2rem] shadow-2xl text-center space-y-6">
+      <div class="size-16 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto">
+        <span class="material-symbols-outlined text-3xl">download</span>
+      </div>
+      <div>
+        <h4 class="text-xl font-black text-emerald-900 uppercase">Confirm Download?</h4>
+        <p class="text-sm text-gray-500 mt-2">File: {{itemToDownload?.fileName}}</p>
+      </div>
+      <div class="flex gap-3">
+        <button (click)="showDownloadConfirm = false" class="flex-1 py-3 bg-gray-100 text-gray-500 font-bold rounded-xl hover:bg-gray-200">Cancel</button>
+        <button (click)="confirmDownload()" class="flex-1 py-3 bg-emerald-500 text-white font-bold rounded-xl shadow-lg hover:bg-emerald-600">Yes</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showModal" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/40 backdrop-blur-md p-6 animate-fade-in select-none">
+    <div class="bg-white w-full max-w-xl p-8 rounded-[2.5rem] shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="flex justify-between items-center border-b border-gray-100 pb-5 shrink-0">
+        <h4 class="text-2xl font-black text-emerald-900 uppercase tracking-tight">
+          {{ isEditing ? 'Edit Discount' : 'Add New Discount' }}
+        </h4>
+        <button (click)="closeModal()" class="size-10 rounded-full bg-gray-50 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all flex items-center justify-center"><span class="material-symbols-outlined font-bold">close</span></button>
+      </div>
+      <div class="flex-1 overflow-y-auto py-6 space-y-6 px-1">
+        <div><label class="text-[11px] font-black text-gray-400 uppercase tracking-wider pl-1">Title / Topic <span class="text-red-500">*</span></label><input type="text" [(ngModel)]="formData.title" placeholder="e.g. Summer Break Promo" class="w-full mt-2 p-4 bg-gray-50/50 border border-gray-200 rounded-2xl text-sm font-bold text-[#0e1b13] outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all placeholder:text-gray-300"></div>
+        <div><label class="text-[11px] font-black text-gray-400 uppercase tracking-wider pl-1">Description</label><textarea [(ngModel)]="formData.description" rows="4" placeholder="Details about the discount..." class="w-full mt-2 p-4 bg-gray-50/50 border border-gray-200 rounded-2xl text-sm font-medium text-[#0e1b13] outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-all placeholder:text-gray-300 resize-none"></textarea></div>
+        <div class="grid grid-cols-2 gap-5">
+          <div><label class="text-[11px] font-black text-gray-400 uppercase tracking-wider pl-1">Start Date <span class="text-red-500">*</span></label><input type="date" [(ngModel)]="formData.startDate" class="w-full mt-2 p-3.5 bg-gray-50/50 border border-gray-200 rounded-2xl text-sm font-bold text-[#0e1b13] outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all cursor-pointer"></div>
+          <div><label class="text-[11px] font-black text-gray-400 uppercase tracking-wider pl-1">End Date <span class="text-red-500">*</span></label><input type="date" [(ngModel)]="formData.endDate" class="w-full mt-2 p-3.5 bg-gray-50/50 border border-gray-200 rounded-2xl text-sm font-bold text-[#0e1b13] outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all cursor-pointer"></div>
+        </div>
+        <div><label class="text-[11px] font-black text-gray-400 uppercase tracking-wider pl-1">Upload Picture / PDF</label><div (click)="fileInput.click()" class="mt-2 w-full border-2 border-dashed border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-emerald-50/30 hover:border-emerald-300 transition-all group bg-white"><div *ngIf="!formData.fileUrl" class="flex flex-col items-center"><div class="size-14 rounded-full bg-gray-50 text-gray-300 flex items-center justify-center group-hover:text-emerald-500 group-hover:bg-emerald-100 transition-all mb-3"><span class="material-symbols-outlined text-3xl">cloud_upload</span></div><p class="text-xs font-bold text-gray-500 group-hover:text-emerald-600">Click to upload file</p><p class="text-[10px] text-gray-400 mt-1">Supports JPG, PNG, PDF</p></div><div *ngIf="formData.fileUrl" class="flex items-center gap-4 w-full"><img *ngIf="formData.fileType === 'image'" [src]="formData.fileUrl" class="h-20 w-20 object-contain bg-gray-100 rounded-xl border border-gray-200 shadow-sm"><div *ngIf="formData.fileType === 'pdf'" class="h-20 w-20 flex items-center justify-center rounded-xl bg-red-50 border border-red-100 text-red-500"><span class="material-symbols-outlined text-4xl">picture_as_pdf</span></div><div class="flex-1 overflow-hidden"><p class="text-sm font-bold text-emerald-900 truncate">{{ formData.fileName }}</p><p class="text-xs text-emerald-500 font-medium cursor-pointer hover:underline mt-1">Click to change</p></div><span class="material-symbols-outlined text-emerald-500">check_circle</span></div><input #fileInput type="file" class="hidden" (change)="onFileSelected($event)" accept="image/png, image/jpeg, application/pdf"></div></div>
+      </div>
+      <div class="pt-5 border-t border-gray-100 shrink-0"><button (click)="onSubmit()" class="w-full py-4 bg-emerald-500 text-white font-black rounded-2xl shadow-lg shadow-emerald-200 hover:bg-emerald-600 hover:scale-[1.01] active:scale-[0.99] transition-all uppercase tracking-widest text-xs flex items-center justify-center gap-2"><span class="material-symbols-outlined">{{ isEditing ? 'save' : 'add_circle' }}</span>{{ isEditing ? 'Update Discount' : 'Submit Discount' }}</button></div>
+    </div>
+  </div>
+
+  <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+
+    <header class="h-24 shrink-0 border-b border-[#e7f3ec] bg-white/80 backdrop-blur-md px-10 flex items-center justify-between z-10">
+      <div class="flex items-center gap-5">
+        <button (click)="goBack()" class="size-10 flex-none flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 transition-all shadow-sm"><span class="material-symbols-outlined text-xl">arrow_back</span></button>
+        <div><h1 class="text-3xl font-black text-[#0e1b13] tracking-tight">Discount & Promotions</h1><p class="text-sm text-[#4e976b] font-medium mt-1">Manage special offers for students and parents.</p></div>
+      </div>
+      <button (click)="openAddModal()" class="flex items-center gap-3 px-6 py-3.5 bg-[#30e87a] text-[#0e1b13] rounded-2xl text-sm font-black shadow-lg shadow-green-200/50 hover:scale-105 hover:shadow-xl hover:bg-[#25d366] transition-all uppercase tracking-wider"><span class="material-symbols-outlined text-[22px]">campaign</span> Add Discount</button>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-10">
+
+      <div *ngIf="discounts.length === 0" class="h-96 flex flex-col items-center justify-center border-3 border-dashed border-gray-200 rounded-[3rem] bg-gray-50/50 text-gray-400">
+        <span class="material-symbols-outlined text-6xl mb-4 opacity-50">sell</span><p class="text-lg font-bold">No discounts created yet.</p><p class="text-sm mt-2">Click the button above to add one.</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div *ngFor="let item of discounts" class="bg-white rounded-[2.5rem] border border-[#e7f3ec] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group relative">
+
+          <div class="h-[450px] w-full bg-gray-100 relative overflow-hidden flex items-center justify-center">
+            <img *ngIf="item.fileType === 'image' && item.fileUrl" [src]="item.fileUrl" alt="Discount Cover" class="w-full h-full object-contain p-2 transition-transform duration-500">
+            <div *ngIf="item.fileType === 'pdf'" class="w-full h-full flex flex-col items-center justify-center bg-red-50 text-red-400 group-hover:bg-red-100 transition-colors"><span class="material-symbols-outlined text-8xl">picture_as_pdf</span><p class="text-sm font-bold mt-4 uppercase tracking-wider">PDF Document</p></div>
+            <div *ngIf="!item.fileUrl" class="w-full h-full flex flex-col items-center justify-center bg-emerald-50/50 text-emerald-300"><span class="material-symbols-outlined text-8xl">image</span><p class="text-sm font-bold mt-4 uppercase tracking-wider opacity-70">No Image</p></div>
+
+            <div class="absolute top-5 right-5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest shadow-sm backdrop-blur-md"
+                 [ngClass]="item.isActive ? 'bg-emerald-500/90 text-white' : 'bg-gray-900/50 text-white'">
+              {{ item.isActive ? 'Active' : 'Inactive' }}
+            </div>
+          </div>
+
+          <div class="p-8 flex flex-col flex-1 border-t border-gray-100">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="material-symbols-outlined text-emerald-500 text-lg">date_range</span>
+              <p class="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg font-mono">{{ item.startDate }} <span class="text-emerald-300 mx-1">to</span> {{ item.endDate }}</p>
+            </div>
+
+            <h3 class="text-xl font-black text-[#0e1b13] leading-tight mb-3 line-clamp-2">{{ item.title }}</h3>
+            <p class="text-sm text-gray-500 font-medium leading-relaxed mb-8 flex-1 line-clamp-4">{{ item.description || 'No description provided.' }}</p>
+
+            <div class="flex items-center justify-between pt-6 border-t border-gray-100">
+
+              <button (click)="toggleStatus(item)"
+                      class="flex items-center gap-2 pl-1 pr-3 py-2 rounded-full transition-all font-bold text-[10px] uppercase tracking-wider"
+                      [ngClass]="item.isActive ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200'">
+                <div class="size-6 rounded-full flex items-center justify-center shadow-sm transition-transform"
+                     [ngClass]="item.isActive ? 'bg-emerald-500 text-white translate-x-0' : 'bg-white text-gray-400 -translate-x-1'">
+                  <span class="material-symbols-outlined text-[14px]">{{ item.isActive ? 'check' : 'power_settings_new' }}</span>
+                </div>
+                {{ item.isActive ? 'Inactive' : 'Active' }}
+              </button>
+
+              <div class="flex items-center gap-2">
+                <button (click)="openPreview(item)" [class.opacity-50]="!item.fileUrl" class="size-10 flex items-center justify-center rounded-full bg-blue-50 text-blue-500 hover:bg-blue-500 hover:text-white transition-all shadow-sm" title="Preview">
+                  <span class="material-symbols-outlined text-[20px]">visibility</span>
+                </button>
+
+                <button (click)="askDownload(item)" [class.opacity-50]="!item.fileUrl" class="size-10 flex items-center justify-center rounded-full bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all shadow-sm" title="Download">
+                  <span class="material-symbols-outlined text-[20px]">download</span>
+                </button>
+
+                <button (click)="openEditModal(item)" class="size-10 flex items-center justify-center rounded-full bg-gray-50 text-gray-500 hover:bg-gray-800 hover:text-white transition-all shadow-sm" title="Edit">
+                  <span class="material-symbols-outlined text-[20px]">edit</span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

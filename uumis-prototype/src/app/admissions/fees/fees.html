@@ -1,0 +1,75 @@
+<div class="min-h-screen bg-[#f8fcfa] font-display text-[#0e1b13] flex flex-col">
+  <app-navbar></app-navbar>
+
+  <main class="flex-grow w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
+
+    <div class="text-center animate-fade-in-up">
+      <span class="inline-block px-4 py-1.5 rounded-full bg-white border border-[#e7f3ec] text-[#30e87a] text-xs font-black uppercase tracking-wider mb-4 shadow-sm">
+        Financial Information
+      </span>
+      <h1 class="text-3xl md:text-5xl font-black text-[#0e1b13] tracking-tight leading-tight">
+        Fee Structure <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#30e87a] to-emerald-600">2025 - 2026</span>
+      </h1>
+      <p class="text-slate-500 mt-4 font-medium">Transparent and comprehensive tuition and fee schedule for the upcoming academic year.</p>
+    </div>
+
+    <section class="animate-fade-in-up delay-100">
+      <div class="bg-white border border-[#e7f3ec] rounded-[2rem] shadow-xl overflow-hidden">
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs md:text-sm text-left border-collapse min-w-[1200px]">
+
+            <thead class="bg-slate-50 text-[#0e1b13] uppercase tracking-wider font-bold">
+            <tr>
+              <th rowspan="2" class="p-4 border-r border-[#e7f3ec] font-black text-[#30e87a] sticky left-0 bg-slate-50 z-10">Grade Level</th>
+              <th colspan="2" class="p-3 text-center border-r border-[#e7f3ec] border-b border-[#e7f3ec] bg-emerald-50">School Fees</th>
+              <th colspan="4" class="p-3 text-center border-r border-[#e7f3ec] border-b border-[#e7f3ec] bg-sky-50">Academic Related Fees</th>
+              <th rowspan="2" class="p-3 text-center border-r border-[#e7f3ec] font-black text-amber-500">Total Fee<br>Semester</th>
+              <th rowspan="2" class="p-3 text-center border-r border-[#e7f3ec] font-black text-amber-500">Total Fee<br>Year</th>
+              <th rowspan="2" class="p-3 text-center border-r border-[#e7f3ec] text-slate-500">*Admission Fee</th>
+              <th rowspan="2" class="p-3 text-center text-slate-500">**Uniform Fee</th>
+            </tr>
+            <tr>
+              <th class="p-3 text-center border-r border-b border-[#e7f3ec] text-slate-600">Semester Fee</th>
+              <th class="p-3 text-center border-r border-b border-[#e7f3ec] text-slate-600 font-bold">Yearly Fee</th>
+              <th class="p-3 text-center border-r border-b border-[#e7f3ec] text-slate-600">Material Fee</th>
+              <th class="p-3 text-center border-r border-b border-[#e7f3ec] text-slate-600">Tech Fee</th>
+              <th class="p-3 text-center border-r border-b border-[#e7f3ec] text-slate-600">Science Fee</th>
+              <th class="p-3 text-center border-r border-b border-[#e7f3ec] text-slate-600">Subtotal</th>
+            </tr>
+            </thead>
+
+            <tbody class="divide-y divide-[#e7f3ec] text-slate-600 font-medium">
+            <tr class="hover:bg-[#f0fdf4] transition-colors">
+              <td class="p-4 font-bold text-[#0e1b13] border-r border-[#e7f3ec] sticky left-0 bg-white z-10">Pre Kindergarten</td>
+              <td class="p-3 text-center border-r border-[#e7f3ec]">2,850.00</td>
+              <td class="p-3 text-center border-r border-[#e7f3ec] font-bold text-emerald-600">5,700.00</td>
+              <td class="p-3 text-center border-r border-[#e7f3ec]">300.00</td>
+              <td class="p-3 text-center border-r border-[#e7f3ec] text-slate-400">-</td>
+              <td class="p-3 text-center border-r border-[#e7f3ec] text-slate-400">-</td>
+              <td class="p-3 text-center border-r border-[#e7f3ec]">300.00</td>
+              <td class="p-3 text-center border-r border-[#e7f3ec] font-bold text-amber-500">3,150.00</td>
+              <td class="p-3 text-center border-r border-[#e7f3ec] font-bold text-amber-500">6,300.00</td>
+              <td class="p-3 text-center border-r border-[#e7f3ec]">250.00</td>
+              <td class="p-3 text-center">250.00</td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-white border-l-8 border-amber-400 rounded-r-3xl p-8 shadow-lg animate-fade-in-up delay-200">
+      <h3 class="text-xl font-bold text-[#0e1b13] mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-amber-500">warning</span>
+        Important Notes
+      </h3>
+      <ol class="list-decimal list-outside pl-5 space-y-3 text-sm text-slate-600 font-medium">
+        <li>The academic year is structured into two semesters.</li>
+        <li class="font-bold text-red-500">Please be advised that all fees paid are strictly non-refundable.</li>
+      </ol>
+    </section>
+
+  </main>
+  <app-footer></app-footer>
+</div>

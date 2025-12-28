@@ -1,0 +1,38 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f0f2f5;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.error-alert {
+  color: red;
+  background-color: #ffebee;
+  padding: 10px;
+  margin-bottom: 15px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.button-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.footer-link {
+  text-align: center;
+  padding: 15px;
+}

@@ -1,0 +1,209 @@
+<div class="flex flex-col h-full bg-[#f8fcfa] font-display text-slate-800 overflow-hidden relative">
+
+  <div *ngIf="showExportConfirm" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/30 backdrop-blur-sm p-6 animate-fade-in">
+    <div class="bg-white w-full max-w-sm p-8 rounded-[2rem] shadow-2xl text-center space-y-6">
+      <div class="size-16 rounded-full bg-red-50 text-red-500 flex items-center justify-center mx-auto">
+        <span class="material-symbols-outlined text-3xl">picture_as_pdf</span>
+      </div>
+      <div>
+        <h4 class="text-xl font-black text-slate-900 uppercase">Confirm Export?</h4>
+      </div>
+      <div class="flex gap-3">
+        <button (click)="showExportConfirm = false" class="flex-1 py-3 bg-gray-100 text-gray-500 font-bold rounded-xl hover:bg-gray-200 transition-colors">{{ lang.text.inventory.modal.cancel }}</button>
+        <button (click)="confirmDownload()" class="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl shadow-lg hover:bg-red-600 transition-colors">Yes, Download</button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-fade-in">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 flex flex-col gap-5">
+      <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+        <h3 class="text-xl font-bold text-slate-900">{{ isEditing ? lang.text.inventory.modal.editTitle : lang.text.inventory.modal.addTitle }}</h3>
+        <button (click)="closeModal()" class="text-slate-400 hover:text-red-500"><span class="material-symbols-outlined">close</span></button>
+      </div>
+
+      <div class="flex flex-col gap-4 max-h-[70vh] overflow-y-auto px-1">
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase">{{ lang.text.inventory.headers.name }}</label>
+          <input [(ngModel)]="formData.name" type="text" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:ring-2 focus:ring-green-500 outline-none">
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="text-xs font-bold text-slate-500 uppercase">{{ lang.text.inventory.headers.category }}</label>
+            <select [(ngModel)]="formData.categorySelect" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none">
+              <option *ngFor="let cat of baseCategories" [value]="cat">{{ cat }}</option>
+              <option value="Others">Others</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-500 uppercase">{{ lang.text.inventory.headers.qty }}</label>
+            <input [(ngModel)]="formData.quantity" type="number" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none">
+          </div>
+        </div>
+        <div *ngIf="formData.categorySelect === 'Others'" class="animate-fade-in">
+          <label class="text-xs font-bold text-slate-500 uppercase">Specify Category Name</label>
+          <input [(ngModel)]="formData.customCategory" type="text" class="w-full mt-1 p-2.5 bg-blue-50 border border-blue-200 rounded-lg text-sm font-bold text-blue-800 outline-none focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase">Unit Value (RM)</label>
+          <input [(ngModel)]="formData.value" type="number" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none">
+        </div>
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase">{{ lang.text.inventory.headers.pic }}</label>
+          <input [(ngModel)]="formData.personInCharge" type="text" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none">
+        </div>
+      </div>
+
+      <div class="pt-3 border-t border-slate-100 flex justify-end gap-3">
+        <button (click)="closeModal()" class="px-4 py-2 text-sm font-bold text-slate-500 bg-slate-100 rounded-lg hover:bg-slate-200">{{ lang.text.inventory.modal.cancel }}</button>
+        <button (click)="submitForm()" class="px-4 py-2 text-sm font-bold text-white bg-[#30e87a] rounded-lg hover:bg-[#25d06b] shadow-sm shadow-green-200">
+          {{ isEditing ? lang.text.inventory.modal.save : lang.text.inventory.modal.add }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <header class="flex h-16 w-full items-center justify-between border-b border-slate-200 bg-white/80 px-6 backdrop-blur-sm sticky top-0 z-10">
+    <div class="flex items-center gap-4">
+      <button (click)="goBack()" class="size-9 flex items-center justify-center rounded-full bg-white border border-slate-200 text-slate-500 hover:bg-slate-50 hover:text-[#30e87a] transition-all shadow-sm">
+        <span class="material-symbols-outlined text-[20px]">arrow_back</span>
+      </button>
+      <div class="hidden lg:flex items-center gap-2 text-sm">
+        <a class="text-slate-500 hover:text-[#30e87a] transition-colors font-medium">{{ lang.text.sidebar.management }}</a>
+        <span class="text-slate-300">/</span>
+        <span class="font-bold text-slate-900">{{ lang.text.inventory.title }}</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <button class="relative flex size-10 items-center justify-center rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
+        <span class="material-symbols-outlined text-[20px]">notifications</span>
+        <span class="absolute right-2 top-2 size-2 rounded-full bg-red-500 ring-2 ring-white"></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
+    <div class="mx-auto max-w-7xl flex flex-col gap-8">
+
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 class="text-3xl font-black tracking-tight text-slate-900">{{ lang.text.inventory.title }}</h1>
+          <p class="text-slate-500 mt-1 font-medium text-sm">{{ lang.text.inventory.subtitle }}</p>
+        </div>
+        <div class="flex gap-3">
+          <button (click)="initiateExport()" class="group inline-flex items-center justify-center gap-2 rounded-xl bg-white border border-slate-200 px-5 py-3 text-sm font-bold text-slate-600 transition-all hover:bg-red-50 hover:text-red-500 hover:border-red-100 shadow-sm">
+            <span class="material-symbols-outlined text-[20px]">picture_as_pdf</span>
+            <span>{{ lang.text.inventory.export }}</span>
+          </button>
+          <button (click)="openAddModal()" class="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#30e87a] px-5 py-3 text-sm font-black text-slate-900 transition-all hover:bg-[#25d06b] active:scale-95 shadow-md shadow-green-200">
+            <span class="material-symbols-outlined text-[20px]">add</span>
+            <span>{{ lang.text.inventory.addNew }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div class="flex flex-col gap-1 rounded-2xl bg-white p-6 shadow-sm border border-slate-100">
+          <div class="flex items-center gap-3 text-slate-500">
+            <span class="material-symbols-outlined">inventory_2</span><span class="text-sm font-bold uppercase tracking-wide">{{ lang.text.inventory.totalItems }}</span>
+          </div>
+          <div class="flex items-end justify-between">
+            <p class="text-3xl font-black text-slate-900">{{ totalAssetsCount }}</p>
+            <div class="flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-bold text-green-700"><span class="material-symbols-outlined text-[14px]">trending_up</span><span>+12%</span></div>
+          </div>
+        </div>
+        <div class="flex flex-col gap-1 rounded-2xl bg-white p-6 shadow-sm border border-slate-100">
+          <div class="flex items-center gap-3 text-slate-500">
+            <span class="material-symbols-outlined text-orange-500">warning</span><span class="text-sm font-bold uppercase tracking-wide">{{ lang.text.inventory.lowStock }}</span>
+          </div>
+          <div class="flex items-end justify-between">
+            <p class="text-3xl font-black text-slate-900">{{ lowStockCount }}</p>
+            <div *ngIf="lowStockCount > 0" class="flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700"><span class="material-symbols-outlined text-[14px]">priority_high</span><span>{{ lang.text.inventory.actionNeeded }}</span></div>
+          </div>
+        </div>
+        <div class="flex flex-col gap-1 rounded-2xl bg-white p-6 shadow-sm border border-slate-100">
+          <div class="flex items-center gap-3 text-slate-500">
+            <span class="material-symbols-outlined text-blue-500">attach_money</span><span class="text-sm font-bold uppercase tracking-wide">{{ lang.text.inventory.totalValue }}</span>
+          </div>
+          <div class="flex items-end justify-between">
+            <p class="text-3xl font-black text-slate-900">RM {{ totalValue | number }}</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ lang.text.inventory.estimated }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-col rounded-2xl bg-white shadow-sm border border-slate-100 overflow-hidden">
+        <div class="flex flex-col gap-4 border-b border-slate-100 p-5 lg:flex-row lg:items-center lg:justify-between">
+          <div class="relative w-full max-w-md group">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <span class="material-symbols-outlined text-slate-400 group-focus-within:text-[#30e87a] transition-colors">search</span>
+            </div>
+            <input [(ngModel)]="searchTerm" (keyup)="filterAssets()" class="block w-full rounded-xl border-0 bg-slate-50 py-3 pl-10 pr-4 text-slate-900 ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-[#30e87a] font-medium transition-all" [placeholder]="lang.text.inventory.searchPlaceholder" type="text"/>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="relative">
+              <select [(ngModel)]="selectedFilter" (change)="filterAssets()" class="appearance-none cursor-pointer rounded-xl bg-white py-2.5 pl-4 pr-10 text-sm font-bold text-slate-600 ring-1 ring-inset ring-slate-200 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-[#30e87a]">
+                <option *ngFor="let option of filterOptions" [value]="option">{{ option }}</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500"><span class="material-symbols-outlined text-[20px]">expand_more</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-sm text-slate-600">
+            <thead class="bg-slate-50/80 text-[10px] uppercase font-black tracking-widest text-slate-400 border-b border-slate-100">
+            <tr>
+              <th class="px-6 py-4">{{ lang.text.inventory.headers.name }}</th>
+              <th class="px-6 py-4">{{ lang.text.inventory.headers.category }}</th>
+              <th class="px-6 py-4 text-center">{{ lang.text.inventory.headers.qty }}</th>
+              <th class="px-6 py-4">{{ lang.text.inventory.headers.status }}</th>
+              <th class="px-6 py-4">{{ lang.text.inventory.headers.pic }}</th>
+              <th class="px-6 py-4 text-right">{{ lang.text.inventory.headers.actions }}</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+            <tr *ngFor="let item of filteredAssets" class="group hover:bg-green-50/30 transition-colors">
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-4">
+                  <div class="flex size-11 shrink-0 items-center justify-center rounded-xl {{item.color}}"><span class="material-symbols-outlined">{{ item.icon }}</span></div>
+                  <div class="flex flex-col"><span class="font-bold text-slate-800">{{ item.name }}</span><span class="text-[10px] font-mono text-slate-400 mt-0.5">ID: {{ item.id }}</span></div>
+                </div>
+              </td>
+              <td class="px-6 py-4"><span class="inline-flex items-center rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-600">{{ item.category }}</span></td>
+              <td class="px-6 py-4 text-center font-black text-slate-800">{{ item.quantity }}</td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                  <span class="size-2.5 rounded-full" [ngClass]="{'bg-emerald-500': item.status === 'In Stock', 'bg-red-500 animate-pulse': item.status !== 'In Stock'}"></span>
+                  <span class="font-bold text-xs" [ngClass]="{'text-emerald-700': item.status === 'In Stock', 'text-red-600': item.status !== 'In Stock'}">{{ item.status }}</span>
+                </div>
+              </td>
+              <td class="px-6 py-4">
+                <div class="flex items-center gap-2">
+                  <div class="size-7 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px] font-black border border-indigo-200">{{ item.picInitials }}</div>
+                  <span class="font-medium text-xs">{{ item.personInCharge }}</span>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <div class="flex justify-end gap-2">
+                  <button (click)="openEditModal(item)" class="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-[#30e87a] hover:bg-emerald-50 transition-colors"><span class="material-symbols-outlined text-[18px]">edit</span></button>
+                  <button (click)="deleteAsset(item.id)" class="size-8 flex items-center justify-center rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors"><span class="material-symbols-outlined text-[18px]">delete</span></button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="filteredAssets.length === 0">
+              <td class="px-6 py-16 text-center" colspan="6">
+                <div class="flex flex-col items-center justify-center gap-3">
+                  <div class="flex size-14 items-center justify-center rounded-full bg-slate-50 text-slate-300"><span class="material-symbols-outlined text-3xl">search_off</span></div>
+                  <h3 class="text-sm font-bold text-slate-900">{{ lang.text.inventory.empty }}</h3>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

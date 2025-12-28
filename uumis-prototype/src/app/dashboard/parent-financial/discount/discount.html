@@ -1,0 +1,89 @@
+<div class="flex h-screen bg-[#f8fcfa] font-display text-[#0e1b13] overflow-hidden relative">
+
+  <div *ngIf="showPreviewModal" class="fixed inset-0 z-[120] flex items-center justify-center bg-black/80 backdrop-blur-sm p-6 animate-fade-in" (click)="closePreview()">
+    <div class="bg-transparent w-full max-w-4xl h-[85vh] flex flex-col items-center justify-center relative" (click)="$event.stopPropagation()">
+
+      <button (click)="closePreview()" class="absolute -top-12 right-0 text-white hover:text-gray-300 transition-colors flex items-center gap-2">
+        <span class="text-sm font-bold uppercase tracking-widest">Close Preview</span>
+        <span class="material-symbols-outlined text-3xl">close</span>
+      </button>
+
+      <div class="w-full h-full bg-white rounded-xl overflow-hidden shadow-2xl flex items-center justify-center">
+        <img *ngIf="previewType === 'image'" [src]="previewContent" class="w-full h-full object-contain">
+        <iframe *ngIf="previewType === 'pdf'" [src]="previewContent" class="w-full h-full border-none"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+
+    <header class="h-24 shrink-0 border-b border-[#e7f3ec] bg-white/80 backdrop-blur-md px-10 flex items-center gap-5 z-10 sticky top-0">
+      <button (click)="goBack()" class="size-10 flex-none flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:bg-emerald-50 hover:text-emerald-600 hover:border-emerald-200 transition-all shadow-sm">
+        <span class="material-symbols-outlined text-xl">arrow_back</span>
+      </button>
+      <div>
+        <h1 class="text-3xl font-black text-[#0e1b13] tracking-tight">Discount & Promotions</h1>
+        <p class="text-sm text-[#4e976b] font-medium mt-1">Exclusive benefits and offers for you.</p>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto p-10">
+
+      <div *ngIf="activeDiscounts.length === 0" class="h-96 flex flex-col items-center justify-center border-3 border-dashed border-gray-200 rounded-[3rem] bg-gray-50/50 text-gray-400">
+        <span class="material-symbols-outlined text-6xl mb-4 opacity-50">sell</span>
+        <p class="text-lg font-bold">No discounts available right now.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+        <div *ngFor="let item of activeDiscounts" class="bg-white rounded-[2.5rem] border border-[#e7f3ec] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group relative">
+
+          <div class="h-[400px] w-full bg-gray-100 relative overflow-hidden flex items-center justify-center">
+
+            <img *ngIf="item.fileType === 'image' && item.fileUrl" [src]="item.fileUrl" alt="Discount Cover" class="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105">
+
+            <div *ngIf="item.fileType === 'pdf'" class="w-full h-full flex flex-col items-center justify-center bg-red-50 text-red-400 group-hover:bg-red-100 transition-colors">
+              <span class="material-symbols-outlined text-8xl">picture_as_pdf</span>
+              <p class="text-sm font-bold mt-4 uppercase tracking-wider">PDF Document</p>
+            </div>
+
+            <div class="absolute top-5 right-5 px-4 py-2 rounded-full text-[11px] font-black uppercase tracking-widest shadow-sm backdrop-blur-md bg-emerald-500/90 text-white">
+              {{ item.status }}
+            </div>
+          </div>
+
+          <div class="p-8 flex flex-col flex-1 border-t border-gray-100">
+
+            <div class="flex items-center gap-2 mb-4">
+              <span class="material-symbols-outlined text-emerald-500 text-lg">date_range</span>
+              <p class="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-lg font-mono">
+                {{ item.startDate }} <span class="text-emerald-300 mx-1">to</span> {{ item.endDate }}
+              </p>
+            </div>
+
+            <h3 class="text-xl font-black text-[#0e1b13] leading-tight mb-3 line-clamp-2">{{ item.title }}</h3>
+            <p class="text-sm text-gray-500 font-medium leading-relaxed mb-8 flex-1 line-clamp-4">
+              {{ item.description || 'No description provided.' }}
+            </p>
+
+            <div class="flex items-center justify-between pt-6 border-t border-gray-100">
+
+              <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Actions</span>
+
+              <div class="flex items-center gap-3">
+                <button (click)="openPreview(item)" [class.opacity-50]="!item.fileUrl" class="h-10 px-5 rounded-full bg-blue-50 text-blue-600 hover:bg-blue-500 hover:text-white transition-all shadow-sm flex items-center gap-2 font-bold text-xs uppercase tracking-wide" title="Preview">
+                  <span class="material-symbols-outlined text-[18px]">visibility</span> View
+                </button>
+
+                <button (click)="downloadFlyer(item)" [class.opacity-50]="!item.fileUrl" class="h-10 px-5 rounded-full bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all shadow-sm flex items-center gap-2 font-bold text-xs uppercase tracking-wide" title="Download">
+                  <span class="material-symbols-outlined text-[18px]">download</span> Download
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

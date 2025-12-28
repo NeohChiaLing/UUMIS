@@ -1,0 +1,79 @@
+<div class="flex h-screen bg-[#f8fcfa] font-display text-[#0e1b13] overflow-hidden relative">
+
+  <section class="w-64 flex-none border-r border-[#e7f3ec] bg-white flex flex-col h-full overflow-hidden">
+    <div class="p-5 border-b border-[#e7f3ec] flex items-center gap-3">
+      <button (click)="goBack()" class="size-8 flex-none flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:bg-emerald-50 hover:text-emerald-600 transition-all shadow-sm">
+        <span class="material-symbols-outlined text-lg">arrow_back</span>
+      </button>
+      <div><h2 class="text-[#0e1b13] text-lg font-bold leading-tight">Payments</h2><p class="text-[#4e976b] text-[10px]">Fee Management</p></div>
+    </div>
+    <div class="p-4">
+      <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
+        <p class="text-[10px] font-black text-[#4e976b] uppercase tracking-widest mb-1">Total Outstanding</p>
+        <p class="text-3xl font-black text-[#0e1b13]">RM {{ totalOutstanding | number:'1.2-2' }}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="flex-1 flex flex-col h-full overflow-hidden bg-[#f8fcfa] p-8 gap-8">
+
+    <div class="bg-white p-8 rounded-[2.5rem] border border-[#e7f3ec] shadow-sm flex flex-col md:flex-row gap-8 items-start">
+      <div class="flex-1 space-y-2">
+        <div class="flex items-center gap-3">
+          <div class="size-10 rounded-full bg-[#30e87a] text-[#0e1b13] flex items-center justify-center"><span class="material-symbols-outlined">upload_file</span></div>
+          <h3 class="text-xl font-black text-[#0e1b13] uppercase">Upload Payment Proof</h3>
+        </div>
+        <p class="text-sm text-gray-500 font-bold leading-relaxed">Please upload your bank transfer receipt here. The status will be updated once the admin verifies the transaction.</p>
+      </div>
+
+      <div class="flex-1 w-full space-y-4 bg-[#f8fcfa] p-6 rounded-[2rem] border border-[#e7f3ec]">
+        <div class="grid grid-cols-2 gap-4">
+          <div><label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Amount Paid (RM)</label><input type="number" [(ngModel)]="uploadData.amount" class="w-full mt-1 p-3 bg-white border border-gray-100 rounded-xl text-lg font-black text-[#0e1b13] outline-none focus:ring-2 focus:ring-[#30e87a]"></div>
+          <div><label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Payment Date</label><input type="date" [(ngModel)]="uploadData.date" class="w-full mt-1 p-3.5 bg-white border border-gray-100 rounded-xl text-xs font-bold text-[#0e1b13]"></div>
+        </div>
+        <div (click)="receiptInput.click()" class="w-full border-2 border-dashed border-gray-200 rounded-xl p-4 flex items-center justify-center gap-3 cursor-pointer hover:bg-white hover:border-[#30e87a] transition-all">
+          <span class="material-symbols-outlined text-gray-400">attach_file</span>
+          <span class="text-xs font-bold text-gray-500">{{ uploadData.fileName || 'Click to select Receipt PDF/Image' }}</span>
+          <input #receiptInput type="file" class="hidden" (change)="onFileSelect($event)" accept=".pdf,.jpg,.png">
+        </div>
+        <button (click)="submitPaymentProof()" class="w-full py-3 bg-[#0e1b13] text-white font-black rounded-xl uppercase text-xs tracking-widest shadow-lg hover:scale-[1.02] transition-transform">Submit Payment</button>
+      </div>
+    </div>
+
+    <div class="flex-1 bg-white border border-[#e7f3ec] rounded-[2.5rem] shadow-sm flex flex-col overflow-hidden">
+      <div class="p-6 border-b border-[#e7f3ec] flex justify-between items-center bg-white">
+        <h3 class="text-lg font-black text-[#0e1b13] uppercase flex items-center gap-2"><span class="material-symbols-outlined text-gray-300">history</span> Payment History</h3>
+      </div>
+
+      <div class="flex-1 overflow-auto p-0">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-[#f8fcfa] sticky top-0 z-10">
+          <tr class="border-b border-[#e7f3ec]">
+            <th class="p-5 pl-8 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Date</th>
+            <th class="p-5 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Description</th>
+            <th class="p-5 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Amount</th>
+            <th class="p-5 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Status</th>
+            <th class="p-5 pr-8 text-[10px] font-black text-[#4e976b] uppercase tracking-widest text-right">Receipt</th>
+          </tr>
+          </thead>
+          <tbody class="divide-y divide-[#e7f3ec]">
+          <tr *ngFor="let txn of transactions" class="group hover:bg-gray-50">
+            <td class="p-5 pl-8 text-sm font-bold text-[#0e1b13]">{{ txn.date }}</td>
+            <td class="p-5 text-sm font-bold text-gray-500">{{ txn.desc }}</td>
+            <td class="p-5 text-sm font-black text-[#0e1b13]">RM {{ txn.amount | number:'1.2-2' }}</td>
+            <td class="p-5">
+              <span [ngClass]="{'bg-green-100 text-green-700': txn.status==='Completed', 'bg-orange-100 text-orange-700': txn.status==='Pending', 'bg-red-100 text-red-700': txn.status==='Rejected'}" class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide">{{ txn.status }}</span>
+            </td>
+            <td class="p-5 pr-8 text-right">
+              <button *ngIf="txn.receiptUrl" (click)="downloadReceipt(txn)" class="size-8 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-500 hover:text-white transition-all inline-flex items-center justify-center">
+                <span class="material-symbols-outlined text-sm">download</span>
+              </button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </section>
+</div>

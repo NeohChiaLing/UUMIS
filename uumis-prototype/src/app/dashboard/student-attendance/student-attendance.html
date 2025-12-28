@@ -1,0 +1,43 @@
+<div class="min-h-screen bg-[#f0fdf4] font-display text-slate-800 p-6 lg:p-10">
+
+  <div class="max-w-5xl mx-auto space-y-8">
+    <div class="flex justify-between items-center">
+      <div class="flex items-center gap-5">
+        <button (click)="goBack()" class="size-11 flex items-center justify-center rounded-full bg-white border border-emerald-100 text-slate-400 hover:text-emerald-500 shadow-sm transition-all">
+          <span class="material-symbols-outlined">arrow_back</span>
+        </button>
+        <div>
+          <h1 class="text-3xl font-black uppercase tracking-tight text-emerald-900">My <span class="text-emerald-500">Attendance</span></h1>
+          <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Presence Log</p>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <div class="px-4 py-2 bg-green-100 text-green-700 rounded-xl text-xs font-black uppercase">Present: 92%</div>
+        <div class="px-4 py-2 bg-red-100 text-red-700 rounded-xl text-xs font-black uppercase">Absent: 3 Days</div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-[2.5rem] border border-emerald-100 overflow-hidden shadow-xl shadow-emerald-500/5">
+      <div class="grid grid-cols-1 divide-y divide-emerald-50">
+        <div *ngFor="let r of attendanceRecords" class="p-6 flex items-center justify-between hover:bg-emerald-50/20 transition-colors">
+          <div class="flex items-center gap-4">
+            <div class="size-12 rounded-2xl flex items-center justify-center text-xl font-bold bg-slate-50 text-slate-400 border border-slate-100">
+              {{r.date.split('-')[2]}}
+            </div>
+            <div>
+              <h4 class="font-bold text-slate-800">{{r.subject}}</h4>
+              <p class="text-xs text-slate-400 font-bold uppercase">{{r.date}}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-6">
+            <span class="text-sm font-mono font-bold text-slate-500">{{r.time}}</span>
+            <span [ngClass]="{'bg-green-100 text-green-700': r.status === 'Present', 'bg-red-100 text-red-700': r.status === 'Absent', 'bg-orange-100 text-orange-700': r.status === 'Late'}"
+                  class="px-4 py-1.5 rounded-lg text-[10px] font-black uppercase min-w-[80px] text-center">
+              {{r.status}}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
