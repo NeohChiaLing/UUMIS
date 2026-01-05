@@ -13,13 +13,13 @@
       <div class="relative z-10 flex flex-col items-center gap-8 max-w-3xl mx-auto animate-fade-in-up">
         <div class="flex flex-col gap-4 items-center">
           <span class="inline-block px-4 py-1.5 rounded-full bg-white/80 border border-white/50 text-[#0e1b13] text-xs font-black uppercase tracking-wider w-fit shadow-sm">
-            Welcome to UUM International School
+            {{ pageData.hero.tagline }}
           </span>
           <h1 class="text-5xl sm:text-6xl md:text-7xl font-black leading-tight tracking-tight text-[#0e1b13]">
-            Shaping Future <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#30e87a] to-emerald-600">Global Leaders</span>
+            {{ pageData.hero.titlePart1 }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#30e87a] to-emerald-600">{{ pageData.hero.titlePart2 }}</span>
           </h1>
           <p class="text-slate-700 text-lg sm:text-xl font-medium max-w-2xl mx-auto leading-relaxed">
-            Providing a nurturing environment where students thrive academically and develop into well-rounded individuals within the serene UUM campus.
+            {{ pageData.hero.description }}
           </p>
         </div>
 
@@ -35,41 +35,6 @@
       </div>
     </div>
 
-    <section>
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <a routerLink="/admin-dashboard" class="group relative flex flex-col items-center justify-center gap-4 p-6 rounded-[2rem] bg-white border border-[#e7f3ec] hover:border-[#30e87a] transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer">
-          <div class="size-14 rounded-full bg-[#f0fdf4] flex items-center justify-center text-[#30e87a] group-hover:bg-[#30e87a] group-hover:text-white transition-colors">
-            <span class="material-symbols-outlined text-3xl">admin_panel_settings</span>
-          </div>
-          <span class="font-bold text-[#0e1b13]">Admin Portal</span>
-        </a>
-        <a routerLink="/staff-dashboard" class="group relative flex flex-col items-center justify-center gap-4 p-6 rounded-[2rem] bg-white border border-[#e7f3ec] hover:border-[#30e87a] transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer">
-          <div class="size-14 rounded-full bg-[#f0fdf4] flex items-center justify-center text-[#30e87a] group-hover:bg-[#30e87a] group-hover:text-white transition-colors">
-            <span class="material-symbols-outlined text-3xl">badge</span>
-          </div>
-          <span class="font-bold text-[#0e1b13]">Staff Login</span>
-        </a>
-        <a routerLink="/teacher-dashboard" class="group relative flex flex-col items-center justify-center gap-4 p-6 rounded-[2rem] bg-white border border-[#e7f3ec] hover:border-[#30e87a] transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer">
-          <div class="size-14 rounded-full bg-[#f0fdf4] flex items-center justify-center text-[#30e87a] group-hover:bg-[#30e87a] group-hover:text-white transition-colors">
-            <span class="material-symbols-outlined text-3xl">school</span>
-          </div>
-          <span class="font-bold text-[#0e1b13]">Teacher Zone</span>
-        </a>
-        <a routerLink="/portal-dashboard" class="group relative flex flex-col items-center justify-center gap-4 p-6 rounded-[2rem] bg-white border border-[#e7f3ec] hover:border-[#30e87a] transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer">
-          <div class="size-14 rounded-full bg-[#f0fdf4] flex items-center justify-center text-[#30e87a] group-hover:bg-[#30e87a] group-hover:text-white transition-colors">
-            <span class="material-symbols-outlined text-3xl">backpack</span>
-          </div>
-          <span class="font-bold text-[#0e1b13]">Student Hub</span>
-        </a>
-        <a routerLink="/portal-dashboard" class="group relative col-span-2 md:col-span-1 flex flex-col items-center justify-center gap-4 p-6 rounded-[2rem] bg-white border border-[#e7f3ec] hover:border-[#30e87a] transition-all hover:-translate-y-1 hover:shadow-xl cursor-pointer">
-          <div class="size-14 rounded-full bg-[#f0fdf4] flex items-center justify-center text-[#30e87a] group-hover:bg-[#30e87a] group-hover:text-white transition-colors">
-            <span class="material-symbols-outlined text-3xl">family_restroom</span>
-          </div>
-          <span class="font-bold text-[#0e1b13]">Parent Portal</span>
-        </a>
-      </div>
-    </section>
-
     <section class="rounded-[2.5rem] bg-white border border-[#e7f3ec] overflow-hidden shadow-xl">
       <div class="grid lg:grid-cols-2">
         <div class="p-8 sm:p-12 flex flex-col justify-center gap-6 order-2 lg:order-1">
@@ -78,11 +43,11 @@
             <span class="text-[#30e87a] font-black tracking-wider text-xs uppercase">Virtual Campus Tour</span>
           </div>
           <h2 class="text-3xl sm:text-4xl font-black text-[#0e1b13] leading-tight">
-            Experience UUMIS <br/>
-            <span class="text-slate-400">Before You Arrive</span>
+            {{ pageData.videoSection.title }} <br/>
+            <span class="text-slate-400">{{ pageData.videoSection.subtitle }}</span>
           </h2>
           <p class="text-slate-500 text-lg leading-relaxed font-medium">
-            Watch our corporate video to see our Cambridge Syllabus in action, our beautiful UUM campus location, and the diverse community that makes us unique.
+            {{ pageData.videoSection.description }}
           </p>
           <button class="flex items-center gap-3 text-[#0e1b13] font-bold group w-fit mt-2">
             <div class="size-12 rounded-full bg-[#30e87a] flex items-center justify-center text-[#0e1b13] group-hover:scale-110 transition-transform shadow-lg shadow-green-200">
@@ -93,8 +58,9 @@
         </div>
 
         <div class="relative min-h-[300px] lg:min-h-full bg-slate-100 order-1 lg:order-2 h-full w-full">
-          <iframe class="absolute inset-0 w-full h-full"
-                  src="https://www.youtube.com/embed/NvSeulgXBoU?si=3cQq5Uu06bPmMfPA"
+          <iframe *ngIf="safeVideoUrl"
+                  class="absolute inset-0 w-full h-full"
+                  [src]="safeVideoUrl"
                   title="UUMIS Corporate Video"
                   frameborder="0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -117,51 +83,18 @@
 
         <div class="flex overflow-x-auto pb-4 gap-4 snap-x">
 
-          <div class="min-w-[300px] sm:min-w-[340px] flex flex-col bg-white rounded-[2rem] overflow-hidden border border-[#e7f3ec] snap-start hover:border-[#30e87a] transition-colors shadow-sm hover:shadow-md">
+          <div *ngFor="let item of pageData.announcements"
+               class="min-w-[300px] sm:min-w-[340px] flex flex-col bg-white rounded-[2rem] overflow-hidden border border-[#e7f3ec] snap-start hover:border-[#30e87a] transition-colors shadow-sm hover:shadow-md">
             <div class="h-48 bg-cover bg-center cursor-pointer hover:opacity-90 transition-opacity"
-                 style="background-image: url('/assets/MAIN-BROCHURE.jpg');"
-                 (click)="openImage('/assets/MAIN-BROCHURE.jpg')">
+                 [style.background-image]="'url(' + item.image + ')'"
+                 (click)="openImage(item.image)">
             </div>
             <div class="p-6 flex flex-col flex-1">
-              <span class="px-2.5 py-0.5 rounded-md bg-[#f0fdf4] text-[#30e87a] text-[10px] font-black uppercase w-fit mb-2">Admissions</span>
-              <h3 class="text-lg font-bold text-[#0e1b13] mb-2">2025/2026 Intakes Open</h3>
-              <p class="text-slate-500 text-sm mb-4 font-medium">Registration is now open for the August 2025 and January 2026 academic sessions.</p>
-            </div>
-          </div>
-
-          <div class="min-w-[300px] sm:min-w-[340px] flex flex-col bg-white rounded-[2rem] overflow-hidden border border-[#e7f3ec] snap-start hover:border-[#30e87a] transition-colors shadow-sm hover:shadow-md">
-            <div class="h-48 bg-cover bg-top cursor-pointer hover:opacity-90 transition-opacity"
-                 style="background-image: url('/assets/calender1.jpg');"
-                 (click)="openImage('/assets/calender1.jpg')">
-            </div>
-            <div class="p-6 flex flex-col flex-1">
-              <span class="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-500 text-[10px] font-black uppercase w-fit mb-2">Academic</span>
-              <h3 class="text-lg font-bold text-[#0e1b13] mb-2">Semester 1 Calendar</h3>
-              <p class="text-slate-500 text-sm mb-4 font-medium">View key dates for Semester 1 (August - December 2025).</p>
-            </div>
-          </div>
-
-          <div class="min-w-[300px] sm:min-w-[340px] flex flex-col bg-white rounded-[2rem] overflow-hidden border border-[#e7f3ec] snap-start hover:border-[#30e87a] transition-colors shadow-sm hover:shadow-md">
-            <div class="h-48 bg-cover bg-top cursor-pointer hover:opacity-90 transition-opacity"
-                 style="background-image: url('/assets/calender2.jpg');"
-                 (click)="openImage('/assets/calender2.jpg')">
-            </div>
-            <div class="p-6 flex flex-col flex-1">
-              <span class="px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-500 text-[10px] font-black uppercase w-fit mb-2">Academic</span>
-              <h3 class="text-lg font-bold text-[#0e1b13] mb-2">Semester 2 Calendar</h3>
-              <p class="text-slate-500 text-sm mb-4 font-medium">View key dates for Semester 2 (January - June 2026).</p>
-            </div>
-          </div>
-
-          <div class="min-w-[300px] sm:min-w-[340px] flex flex-col bg-white rounded-[2rem] overflow-hidden border border-[#e7f3ec] snap-start hover:border-[#30e87a] transition-colors shadow-sm hover:shadow-md">
-            <div class="h-48 bg-cover bg-top cursor-pointer hover:opacity-90 transition-opacity"
-                 style="background-image: url('/assets/UUMIS-PROMOTIONAL-BROCHURE.jpg');"
-                 (click)="openImage('/assets/UUMIS-PROMOTIONAL-BROCHURE.jpg')">
-            </div>
-            <div class="p-6 flex flex-col flex-1">
-              <span class="px-2.5 py-0.5 rounded-md bg-purple-50 text-purple-500 text-[10px] font-black uppercase w-fit mb-2">Highlights</span>
-              <h3 class="text-lg font-bold text-[#0e1b13] mb-2">Shaping Global Leaders</h3>
-              <p class="text-slate-500 text-sm mb-4 font-medium">Discover our holistic approach to education and Cambridge syllabus.</p>
+              <span [class]="item.styleClass" class="px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase w-fit mb-2">
+                {{ item.category }}
+              </span>
+              <h3 class="text-lg font-bold text-[#0e1b13] mb-2">{{ item.title }}</h3>
+              <p class="text-slate-500 text-sm mb-4 font-medium">{{ item.desc }}</p>
             </div>
           </div>
 
@@ -177,25 +110,15 @@
         </div>
         <div class="bg-white rounded-[2.5rem] border border-[#e7f3ec] p-2 flex flex-col gap-1 h-full shadow-sm">
 
-          <a class="flex items-center gap-4 p-4 rounded-[2rem] hover:bg-[#f0fdf4] transition-colors group cursor-pointer border border-transparent hover:border-[#30e87a]/20">
+          <a *ngFor="let event of pageData.events"
+             class="flex items-center gap-4 p-4 rounded-[2rem] hover:bg-[#f0fdf4] transition-colors group cursor-pointer border border-transparent hover:border-[#30e87a]/20">
             <div class="flex-shrink-0 w-16 h-16 bg-white rounded-2xl border border-[#e7f3ec] flex flex-col items-center justify-center text-center group-hover:border-[#30e87a] transition-colors shadow-sm">
-              <span class="text-[10px] font-black text-[#30e87a] uppercase">Aug</span>
-              <span class="text-2xl font-black text-[#0e1b13]">10</span>
+              <span class="text-[10px] font-black text-[#30e87a] uppercase">{{ event.month }}</span>
+              <span class="text-2xl font-black text-[#0e1b13]">{{ event.day }}</span>
             </div>
             <div class="flex-1 min-w-0">
-              <h4 class="text-[#0e1b13] font-bold truncate">First Day of School</h4>
-              <p class="text-slate-500 text-xs font-bold uppercase tracking-wider truncate">Semester 1 Begins</p>
-            </div>
-          </a>
-
-          <a class="flex items-center gap-4 p-4 rounded-[2rem] hover:bg-[#f0fdf4] transition-colors group cursor-pointer border border-transparent hover:border-[#30e87a]/20">
-            <div class="flex-shrink-0 w-16 h-16 bg-white rounded-2xl border border-[#e7f3ec] flex flex-col items-center justify-center text-center group-hover:border-[#30e87a] transition-colors shadow-sm">
-              <span class="text-[10px] font-black text-[#30e87a] uppercase">Aug</span>
-              <span class="text-2xl font-black text-[#0e1b13]">31</span>
-            </div>
-            <div class="flex-1 min-w-0">
-              <h4 class="text-[#0e1b13] font-bold truncate">National Day</h4>
-              <p class="text-slate-500 text-xs font-bold uppercase tracking-wider truncate">Public Holiday</p>
+              <h4 class="text-[#0e1b13] font-bold truncate">{{ event.title }}</h4>
+              <p class="text-slate-500 text-xs font-bold uppercase tracking-wider truncate">{{ event.subtitle }}</p>
             </div>
           </a>
 

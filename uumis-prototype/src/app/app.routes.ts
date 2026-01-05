@@ -54,6 +54,9 @@ import { PaymentComponent as ParentPaymentComponent } from './dashboard/parent-f
 import { RefundComponent as ParentRefundComponent } from './dashboard/parent-financial/refund/refund';
 import { WalletComponent as ParentWalletComponent } from './dashboard/parent-financial/wallet/wallet';
 import { DiscountComponent as ParentDiscountComponent } from './dashboard/parent-financial/discount/discount';
+import { UserProfileComponent } from './user-profile/user-profile';
+import { WebsiteManagementComponent } from './dashboard/admin/website-management/website-management';
+
 
 
 export const routes: Routes = [
@@ -85,6 +88,10 @@ export const routes: Routes = [
   { path: 'dashboard/admin/inventory', component: InventoryComponent, title: 'Admin - Inventory' },
   { path: 'dashboard/admin/notification', component: NotificationComponent, title: 'Admin - Notifications' },
   { path: 'dashboard/admin/settings', component: SettingsComponent, title: 'Admin - Settings' },
+  { path: 'dashboard/staff/settings', component: SettingsComponent, title: 'Staff - Settings' },
+  { path: 'dashboard/teacher/settings', component: SettingsComponent, title: 'Teacher - Settings' },
+  { path: 'dashboard/student/settings', component: SettingsComponent, title: 'Student - Settings' },
+  { path: 'dashboard/parent/settings', component: SettingsComponent, title: 'Parent - Settings' },
 
   // --- FINANCIAL ROUTES (Admin/Staff Shared) ---
   {
@@ -152,4 +159,9 @@ export const routes: Routes = [
   { path: 'dashboard/parent/grades', component: StudentGradesComponent, title: 'Child Grades' },
   { path: 'dashboard/parent/attendance', component: StudentAttendanceComponent, title: 'Child Attendance' },
   { path: 'dashboard/parent/food', component: StudentFoodComponent, title: 'Food Ordering' },
+
+  // 示例
+  // 修复：路径必须包含 'dashboard/' 以匹配按钮的 routerLink
+  { path: 'dashboard/user-profile', component: UserProfileComponent, title: 'My Profile' },
+  { path: 'dashboard/admin/website', component: WebsiteManagementComponent, title: 'Website Editor' },
 ];

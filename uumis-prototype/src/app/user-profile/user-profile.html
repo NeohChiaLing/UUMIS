@@ -1,0 +1,93 @@
+<div class="min-h-screen bg-[#f0fdf4] font-display text-slate-800 p-6 lg:p-12 overflow-y-auto">
+
+  <div class="max-w-4xl mx-auto flex justify-between items-center mb-10">
+    <div class="flex items-center gap-5">
+      <button (click)="goBack()" class="size-11 flex items-center justify-center rounded-full bg-white border border-emerald-100 text-slate-400 hover:text-emerald-500 shadow-sm transition-all">
+        <span class="material-symbols-outlined font-bold">arrow_back</span>
+      </button>
+      <div>
+        <h1 class="text-3xl font-black text-emerald-900 uppercase tracking-tight">My <span class="text-emerald-500">Profile</span></h1>
+        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em] mt-1">Manage Account Settings</p>
+      </div>
+    </div>
+
+    <button (click)="toggleEdit()"
+            [class]="isEditMode ? 'bg-orange-500 shadow-orange-200' : 'bg-emerald-500 shadow-emerald-200'"
+            class="px-8 py-3 text-white rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-lg hover:scale-105 transition-all flex items-center gap-2">
+      <span class="material-symbols-outlined text-sm">{{ isEditMode ? 'save' : 'edit_square' }}</span>
+      {{ isEditMode ? 'Save Changes' : 'Edit Profile' }}
+    </button>
+  </div>
+
+  <div class="max-w-4xl mx-auto bg-white rounded-[3rem] border border-emerald-100 shadow-xl shadow-emerald-500/5 overflow-hidden relative">
+
+    <div class="h-40 bg-gradient-to-r from-emerald-400 to-teal-500 relative">
+      <div class="absolute inset-0 bg-white/10 opacity-10"></div>
+    </div>
+    <div class="px-10 pb-10">
+
+      <div class="flex flex-col md:flex-row gap-8 items-end -mt-16 mb-8 relative z-10">
+        <div class="relative group">
+          <div (click)="triggerFileInput()"
+               [class.cursor-pointer]="isEditMode"
+               class="size-36 rounded-[2.5rem] bg-white p-1.5 shadow-2xl transition-all hover:scale-105">
+            <div class="w-full h-full rounded-[2rem] bg-emerald-50 flex items-center justify-center overflow-hidden border-2 border-white relative">
+
+              <span *ngIf="!user.avatarUrl" class="text-4xl font-black text-emerald-300 select-none">{{ user.initials }}</span>
+
+              <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" class="w-full h-full object-cover">
+
+              <div *ngIf="isEditMode" class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+                <span class="material-symbols-outlined text-white text-3xl">add_a_photo</span>
+              </div>
+            </div>
+          </div>
+          <input type="file" id="avatarInput" class="hidden" accept="image/*" (change)="onFileSelected($event)">
+        </div>
+
+        <div class="flex-1 pb-2 text-center md:text-left">
+          <h2 class="text-3xl font-black text-slate-800 uppercase">{{ user.name }}</h2>
+          <p class="text-emerald-500 font-bold text-sm uppercase tracking-wider mt-1">{{ user.role }} Account</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+        <div class="space-y-1">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
+          <input [(ngModel)]="user.name" [readonly]="!isEditMode" class="w-full bg-slate-50 border border-emerald-50 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all focus:bg-white">
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
+          <input [(ngModel)]="user.email" [readonly]="!isEditMode" class="w-full bg-slate-50 border border-emerald-50 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all focus:bg-white">
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone Number</label>
+          <input [(ngModel)]="user.phone" [readonly]="!isEditMode" class="w-full bg-slate-50 border border-emerald-50 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all focus:bg-white">
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Location</label>
+          <input [(ngModel)]="user.location" [readonly]="!isEditMode" class="w-full bg-slate-50 border border-emerald-50 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all focus:bg-white">
+        </div>
+
+        <div class="col-span-1 md:col-span-2 space-y-1">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Bio / About</label>
+          <textarea [(ngModel)]="user.bio" [readonly]="!isEditMode" rows="3" class="w-full bg-slate-50 border border-emerald-50 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all resize-none focus:bg-white"></textarea>
+        </div>
+
+      </div>
+
+      <div *ngIf="isEditMode" class="mt-10 pt-8 border-t border-slate-100 flex justify-end gap-4 animate-fade-in">
+        <button (click)="toggleEdit()" class="px-8 py-3 rounded-xl border border-slate-200 text-slate-400 font-black uppercase text-[10px] tracking-widest hover:bg-slate-50 transition-all">Cancel</button>
+        <button (click)="saveProfile()" class="px-8 py-3 rounded-xl bg-emerald-500 text-white font-black uppercase text-[10px] tracking-widest shadow-lg shadow-emerald-200 hover:bg-emerald-600 transition-all flex items-center gap-2">
+          <span class="material-symbols-outlined text-sm">check</span> Save Profile
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
