@@ -1,0 +1,73 @@
+/* 1. The @import must be the FIRST line */
+@import url('https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&family=Noto+Sans:wght@300;400;500;600;700&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap');
+
+/* 2. Tailwind Directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 3. Global Styles */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: 'Spline Sans', sans-serif;
+  background-color: #f0fdf4; /* 保持你的背景色 */
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f0fdf4;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #10b981; /* emerald-500 */
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #059669; /* emerald-600 */
+}
+/* ========================================== */
+/* NUKE GOOGLE TRANSLATE BANNER & POPUPS      */
+/* ========================================== */
+
+/* Target the banner by class, id, and tag combinations */
+.goog-te-banner-frame,
+iframe.goog-te-banner-frame,
+iframe[id^=":1.container"],
+iframe[name^="goog_"],
+.skiptranslate > iframe,
+body > .skiptranslate {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  width: 0 !important;
+}
+
+/* Force body to stay at the absolute top */
+body {
+  top: 0 !important;
+  position: static !important;
+  min-height: 100vh !important;
+}
+
+/* Hide hover popups, ratings, and tooltips */
+#goog-gt-tt,
+.goog-te-balloon-frame,
+.VIpgJd-yAWNEb-hvhzNd-aXYTce,
+div[id^="goog-gt-"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Remove yellow text highlights */
+.goog-text-highlight {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}

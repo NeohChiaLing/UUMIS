@@ -1,0 +1,91 @@
+<div class="flex flex-col h-full bg-[#f8fcfa] font-display text-slate-800 overflow-hidden relative">
+
+  <header class="flex h-20 w-full items-center justify-between border-b border-[#e7f3ec] bg-white/80 px-8 backdrop-blur-md sticky top-0 z-10 shrink-0">
+    <div class="flex items-center gap-5">
+      <button (click)="goBack()" class="size-10 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:bg-[#e7f3ec] hover:text-[#30e87a] transition-all shadow-sm">
+        <span translate="no" class="material-symbols-outlined notranslate text-[20px]">arrow_back</span>
+      </button>
+      <div>
+        <h1 class="text-2xl font-black text-[#0e1b13] tracking-tight">User Roles Management</h1>
+        <p class="text-sm text-[#4e976b] font-medium mt-0.5">Assign access levels to registered accounts.</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex-1 overflow-y-auto p-6 md:p-10 scroll-smooth">
+    <div class="max-w-6xl mx-auto flex flex-col gap-6">
+
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-5 rounded-[1.5rem] shadow-sm border border-[#e7f3ec]">
+        <div class="relative w-full md:w-96">
+          <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400"><span translate="no" class="material-symbols-outlined notranslate">search</span></span>
+          <input [(ngModel)]="searchTerm" (keyup)="filterUsers()" class="block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-sm font-bold focus:ring-2 focus:ring-[#30e87a] outline-none" placeholder="Search by name or email..." type="text"/>
+        </div>
+        <div class="flex gap-3 w-full md:w-auto">
+          <select [(ngModel)]="selectedRoleFilter" (change)="filterUsers()" class="w-full md:w-auto rounded-xl border-gray-200 bg-gray-50 text-xs font-bold uppercase py-3 px-4 focus:ring-[#30e87a] cursor-pointer outline-none border">
+            <option value="All">All Roles</option>
+            <option value="admin">Admin</option>
+            <option value="staff">Staff</option>
+            <option value="teacher">Teacher</option>
+            <option value="parent">Parent</option>
+            <option value="student">Student</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="bg-white border border-[#e7f3ec] rounded-[1.5rem] shadow-sm overflow-hidden">
+        <table class="w-full text-left text-sm text-gray-600">
+          <thead class="bg-gray-50/50 text-[10px] uppercase font-black tracking-widest text-slate-400 border-b border-[#e7f3ec]">
+          <tr>
+            <th class="px-6 py-5">User Details</th>
+            <th class="px-6 py-5">Contact Info</th>
+            <th class="px-6 py-5 text-center">Verification</th>
+            <th class="px-6 py-5 text-right">Assign Role</th>
+          </tr>
+          </thead>
+          <tbody class="divide-y divide-[#e7f3ec]">
+          <tr *ngFor="let user of filteredUsers" class="group hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4">
+              <div class="flex items-center gap-4">
+                <div class="size-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-black text-sm uppercase">
+                  {{ (user.fullName || user.username || 'U').substring(0, 2) }}
+                </div>
+                <div>
+                  <p class="font-bold text-[#0e1b13]">{{ user.fullName || user.username || 'No Name Set' }}</p>
+                  <p class="text-[10px] text-gray-400 font-mono mt-0.5 uppercase tracking-widest">@{{ user.role || 'student' }}</p>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4">
+              <p class="font-bold text-slate-700 text-xs">{{ user.email }}</p>
+              <p class="text-[10px] text-gray-400 mt-0.5">{{ user.phone || 'No phone' }}</p>
+            </td>
+            <td class="px-6 py-4 text-center">
+                <span *ngIf="user.enabled" class="inline-flex items-center gap-1 bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wide">
+                  <span translate="no" class="material-symbols-outlined notranslate text-[14px]">verified</span> Verified
+                </span>
+              <span *ngIf="!user.enabled" class="inline-flex items-center gap-1 bg-orange-100 text-orange-700 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wide">
+                  <span translate="no" class="material-symbols-outlined notranslate text-[14px]">pending</span> Pending
+                </span>
+            </td>
+            <td class="px-6 py-4 text-right">
+              <div class="flex items-center justify-end gap-2">
+                <select [value]="user.role || 'student'" (change)="changeRole(user, $event)" class="bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold uppercase tracking-wider py-2 px-3 focus:ring-2 focus:ring-[#30e87a] outline-none cursor-pointer shadow-sm">
+                  <option *ngFor="let role of availableRoles" [value]="role">{{ role }}</option>
+                </select>
+
+                <button (click)="deleteUser(user)" class="size-9 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-gray-400 hover:text-red-500 hover:bg-red-50 hover:border-red-200 transition-all shadow-sm" title="Delete User">
+                  <span translate="no" class="material-symbols-outlined notranslate text-[18px]">delete</span>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr *ngIf="filteredUsers.length === 0">
+            <td colspan="4" class="p-10 text-center text-gray-400 font-bold text-sm">No users found.</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>

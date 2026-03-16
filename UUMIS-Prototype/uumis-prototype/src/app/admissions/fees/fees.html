@@ -1,0 +1,144 @@
+<div class="min-h-screen bg-[#f8fcfa] font-display text-[#0e1b13] flex flex-col">
+  <app-navbar></app-navbar>
+
+  <main class="flex-grow w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12 relative">
+
+    <div class="fixed bottom-8 right-8 z-[90] flex flex-col items-end gap-4">
+
+      <button *ngIf="isAdmin" (click)="publishChanges()" class="bg-[#0e1b13] text-white px-6 py-3 rounded-full font-black text-sm shadow-2xl hover:bg-[#30e87a] hover:text-[#0e1b13] hover:scale-105 transition-all flex items-center gap-2 animate-fade-in-up border border-[#e7f3ec]">
+        <span translate="no" class="material-symbols-outlined notranslate text-[18px]">cloud_upload</span> Publish Changes
+      </button>
+
+      @if (showLangModal) {
+        <div class="bg-white rounded-2xl shadow-2xl border border-[#e7f3ec] p-3 w-48 animate-fade-in-up flex flex-col gap-1">
+          <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 px-3 mt-1">Select Language</h3>
+          <button (click)="switchLanguage('en')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-[#f0fdf4] hover:text-[#30e87a] font-bold text-sm transition-colors flex items-center gap-3"><span class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-black">EN</span> English</button>
+          <button (click)="switchLanguage('ms')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-[#f0fdf4] hover:text-[#30e87a] font-bold text-sm transition-colors flex items-center gap-3"><span class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-black">MS</span> Melayu</button>
+        </div>
+      }
+      <button (click)="toggleLangModal()" class="size-14 rounded-full bg-[#0e1b13] text-white flex items-center justify-center shadow-2xl hover:scale-110 hover:bg-[#30e87a] hover:text-[#0e1b13] transition-all cursor-pointer group">
+        <span translate="no" class="material-symbols-outlined notranslate text-2xl group-hover:scale-110 transition-transform">translate</span>
+      </button>
+    </div>
+
+    <div class="text-center animate-fade-in-up flex flex-col items-center justify-center w-full">
+      <span class="inline-block px-4 py-1.5 rounded-full bg-white border border-[#e7f3ec] text-[#30e87a] text-xs font-black uppercase tracking-wider mb-6 shadow-sm">Financial Information</span>
+
+      <div class="flex flex-wrap items-center justify-center gap-3 md:gap-4 w-full mb-4">
+
+        <ng-container *ngIf="isAdmin">
+          <input [(ngModel)]="pageData.titleStart" class="bg-white border-2 border-dashed border-slate-300 rounded-xl outline-none text-center font-black text-2xl md:text-4xl text-[#0e1b13] px-4 py-2 w-full max-w-[350px] focus:border-emerald-500 transition-colors shadow-sm">
+
+          <select [(ngModel)]="academicYear" class="bg-emerald-50 border-2 border-dashed border-emerald-400 rounded-xl outline-none text-center font-black text-2xl md:text-4xl text-emerald-700 px-4 py-2 w-full max-w-[350px] focus:border-emerald-600 transition-colors cursor-pointer shadow-sm appearance-none">
+            <option *ngFor="let year of availableYears" [value]="year" class="text-lg font-bold">{{ year }}</option>
+          </select>
+        </ng-container>
+
+        <ng-container *ngIf="!isAdmin">
+          <h1 class="text-3xl md:text-5xl font-black text-[#0e1b13] tracking-tight leading-tight">
+            {{ pageData.titleStart }} <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#30e87a] to-emerald-600">{{ academicYear }}</span>
+          </h1>
+        </ng-container>
+      </div>
+
+      <p *ngIf="!isAdmin" class="text-slate-500 font-medium max-w-2xl mx-auto">{{ pageData.desc }}</p>
+      <textarea *ngIf="isAdmin" [(ngModel)]="pageData.desc" class="w-full max-w-2xl mx-auto bg-white border-2 border-dashed border-slate-300 rounded-xl p-3 text-slate-600 text-center font-medium outline-none focus:border-emerald-500 shadow-sm resize-none" rows="2"></textarea>
+    </div>
+
+    <section class="animate-fade-in-up delay-100 relative group">
+      <button *ngIf="isAdmin" (click)="addRow()" class="absolute -top-10 right-0 z-50 bg-[#0e1b13] text-white px-4 py-2 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-[#30e87a] hover:text-[#0e1b13] transition-colors shadow-md">
+        <span translate="no" class="material-symbols-outlined text-[16px] notranslate">add</span> Add Fee Row
+      </button>
+
+      <div class="bg-white border border-[#e7f3ec] rounded-[2rem] shadow-xl overflow-x-auto relative">
+        <table class="w-full text-xs md:text-sm text-left border-collapse min-w-[1200px]">
+          <thead class="bg-slate-50 text-[#0e1b13] uppercase tracking-wider font-bold">
+          <tr>
+            <th rowspan="2" class="p-4 border-r border-[#e7f3ec] font-black text-[#30e87a] sticky left-0 bg-slate-50 z-20">Grade Level</th>
+            <th colspan="2" class="p-3 text-center border-r border-[#e7f3ec] border-b border-[#e7f3ec] bg-emerald-50">School Fees</th>
+            <th colspan="4" class="p-3 text-center border-r border-[#e7f3ec] border-b border-[#e7f3ec] bg-sky-50">Academic Related Fees</th>
+            <th rowspan="2" class="p-3 text-center border-r border-[#e7f3ec] font-black text-amber-500">Total Fee<br>Semester</th>
+            <th rowspan="2" class="p-3 text-center border-r border-[#e7f3ec] font-black text-amber-500">Total Fee<br>Year</th>
+            <th rowspan="2" class="p-3 text-center border-r border-[#e7f3ec] text-slate-500">*Admission Fee</th>
+            <th rowspan="2" class="p-3 text-center text-slate-500">**Uniform Fee</th>
+            <th *ngIf="isAdmin" rowspan="2" class="p-3 text-center text-red-500">Actions</th>
+          </tr>
+          <tr>
+            <th class="p-3 text-center border-r border-b border-[#e7f3ec] text-slate-600">Semester Fee</th>
+            <th class="p-3 text-center border-r border-b border-[#e7f3ec] text-slate-600 font-bold">Yearly Fee</th>
+            <th class="p-3 text-center border-r border-b border-[#e7f3ec] text-slate-600">Material Fee</th>
+            <th class="p-3 text-center border-r border-b border-[#e7f3ec] text-slate-600">Tech Fee</th>
+            <th class="p-3 text-center border-r border-b border-[#e7f3ec] text-slate-600">Science Fee</th>
+            <th class="p-3 text-center border-r border-b border-[#e7f3ec] text-slate-600">Subtotal</th>
+          </tr>
+          </thead>
+
+          <tbody class="divide-y divide-[#e7f3ec] text-slate-600 font-medium">
+          <tr *ngFor="let row of feeRows; let i = index" class="hover:bg-[#f0fdf4] transition-colors group/row">
+            <td class="p-4 font-bold text-[#0e1b13] border-r border-[#e7f3ec] sticky left-0 bg-white group-hover/row:bg-[#f0fdf4] z-10">
+              <input *ngIf="isAdmin" [(ngModel)]="row.grade" class="bg-transparent border-b border-dashed border-emerald-300 outline-none w-full text-emerald-800 font-bold">
+              <span *ngIf="!isAdmin">{{ row.grade }}</span>
+            </td>
+            <td class="p-3 text-center border-r border-[#e7f3ec]">
+              <input *ngIf="isAdmin" [(ngModel)]="row.semFee" class="bg-transparent border-b border-dashed border-slate-300 w-16 text-center outline-none"><span *ngIf="!isAdmin">{{ row.semFee }}</span>
+            </td>
+            <td class="p-3 text-center border-r border-[#e7f3ec] font-bold text-emerald-600">
+              <input *ngIf="isAdmin" [(ngModel)]="row.yearFee" class="bg-transparent border-b border-dashed border-emerald-300 w-20 text-center outline-none"><span *ngIf="!isAdmin">{{ row.yearFee }}</span>
+            </td>
+            <td class="p-3 text-center border-r border-[#e7f3ec]">
+              <input *ngIf="isAdmin" [(ngModel)]="row.matFee" class="bg-transparent border-b border-dashed border-slate-300 w-16 text-center outline-none"><span *ngIf="!isAdmin">{{ row.matFee }}</span>
+            </td>
+            <td class="p-3 text-center border-r border-[#e7f3ec] text-slate-400">
+              <input *ngIf="isAdmin" [(ngModel)]="row.techFee" class="bg-transparent border-b border-dashed border-slate-300 w-16 text-center outline-none"><span *ngIf="!isAdmin">{{ row.techFee }}</span>
+            </td>
+            <td class="p-3 text-center border-r border-[#e7f3ec] text-slate-400">
+              <input *ngIf="isAdmin" [(ngModel)]="row.sciFee" class="bg-transparent border-b border-dashed border-slate-300 w-16 text-center outline-none"><span *ngIf="!isAdmin">{{ row.sciFee }}</span>
+            </td>
+            <td class="p-3 text-center border-r border-[#e7f3ec]">
+              <input *ngIf="isAdmin" [(ngModel)]="row.sub" class="bg-transparent border-b border-dashed border-slate-300 w-16 text-center outline-none"><span *ngIf="!isAdmin">{{ row.sub }}</span>
+            </td>
+            <td class="p-3 text-center border-r border-[#e7f3ec] font-bold text-amber-500">
+              <input *ngIf="isAdmin" [(ngModel)]="row.totSem" class="bg-transparent border-b border-dashed border-amber-300 w-20 text-center outline-none text-amber-600"><span *ngIf="!isAdmin">{{ row.totSem }}</span>
+            </td>
+            <td class="p-3 text-center border-r border-[#e7f3ec] font-bold text-amber-500">
+              <input *ngIf="isAdmin" [(ngModel)]="row.totYear" class="bg-transparent border-b border-dashed border-amber-300 w-20 text-center outline-none text-amber-600"><span *ngIf="!isAdmin">{{ row.totYear }}</span>
+            </td>
+            <td class="p-3 text-center border-r border-[#e7f3ec]">
+              <input *ngIf="isAdmin" [(ngModel)]="row.admFee" class="bg-transparent border-b border-dashed border-slate-300 w-16 text-center outline-none"><span *ngIf="!isAdmin">{{ row.admFee }}</span>
+            </td>
+            <td class="p-3 text-center">
+              <input *ngIf="isAdmin" [(ngModel)]="row.uniFee" class="bg-transparent border-b border-dashed border-slate-300 w-16 text-center outline-none"><span *ngIf="!isAdmin">{{ row.uniFee }}</span>
+            </td>
+            <td *ngIf="isAdmin" class="p-3 text-center">
+              <button (click)="removeRow(i)" class="text-red-500 hover:text-red-700 bg-red-50 p-1 rounded-lg"><span translate="no" class="material-symbols-outlined text-[16px] notranslate">delete</span></button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="bg-white border-l-8 border-amber-400 rounded-r-3xl p-8 shadow-lg animate-fade-in-up delay-200 relative">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-[#0e1b13] flex items-center gap-2">
+          <span translate="no" class="material-symbols-outlined notranslate text-amber-500">warning</span> Important Notes
+        </h3>
+        <button *ngIf="isAdmin" (click)="addNote()" class="text-xs bg-amber-100 text-amber-700 px-3 py-1.5 rounded-lg font-bold hover:bg-amber-200">+ Add Note</button>
+      </div>
+
+      <ol class="list-decimal list-outside pl-5 space-y-3 text-sm text-slate-600 font-medium">
+        <li *ngFor="let note of notes; let i = index" [class.text-red-500]="note.isRed" [class.font-bold]="note.isRed" class="relative group">
+          <input *ngIf="isAdmin" [(ngModel)]="note.text" class="w-full bg-transparent border-b border-dashed border-slate-300 outline-none p-1">
+          <span *ngIf="!isAdmin">{{ note.text }}</span>
+
+          <div *ngIf="isAdmin" class="absolute -right-2 top-0 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-white px-2 rounded shadow-sm">
+            <label class="text-[10px] flex items-center gap-1 cursor-pointer"><input type="checkbox" [(ngModel)]="note.isRed"> Red Text</label>
+            <button (click)="removeNote(i)" class="text-red-500 hover:text-red-700"><span translate="no" class="material-symbols-outlined text-[14px] notranslate">delete</span></button>
+          </div>
+        </li>
+      </ol>
+    </section>
+
+  </main>
+  <app-footer></app-footer>
+</div>
