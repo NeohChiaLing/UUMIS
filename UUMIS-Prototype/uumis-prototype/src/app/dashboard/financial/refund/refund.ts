@@ -34,7 +34,8 @@ export class RefundComponent implements OnInit {
       next: (data: any[]) => {
         this.allStudents = data.map(user => {
           const grade = user.bio || 'Unassigned - Unassigned';
-          const parts = grade.split('-');
+          // FIX: Split by space-dash-space so "Pre-Kindergarten" doesn't get broken in half!
+          const parts = grade.split(' - ');
           const yearStr = parts.length > 1 ? parts[1].trim() : 'Unassigned';
 
           return {
@@ -111,7 +112,7 @@ export class RefundComponent implements OnInit {
 
     const tableBody = this.historyRefunds.map(item => [
       item.date,
-      item.invoiceNo, // Swapped category for invoice number since parent submits invoiceNo
+      item.invoiceNo,
       item.reason,
       `RM ${item.amount.toFixed(2)}`,
       item.status

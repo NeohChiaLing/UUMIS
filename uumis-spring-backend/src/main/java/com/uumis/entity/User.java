@@ -16,7 +16,10 @@ public class User {
     @Column(name = "full_name")
     private String fullName;
 
+    // --- THIS IS THE FIX FOR THE DUPLICATE USERS ---
+    @Column(unique = true)
     private String email;
+
     private String phone;
     private String bio;
 
@@ -127,28 +130,17 @@ public class User {
     public Double getOutstandingDue() { return outstandingDue; }
     public void setOutstandingDue(Double outstandingDue) { this.outstandingDue = outstandingDue; }
 
-// ... inside User.java ...
-
     // ==========================================
     // --- NEW: PARENT-CHILD LINKING ---
     // ==========================================
-    // If user role is 'parent', this stores the database ID of their child
-    // ... inside User.java ...
-
     @Column(name = "child_user_id")
     private Integer childUserId;
 
-    // --- ADD THIS FOR OPTION 2 ---
     @Column(name = "parent_id")
     private Integer parentId;
 
-    // ... scroll down to getters/setters and add these:
     public Integer getParentId() { return parentId; }
     public void setParentId(Integer parentId) { this.parentId = parentId; }
-    // ==========================================
-    // --- GETTERS & SETTERS ---
-    // ==========================================
-    // ... existing ...
 
     public Integer getChildUserId() { return childUserId; }
     public void setChildUserId(Integer childUserId) { this.childUserId = childUserId; }
@@ -167,14 +159,32 @@ public class User {
         this.walletBalance = walletBalance;
     }
 
-
-    // Add this near your other fields in User.java
     @Column(name = "language_pref", columnDefinition = "varchar(10) default 'en'")
     private String languagePreference = "en";
 
-    // Getters and Setters
     public String getLanguagePreference() { return languagePreference; }
     public void setLanguagePreference(String languagePreference) { this.languagePreference = languagePreference; }
 
+    public String getProfileStatus() {
+        return profileStatus;
+    }
+
+    public void setProfileStatus(String profileStatus) {
+        this.profileStatus = profileStatus;
+    }
+
+    @Column(name = "profile_status", columnDefinition = "varchar(255) default 'APPROVED'")
+    private String profileStatus = "APPROVED";
+
+    public String getProfileJson() {
+        return profileJson;
+    }
+
+    public void setProfileJson(String profileJson) {
+        this.profileJson = profileJson;
+    }
+
+    @Column(name = "profile_json", columnDefinition = "LONGTEXT")
+    private String profileJson;
 
 }

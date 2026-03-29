@@ -5,3 +5,4 @@ INSERT IGNORE INTO users (email, password, role, full_name, is_enabled) VALUES (
 INSERT IGNORE INTO users (email, password, role, full_name, is_enabled) VALUES ('parent@uumis.edu.my', '123', 'PARENT', 'System Parent', 1);
 INSERT IGNORE INTO users (email, password, role, full_name, is_enabled) VALUES ('register@uumis.edu.my', '123', 'STAFF', 'Register Manager', 1);
 INSERT IGNORE INTO users (email, password, role, full_name, is_enabled) VALUES ('finance@uumis.edu.my', '123', 'STAFF', 'Financial Manager', 1);
+INSERT IGNORE INTO users (email, password, role, full_name, is_enabled) VALUES ('teacher@uumis.edu.my', '123', 'TEACHER', 'System Teacher', 1);

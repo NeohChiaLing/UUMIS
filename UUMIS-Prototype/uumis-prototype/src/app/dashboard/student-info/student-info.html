@@ -54,18 +54,28 @@
             <span *ngIf="student.status === 'Active'" class="px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-wide">Active</span>
             <span *ngIf="student.status === 'Pending'" class="px-3 py-1.5 rounded-full bg-orange-100 text-orange-700 text-[10px] font-black uppercase tracking-wide">Pending</span>
           </td>
-          <td class="p-6 pr-8 text-right flex justify-end gap-3" (click)="$event.stopPropagation()">
+          <td class="p-6 pr-8 text-right flex justify-end gap-2" (click)="$event.stopPropagation()">
 
-            <button (click)="viewStudent(student)" class="size-10 rounded-full bg-white border border-slate-100 text-slate-400 hover:text-emerald-600 hover:border-emerald-200 hover:shadow-md transition-all flex items-center justify-center" title="View Profile">
-              <span translate="no" class="material-symbols-outlined notranslate text-[20px]">visibility</span>
+            <button (click)="viewStudent(student)" class="size-8 rounded-full bg-white border border-slate-100 text-slate-400 hover:text-emerald-600 hover:border-emerald-200 hover:shadow-md transition-all flex items-center justify-center" title="View Profile">
+              <span translate="no" class="material-symbols-outlined notranslate text-[18px]">visibility</span>
             </button>
 
-            <button *ngIf="student.status === 'Pending'" (click)="approveStudent(student, $event)" class="h-10 px-4 rounded-full bg-emerald-500 text-white font-black text-[10px] uppercase tracking-widest hover:bg-emerald-600 shadow-md transition-all flex items-center gap-2">
-              <span translate="no" class="material-symbols-outlined notranslate text-[16px]">check</span> Approve
+            <button (click)="approveProfile(student, $event)"
+                    [ngClass]="student.profileStatus === 'APPROVED' ? 'bg-emerald-500 text-white border-emerald-600 shadow-md' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white'"
+                    class="h-8 px-3 rounded-full border border-emerald-200 font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-1">
+              <span translate="no" class="material-symbols-outlined notranslate text-[14px]">
+                {{ student.profileStatus === 'APPROVED' ? 'check_circle' : 'check' }}
+              </span>
+              {{ student.profileStatus === 'APPROVED' ? 'Approved' : 'Approve' }}
             </button>
 
-            <button *ngIf="student.status === 'Active'" disabled class="h-10 px-4 rounded-full bg-slate-100 text-slate-400 border border-slate-200 font-black text-[10px] uppercase tracking-widest cursor-not-allowed flex items-center gap-2">
-              <span translate="no" class="material-symbols-outlined notranslate text-[16px]">check_circle</span> Approved
+            <button (click)="rejectProfile(student, $event)"
+                    [ngClass]="student.profileStatus === 'REJECTED' ? 'bg-red-500 text-white border-red-600 shadow-md' : 'bg-red-50 text-red-600 hover:bg-red-500 hover:text-white'"
+                    class="h-8 px-3 rounded-full border border-red-200 font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-1">
+              <span translate="no" class="material-symbols-outlined notranslate text-[14px]">
+                {{ student.profileStatus === 'REJECTED' ? 'cancel' : 'close' }}
+              </span>
+              {{ student.profileStatus === 'REJECTED' ? 'Rejected' : 'Reject' }}
             </button>
 
           </td>
@@ -91,10 +101,10 @@
       <div *ngIf="!isAddingMode" class="bg-white p-5 rounded-[2rem] border border-emerald-100 shadow-sm w-full md:w-80">
         <div class="flex justify-between items-end mb-2">
           <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Profile Completion</span>
-          <span class="text-2xl font-black text-emerald-500">{{ selectedStudent.completion }}%</span>
+          <span class="text-2xl font-black text-emerald-500">{{ completionPercentage }}%</span>
         </div>
         <div class="w-full bg-emerald-50 rounded-full h-2">
-          <div class="bg-emerald-500 h-2 rounded-full" [style.width.%]="selectedStudent.completion"></div>
+          <div class="bg-emerald-500 h-2 rounded-full transition-all duration-500" [style.width.%]="completionPercentage"></div>
         </div>
       </div>
     </div>
@@ -142,7 +152,8 @@
             </span>
           </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 px-8 pb-8 pt-4">
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 px-8 pb-8 pt-4">
 
           <div class="p-5 bg-slate-50 rounded-[1.5rem] border border-slate-100">
             <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Student ID (Required)</p>
@@ -163,11 +174,6 @@
               <option value="" disabled selected>Select Year...</option>
               <option *ngFor="let yr of getYearsForLevel(selectedStudent.level)" [value]="yr">{{yr}}</option>
             </select>
-          </div>
-
-          <div class="p-5 bg-slate-50 rounded-[1.5rem] border border-slate-100 opacity-50">
-            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Homeroom Teacher</p>
-            <input type="text" disabled placeholder="Unassigned" class="font-bold text-slate-700 bg-transparent w-full outline-none placeholder:font-normal cursor-not-allowed border-b border-slate-200 pb-1">
           </div>
 
         </div>
@@ -301,6 +307,10 @@
                 <input type="tel" [(ngModel)]="selectedStudent.father.phone" class="w-full bg-white border-none rounded-xl p-3 text-sm font-bold text-slate-700 shadow-sm">
               </div>
               <div class="space-y-1">
+                <label class="text-[9px] font-black text-sky-600 uppercase tracking-widest ml-1">Email</label>
+                <input type="email" [(ngModel)]="selectedStudent.father.email" class="w-full bg-white border-none rounded-xl p-3 text-sm font-bold text-slate-700 shadow-sm">
+              </div>
+              <div class="space-y-1 md:col-span-2">
                 <label class="text-[9px] font-black text-sky-600 uppercase tracking-widest ml-1">Occupation</label>
                 <input type="text" [(ngModel)]="selectedStudent.father.job" class="w-full bg-white border-none rounded-xl p-3 text-sm font-bold text-slate-700 shadow-sm">
               </div>
@@ -322,6 +332,10 @@
                 <input type="tel" [(ngModel)]="selectedStudent.mother.phone" class="w-full bg-white border-none rounded-xl p-3 text-sm font-bold text-slate-700 shadow-sm">
               </div>
               <div class="space-y-1">
+                <label class="text-[9px] font-black text-purple-600 uppercase tracking-widest ml-1">Email</label>
+                <input type="email" [(ngModel)]="selectedStudent.mother.email" class="w-full bg-white border-none rounded-xl p-3 text-sm font-bold text-slate-700 shadow-sm">
+              </div>
+              <div class="space-y-1 md:col-span-2">
                 <label class="text-[9px] font-black text-purple-600 uppercase tracking-widest ml-1">Occupation</label>
                 <input type="text" [(ngModel)]="selectedStudent.mother.job" class="w-full bg-white border-none rounded-xl p-3 text-sm font-bold text-slate-700 shadow-sm">
               </div>

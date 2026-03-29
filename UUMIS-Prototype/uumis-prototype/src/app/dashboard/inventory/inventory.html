@@ -9,7 +9,7 @@
         <h4 class="text-xl font-black text-slate-900 uppercase">Confirm Export?</h4>
       </div>
       <div class="flex gap-3">
-        <button (click)="showExportConfirm = false" class="flex-1 py-3 bg-gray-100 text-gray-500 font-bold rounded-xl hover:bg-gray-200 transition-colors">{{ lang.text.inventory.modal.cancel }}</button>
+        <button (click)="showExportConfirm = false" class="flex-1 py-3 bg-gray-100 text-gray-500 font-bold rounded-xl hover:bg-gray-200 transition-colors">Cancel</button>
         <button (click)="confirmDownload()" class="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl shadow-lg hover:bg-red-600 transition-colors">Yes, Download</button>
       </div>
     </div>
@@ -18,25 +18,25 @@
   <div *ngIf="showModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-fade-in">
     <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 flex flex-col gap-5">
       <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-        <h3 class="text-xl font-bold text-slate-900">{{ isEditing ? lang.text.inventory.modal.editTitle : lang.text.inventory.modal.addTitle }}</h3>
+        <h3 class="text-xl font-bold text-slate-900">{{ isEditing ? 'Edit Asset' : 'Add New Asset' }}</h3>
         <button (click)="closeModal()" class="text-slate-400 hover:text-red-500"><span translate="no" class="material-symbols-outlined notranslate">close</span></button>
       </div>
 
       <div class="flex flex-col gap-4 max-h-[70vh] overflow-y-auto px-1">
         <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">{{ lang.text.inventory.headers.name }}</label>
+          <label class="text-xs font-bold text-slate-500 uppercase">Item Name</label>
           <input [(ngModel)]="formData.name" type="text" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold focus:ring-2 focus:ring-green-500 outline-none">
         </div>
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="text-xs font-bold text-slate-500 uppercase">{{ lang.text.inventory.headers.category }}</label>
+            <label class="text-xs font-bold text-slate-500 uppercase">Category</label>
             <select [(ngModel)]="formData.categorySelect" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none">
               <option *ngFor="let cat of baseCategories" [value]="cat">{{ cat }}</option>
               <option value="Others">Others</option>
             </select>
           </div>
           <div>
-            <label class="text-xs font-bold text-slate-500 uppercase">{{ lang.text.inventory.headers.qty }}</label>
+            <label class="text-xs font-bold text-slate-500 uppercase">Quantity</label>
             <input [(ngModel)]="formData.quantity" type="number" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none">
           </div>
         </div>
@@ -49,15 +49,15 @@
           <input [(ngModel)]="formData.value" type="number" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none">
         </div>
         <div>
-          <label class="text-xs font-bold text-slate-500 uppercase">{{ lang.text.inventory.headers.pic }}</label>
+          <label class="text-xs font-bold text-slate-500 uppercase">Person In Charge</label>
           <input [(ngModel)]="formData.personInCharge" type="text" class="w-full mt-1 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm font-bold outline-none">
         </div>
       </div>
 
       <div class="pt-3 border-t border-slate-100 flex justify-end gap-3">
-        <button (click)="closeModal()" class="px-4 py-2 text-sm font-bold text-slate-500 bg-slate-100 rounded-lg hover:bg-slate-200">{{ lang.text.inventory.modal.cancel }}</button>
+        <button (click)="closeModal()" class="px-4 py-2 text-sm font-bold text-slate-500 bg-slate-100 rounded-lg hover:bg-slate-200">Cancel</button>
         <button (click)="submitForm()" class="px-4 py-2 text-sm font-bold text-white bg-[#30e87a] rounded-lg hover:bg-[#25d06b] shadow-sm shadow-green-200">
-          {{ isEditing ? lang.text.inventory.modal.save : lang.text.inventory.modal.add }}
+          {{ isEditing ? 'Save Changes' : 'Add Asset' }}
         </button>
       </div>
     </div>
@@ -69,9 +69,9 @@
         <span translate="no" class="material-symbols-outlined notranslate text-[20px]">arrow_back</span>
       </button>
       <div class="hidden lg:flex items-center gap-2 text-sm">
-        <a class="text-slate-500 hover:text-[#30e87a] transition-colors font-medium">{{ lang.text.sidebar.management }}</a>
+        <a class="text-slate-500 hover:text-[#30e87a] transition-colors font-medium">Management</a>
         <span class="text-slate-300">/</span>
-        <span class="font-bold text-slate-900">{{ lang.text.inventory.title }}</span>
+        <span class="font-bold text-slate-900">Inventory</span>
       </div>
     </div>
     <div class="flex items-center gap-3">
@@ -87,17 +87,17 @@
 
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 class="text-3xl font-black tracking-tight text-slate-900">{{ lang.text.inventory.title }}</h1>
-          <p class="text-slate-500 mt-1 font-medium text-sm">{{ lang.text.inventory.subtitle }}</p>
+          <h1 class="text-3xl font-black tracking-tight text-slate-900">Inventory</h1>
+          <p class="text-slate-500 mt-1 font-medium text-sm">Manage school assets and supplies.</p>
         </div>
         <div class="flex gap-3">
           <button (click)="initiateExport()" class="group inline-flex items-center justify-center gap-2 rounded-xl bg-white border border-slate-200 px-5 py-3 text-sm font-bold text-slate-600 transition-all hover:bg-red-50 hover:text-red-500 hover:border-red-100 shadow-sm">
             <span translate="no" class="material-symbols-outlined notranslate text-[20px]">picture_as_pdf</span>
-            <span>{{ lang.text.inventory.export }}</span>
+            <span>Export PDF</span>
           </button>
           <button (click)="openAddModal()" class="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#30e87a] px-5 py-3 text-sm font-black text-slate-900 transition-all hover:bg-[#25d06b] active:scale-95 shadow-md shadow-green-200">
             <span translate="no" class="material-symbols-outlined notranslate text-[20px]">add</span>
-            <span>{{ lang.text.inventory.addNew }}</span>
+            <span>Add New</span>
           </button>
         </div>
       </div>
@@ -105,7 +105,7 @@
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div class="flex flex-col gap-1 rounded-2xl bg-white p-6 shadow-sm border border-slate-100">
           <div class="flex items-center gap-3 text-slate-500">
-            <span translate="no" class="material-symbols-outlined notranslate">inventory_2</span><span class="text-sm font-bold uppercase tracking-wide">{{ lang.text.inventory.totalItems }}</span>
+            <span translate="no" class="material-symbols-outlined notranslate">inventory_2</span><span class="text-sm font-bold uppercase tracking-wide">Total Items</span>
           </div>
           <div class="flex items-end justify-between">
             <p class="text-3xl font-black text-slate-900">{{ totalAssetsCount }}</p>
@@ -113,20 +113,20 @@
         </div>
         <div class="flex flex-col gap-1 rounded-2xl bg-white p-6 shadow-sm border border-slate-100">
           <div class="flex items-center gap-3 text-slate-500">
-            <span translate="no" class="material-symbols-outlined notranslate text-orange-500">warning</span><span class="text-sm font-bold uppercase tracking-wide">{{ lang.text.inventory.lowStock }}</span>
+            <span translate="no" class="material-symbols-outlined notranslate text-orange-500">warning</span><span class="text-sm font-bold uppercase tracking-wide">Low Stock Alerts</span>
           </div>
           <div class="flex items-end justify-between">
             <p class="text-3xl font-black text-slate-900">{{ lowStockCount }}</p>
-            <div *ngIf="lowStockCount > 0" class="flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700"><span translate="no" class="material-symbols-outlined notranslate text-[14px]">priority_high</span><span>{{ lang.text.inventory.actionNeeded }}</span></div>
+            <div *ngIf="lowStockCount > 0" class="flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700"><span translate="no" class="material-symbols-outlined notranslate text-[14px]">priority_high</span><span>Action Needed</span></div>
           </div>
         </div>
         <div class="flex flex-col gap-1 rounded-2xl bg-white p-6 shadow-sm border border-slate-100">
           <div class="flex items-center gap-3 text-slate-500">
-            <span translate="no" class="material-symbols-outlined notranslate text-blue-500">attach_money</span><span class="text-sm font-bold uppercase tracking-wide">{{ lang.text.inventory.totalValue }}</span>
+            <span translate="no" class="material-symbols-outlined notranslate text-blue-500">attach_money</span><span class="text-sm font-bold uppercase tracking-wide">Total Value</span>
           </div>
           <div class="flex items-end justify-between">
             <p class="text-3xl font-black text-slate-900">RM {{ totalValue | number }}</p>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{{ lang.text.inventory.estimated }}</p>
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Estimated</p>
           </div>
         </div>
       </div>
@@ -137,7 +137,7 @@
             <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <span translate="no" class="material-symbols-outlined notranslate text-slate-400 group-focus-within:text-[#30e87a] transition-colors">search</span>
             </div>
-            <input [(ngModel)]="searchTerm" (keyup)="filterAssets()" class="block w-full rounded-xl border-0 bg-slate-50 py-3 pl-10 pr-4 text-slate-900 ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-[#30e87a] font-medium transition-all" [placeholder]="lang.text.inventory.searchPlaceholder" type="text"/>
+            <input [(ngModel)]="searchTerm" (keyup)="filterAssets()" class="block w-full rounded-xl border-0 bg-slate-50 py-3 pl-10 pr-4 text-slate-900 ring-1 ring-inset ring-slate-200 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-[#30e87a] font-medium transition-all" placeholder="Search assets..." type="text"/>
           </div>
           <div class="flex flex-wrap items-center gap-3">
             <div class="relative">
@@ -153,12 +153,12 @@
           <table class="w-full text-left text-sm text-slate-600">
             <thead class="bg-slate-50/80 text-[10px] uppercase font-black tracking-widest text-slate-400 border-b border-slate-100">
             <tr>
-              <th class="px-6 py-4">{{ lang.text.inventory.headers.name }}</th>
-              <th class="px-6 py-4">{{ lang.text.inventory.headers.category }}</th>
-              <th class="px-6 py-4 text-center">{{ lang.text.inventory.headers.qty }}</th>
-              <th class="px-6 py-4">{{ lang.text.inventory.headers.status }}</th>
-              <th class="px-6 py-4">{{ lang.text.inventory.headers.pic }}</th>
-              <th class="px-6 py-4 text-right">{{ lang.text.inventory.headers.actions }}</th>
+              <th class="px-6 py-4">Name</th>
+              <th class="px-6 py-4">Category</th>
+              <th class="px-6 py-4 text-center">Qty</th>
+              <th class="px-6 py-4">Status</th>
+              <th class="px-6 py-4">Person In Charge</th>
+              <th class="px-6 py-4 text-right">Actions</th>
             </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
@@ -194,7 +194,7 @@
               <td class="px-6 py-16 text-center" colspan="6">
                 <div class="flex flex-col items-center justify-center gap-3">
                   <div class="flex size-14 items-center justify-center rounded-full bg-slate-50 text-slate-300"><span translate="no" class="material-symbols-outlined notranslate text-3xl">search_off</span></div>
-                  <h3 class="text-sm font-bold text-slate-900">{{ lang.text.inventory.empty }}</h3>
+                  <h3 class="text-sm font-bold text-slate-900">No assets found.</h3>
                 </div>
               </td>
             </tr>

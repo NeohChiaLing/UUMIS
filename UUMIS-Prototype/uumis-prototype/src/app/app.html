@@ -1,1 +1,21 @@
 <router-outlet></router-outlet>
+
+<div *ngIf="isDashboard" class="fixed bottom-8 right-8 z-[9999] flex flex-col items-end gap-4 animate-fade-in-up">
+
+  <div *ngIf="showLangModal" class="bg-white rounded-2xl shadow-2xl border border-emerald-100 p-3 w-48 animate-fade-in-up flex flex-col gap-1">
+    <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 px-3 mt-1">Select Language</h3>
+
+    <button (click)="switchLanguage('en')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-emerald-50 hover:text-emerald-600 font-bold text-sm transition-colors flex items-center gap-3">
+      <span class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-black">EN</span> English
+    </button>
+
+    <button (click)="switchLanguage('ms')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-emerald-50 hover:text-emerald-600 font-bold text-sm transition-colors flex items-center gap-3">
+      <span class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-black">MS</span> Melayu
+    </button>
+  </div>
+
+  <button (click)="toggleLangModal()" class="size-14 rounded-full bg-emerald-500 text-white flex items-center justify-center shadow-[0_10px_20px_-10px_rgba(16,185,129,0.6)] hover:scale-110 hover:bg-emerald-600 transition-all cursor-pointer group">
+    <span translate="no" class="material-symbols-outlined notranslate text-2xl group-hover:scale-110 transition-transform">translate</span>
+  </button>
+
+</div>

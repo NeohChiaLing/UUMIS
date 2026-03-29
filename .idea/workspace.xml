@@ -5,14 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="664642ca-f811-44e7-b19b-cb99d237de11" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/nginx.conf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/uumis-spring-backend/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/uumis-spring-backend/src/main/resources/data.sql" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/angular.json" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/angular.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/staff-dashboard/staff-dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/staff-dashboard/staff-dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/staff-dashboard/staff-dashboard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/staff-dashboard/staff-dashboard.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/uumis-spring-backend/src/main/java/com/uumis/controller/ContactController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-info/student-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-info/student-info.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-info/student-info.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-info/student-info.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-profile/student-profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-profile/student-profile.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-profile/student-profile.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-profile/student-profile.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/uumis-spring-backend/src/main/java/com/uumis/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/uumis-spring-backend/src/main/java/com/uumis/entity/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/uumis-spring-backend/src/main/resources/data.sql" beforeDir="false" afterPath="$PROJECT_DIR$/uumis-spring-backend/src/main/resources/data.sql" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -88,7 +88,9 @@
       <workItem from="1767105960378" duration="1194000" />
       <workItem from="1773649082516" duration="6907000" />
       <workItem from="1773656459357" duration="595000" />
-      <workItem from="1773657075922" duration="2387000" />
+      <workItem from="1773657075922" duration="3271000" />
+      <workItem from="1773660491087" duration="77000" />
+      <workItem from="1774787471200" duration="14769000" />
     </task>
     <servers />
   </component>

@@ -56,7 +56,8 @@ export class PaymentComponent implements OnInit {
       next: (data: any[]) => {
         this.allStudents = data.map(user => {
           const grade = user.bio || 'Unassigned - Unassigned';
-          const parts = grade.split('-');
+          // FIX: Split by space-dash-space so "Pre-Kindergarten" doesn't get broken in half!
+          const parts = grade.split(' - ');
           const yearStr = parts.length > 1 ? parts[1].trim() : 'Unassigned';
 
           return {
@@ -128,20 +129,19 @@ export class PaymentComponent implements OnInit {
     this.showAddPaymentModal = true;
   }
 
-  // --- STAFF CREATES AN INVOICE (ADDS DEBT) ---
   submitNewPayment() {
     if (!this.newTxn.amount) return;
 
     const payload = {
       ...this.newTxn,
-      status: 'UNPAID', // Invoices are automatically UNPAID so they don't have Check/Cross buttons
+      status: 'UNPAID',
       invoiceNumber: 'INV-' + Math.floor(Math.random() * 100000)
     };
 
     this.authService.addPayment(this.selectedStudent.dbId, payload).subscribe({
       next: (savedTxn) => {
         this.transactions.unshift(savedTxn);
-        this.selectedStudent.due += savedTxn.amount; // Instantly adds the charge to Outstanding debt
+        this.selectedStudent.due += savedTxn.amount;
         this.submitChanges();
         this.showAddPaymentModal = false;
       },
@@ -149,7 +149,6 @@ export class PaymentComponent implements OnInit {
     });
   }
 
-  // --- STAFF APPROVES PARENT RECEIPT ---
   changeStatus(txn: any, status: string) {
     if (txn.status === status) return;
     const oldStatus = txn.status;
@@ -158,8 +157,6 @@ export class PaymentComponent implements OnInit {
       next: () => {
         txn.status = status;
 
-        // 1. Math only applies if the Staff is approving a Parent's Payment Proof
-        // (This prevents double-math if a staff manual overrides an invoice)
         if (txn.description === 'Payment Proof Uploaded' || txn.desc === 'Payment Proof Uploaded') {
           if (status === 'Completed' && oldStatus !== 'Completed') {
             this.selectedStudent.totalPaid += txn.amount;
@@ -174,11 +171,6 @@ export class PaymentComponent implements OnInit {
         if (this.selectedStudent.due < 0) this.selectedStudent.due = 0;
         if (this.selectedStudent.totalPaid < 0) this.selectedStudent.totalPaid = 0;
 
-        // ==========================================
-        // 2. AUTO-CLEAR MAGIC
-        // If the parent's payment completely clears the debt (due hits 0),
-        // automatically mark the original "School Fee" invoice as Completed!
-        // ==========================================
         if (this.selectedStudent.due === 0) {
           this.transactions.forEach(t => {
             if (t.status === 'UNPAID') {
@@ -188,13 +180,12 @@ export class PaymentComponent implements OnInit {
           });
         }
 
-        this.submitChanges(); // Save balances to DB
+        this.submitChanges();
       },
       error: () => alert('Failed to update status.')
     });
   }
 
-  // --- STAFF DELETES A RECORD ---
   deleteTransaction(txnId: number) {
     if (confirm('Are you sure you want to permanently delete this transaction?')) {
       const txnToDelete = this.transactions.find(t => t.id === txnId);
@@ -207,13 +198,11 @@ export class PaymentComponent implements OnInit {
             const isPaymentProof = (txnToDelete.desc === 'Payment Proof Uploaded' || txnToDelete.description === 'Payment Proof Uploaded');
 
             if (isPaymentProof) {
-              // Deleting an approved proof means removing it from paid total and restoring the debt
               if (txnToDelete.status === 'Completed') {
                 this.selectedStudent.totalPaid -= txnToDelete.amount;
                 this.selectedStudent.due += txnToDelete.amount;
               }
             } else {
-              // Deleting an Invoice (like School Fees) cancels the charge from the debt
               this.selectedStudent.due -= txnToDelete.amount;
             }
 
@@ -227,7 +216,6 @@ export class PaymentComponent implements OnInit {
     }
   }
 
-  // File Upload Logic
   onReceiptSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -252,7 +240,7 @@ export class PaymentComponent implements OnInit {
           this.authService.updatePayment(txn.id, payload).subscribe({
             next: () => {
               txn.receiptFile = file.name;
-              txn.receiptUrl = ev.target.result; // Updated to correctly assign receipt URL
+              txn.receiptUrl = ev.target.result;
               alert('Receipt securely uploaded!');
             }
           });

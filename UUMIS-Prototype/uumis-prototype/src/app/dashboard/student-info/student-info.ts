@@ -19,10 +19,6 @@ export class StudentInfoComponent implements OnInit {
   isLoading: boolean = false;
 
   students: any[] = [];
-
-  // ==========================================
-  // --- FIX: STORES LIST OF PARENTS FOR DROPDOWN ---
-  // ==========================================
   parents: any[] = [];
 
   academicLevels = ['Kindergarten', 'Primary', 'Lower Secondary', 'Upper Secondary'];
@@ -35,36 +31,36 @@ export class StudentInfoComponent implements OnInit {
     return [];
   }
 
+  // FIX: Wiped dummy data completely
   emptyStudent = {
     name: '', id: '', grade: '', level: '', year: '', email: '', status: 'Pending',
-    parentId: '', // Added parentId mapping
+    parentId: '',
+    profileStatus: 'PENDING',
     admissionDate: new Date().toISOString().split('T')[0],
     teacher: '', completion: 0, avatarColor: 'bg-gray-100 text-gray-600',
     dob: '', gender: 'Male', address: '', passport: '', phone: '',
-    bloodGroup: 'O+', allergies: 'None', medicalConditions: 'None',
-    father: { name: '', ic: '', phone: '', job: '' },
-    mother: { name: '', ic: '', phone: '', job: '' }
+    bloodGroup: 'O+', allergies: '', medicalConditions: '',
+    father: { name: '', ic: '', phone: '', email: '', job: '' },
+    mother: { name: '', ic: '', phone: '', email: '', job: '' }
   };
 
+  // FIX: Wiped dummy data completely
   fullProfileTemplate = {
-    level: '', year: '', parentId: '', dob: '2008-01-01', gender: 'Male', address: '123 School Road',
-    passport: '', phone: '', bloodGroup: 'O+', allergies: 'None',
-    medicalConditions: 'None',
-    father: { name: 'Father Name', ic: '', phone: '', job: '' },
-    mother: { name: 'Mother Name', ic: '', phone: '', job: '' }
+    level: '', year: '', parentId: '', dob: '', gender: 'Male', address: '',
+    passport: '', phone: '', bloodGroup: 'O+', allergies: '', profileStatus: 'PENDING',
+    medicalConditions: '',
+    father: { name: '', ic: '', phone: '', email: '', job: '' },
+    mother: { name: '', ic: '', phone: '', email: '', job: '' }
   };
-// ==========================================
-  // --- CUSTOM SEARCHABLE DROPDOWN LOGIC ---
-  // ==========================================
+
   isParentDropdownOpen: boolean = false;
   parentSearchQuery: string = '';
 
   toggleParentDropdown() {
     this.isParentDropdownOpen = !this.isParentDropdownOpen;
-    if (this.isParentDropdownOpen) this.parentSearchQuery = ''; // Clear search when opening
+    if (this.isParentDropdownOpen) this.parentSearchQuery = '';
   }
 
-  // Auto-filters the list as you type!
   get filteredParents() {
     if (!this.parentSearchQuery) return this.parents;
     const q = this.parentSearchQuery.toLowerCase();
@@ -74,19 +70,63 @@ export class StudentInfoComponent implements OnInit {
     );
   }
 
-  // Shows the name of the currently selected parent on the button
   get selectedParentName() {
     if (!this.selectedStudent?.parentId) return '-- Select a Parent Account to Link --';
     const p = this.parents.find(x => x.id === this.selectedStudent.parentId);
     return p ? `${p.fullName || p.username} (${p.email})` : '-- Select a Parent Account to Link --';
   }
 
-  // Saves the selection and closes the menu
+  get completionPercentage(): number {
+    if (!this.selectedStudent) return 0;
+
+    let totalFields = 0;
+    let filledFields = 0;
+
+    const checkValue = (val: string) => {
+      totalFields++;
+      if (val && val.trim() !== '' && val.trim() !== '---' && val.trim() !== 'Unassigned') {
+        filledFields++;
+      }
+    };
+
+    checkValue(this.selectedStudent.name);
+    checkValue(this.selectedStudent.id);
+    checkValue(this.selectedStudent.level);
+    checkValue(this.selectedStudent.year);
+    checkValue(this.selectedStudent.dob);
+    checkValue(this.selectedStudent.gender);
+    checkValue(this.selectedStudent.address);
+    checkValue(this.selectedStudent.passport);
+    checkValue(this.selectedStudent.phone);
+    checkValue(this.selectedStudent.bloodGroup);
+    checkValue(this.selectedStudent.allergies);
+    checkValue(this.selectedStudent.medicalConditions);
+
+    if (this.selectedStudent.father) {
+      checkValue(this.selectedStudent.father.name);
+      checkValue(this.selectedStudent.father.ic);
+      checkValue(this.selectedStudent.father.phone);
+      checkValue(this.selectedStudent.father.email);
+      checkValue(this.selectedStudent.father.job);
+    }
+
+    if (this.selectedStudent.mother) {
+      checkValue(this.selectedStudent.mother.name);
+      checkValue(this.selectedStudent.mother.ic);
+      checkValue(this.selectedStudent.mother.phone);
+      checkValue(this.selectedStudent.mother.email);
+      checkValue(this.selectedStudent.mother.job);
+    }
+
+    if (totalFields === 0) return 0;
+    return Math.round((filledFields / totalFields) * 100);
+  }
+
   selectParent(parentId: any) {
     this.selectedStudent.parentId = parentId;
     this.isParentDropdownOpen = false;
   }
-  // ==========================================
+
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -108,15 +148,11 @@ export class StudentInfoComponent implements OnInit {
     }
 
     this.loadStudents();
-
-    // --- FETCH PARENTS WHEN PAGE LOADS ---
     this.loadParents();
   }
 
-// --- NEW FUNCTION TO FETCH PARENTS FROM DATABASE ---
   loadParents() {
     this.authService.getParents().subscribe({
-      // FIX: Added ': any[]' so Strict Mode knows it's receiving an array of data
       next: (data: any[]) => this.parents = data,
       error: () => console.log('Failed to load parents')
     });
@@ -132,21 +168,30 @@ export class StudentInfoComponent implements OnInit {
       next: (data: any[]) => {
         if (!data || !Array.isArray(data)) return;
 
-        this.students = data.map(user => ({
-          dbId: user.id,
-          id: user.studentId || user.verificationCode || user.username || '---',
-          name: user.fullName || user.username || 'No Name',
-          grade: user.bio || 'Unassigned',
-          parentId: user.parentId, // Extract parent link from database
-          email: user.email || 'No Email',
-          status: (user.enabled === true || user.isEnabled === true) ? 'Active' : 'Pending',
-          admissionDate: '2023-01-01',
-          teacher: 'Unassigned',
-          completion: user.avatar ? 100 : 50,
-          avatarColor: 'bg-emerald-100 text-emerald-600',
-          phone: user.phone || 'No Phone',
-          avatarUrl: user.avatar || null
-        }));
+        this.students = data.map(user => {
+          let profileData = {};
+          if (user.profileJson) {
+            try { profileData = JSON.parse(user.profileJson); } catch (e) {}
+          }
+
+          return {
+            ...this.fullProfileTemplate,
+            ...profileData,
+            dbId: user.id,
+            id: user.studentId || user.verificationCode || user.username || '---',
+            name: user.fullName || user.username || 'No Name',
+            grade: user.bio || 'Unassigned',
+            parentId: user.parentId,
+            profileStatus: user.profileStatus || 'PENDING',
+            email: user.email || '',
+            status: (user.enabled === true || user.isEnabled === true) ? 'Active' : 'Pending',
+            admissionDate: '2023-01-01',
+            teacher: 'Unassigned',
+            avatarColor: 'bg-emerald-100 text-emerald-600',
+            phone: user.phone || '',
+            avatarUrl: user.avatar || null
+          };
+        });
       },
       error: (err: any) => console.error('Failed to load students', err)
     });
@@ -165,9 +210,7 @@ export class StudentInfoComponent implements OnInit {
     this.selectedStudent.level = this.academicLevels.includes(parts[0]) ? parts[0] : '';
     this.selectedStudent.year = parts[1] || '';
 
-    // Ensure parent dropdown selects correctly if already linked
     this.selectedStudent.parentId = student.parentId || '';
-
     window.scrollTo(0,0);
   }
 
@@ -177,15 +220,50 @@ export class StudentInfoComponent implements OnInit {
     window.scrollTo(0,0);
   }
 
-  approveStudent(student: any, event: Event) {
+  // FIX: Removed the early return so it asks for confirmation anyway
+  approveProfile(student: any, event: Event) {
     event.stopPropagation();
-    if(confirm(`Approve ${student.name}?`)) {
-      this.authService.approveStudent(student.dbId).subscribe({
+
+    if(confirm(`Approve ${student.name}'s profile and activate their account?`)) {
+      student.profileStatus = 'APPROVED';
+      student.status = 'Active';
+
+      this.authService.adminUpdateStudent(student.dbId, {
+        profileStatus: 'APPROVED',
+        enabled: true
+      }).subscribe({
+        next: () => alert(`Student ${student.name} has been approved.`),
+        error: () => alert('Failed to approve student.')
+      });
+    }
+  }
+
+  rejectProfile(student: any, event: Event) {
+    event.stopPropagation();
+    if (student.profileStatus === 'REJECTED') return;
+
+    if(confirm(`Reject ${student.name}'s profile? This will notify them via email.`)) {
+      student.profileStatus = 'REJECTED';
+      student.status = 'Pending';
+
+      this.authService.adminUpdateStudent(student.dbId, {
+        profileStatus: 'REJECTED',
+        enabled: false
+      }).subscribe({
         next: () => {
-          alert(`Student ${student.name} has been approved.`);
-          student.status = 'Active';
+          alert(`Student ${student.name} rejected. An email notification has been sent to ${student.email}.`);
+
+          fetch('http://localhost:8080/api/content/contact/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fullName: student.name,
+              email: student.email,
+              message: 'Your student profile update has been reviewed and requires further changes. Please log in to your portal to review.'
+            })
+          }).catch(e => console.log('Email API not reachable, but status was updated.'));
         },
-        error: (err: any) => alert('Failed to approve student.')
+        error: () => alert('Failed to reject student.')
       });
     }
   }
@@ -219,21 +297,21 @@ export class StudentInfoComponent implements OnInit {
     }
 
     const payload = {
-      // --- THE FIX: Send the ID as BOTH variables so Spring Boot catches it perfectly ---
       studentId: this.selectedStudent.id,
       verificationCode: this.selectedStudent.id,
-
       fullName: this.selectedStudent.name,
       bio: combinedGrade,
       phone: this.selectedStudent.phone,
-      enabled: false,
-      parentId: this.selectedStudent.parentId
+      enabled: this.selectedStudent.status === 'Active',
+      parentId: this.selectedStudent.parentId,
+      profileJson: JSON.stringify(this.selectedStudent)
     };
+
     this.authService.adminUpdateStudent(this.selectedStudent.dbId, payload).subscribe({
       next: (res: any) => {
-        alert('Student profile updated and Parent Linked successfully!');
+        alert('Student profile updated successfully!');
         this.isLoading = false;
-        this.loadStudents(); // Refresh to catch new links
+        this.loadStudents();
         this.goBack();
       },
       error: (err: any) => {

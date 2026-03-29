@@ -55,7 +55,8 @@ export class WalletComponent implements OnInit {
       next: (data: any[]) => {
         this.allStudents = data.map(user => {
           const grade = user.bio || 'Unassigned - Unassigned';
-          const parts = grade.split('-');
+          // FIX: Split by space-dash-space so "Pre-Kindergarten" doesn't get broken in half!
+          const parts = grade.split(' - ');
           const yearStr = parts.length > 1 ? parts[1].trim() : 'Unassigned';
 
           return {
@@ -89,7 +90,6 @@ export class WalletComponent implements OnInit {
     }
   }
 
-  // --- FETCH REAL WALLET DATA ---
   selectStudent(s: Student) {
     this.selectedStudent = s;
     this.authService.getWalletData(s.dbId).subscribe({
@@ -116,7 +116,6 @@ export class WalletComponent implements OnInit {
     this.amountInput += val;
   }
 
-  // --- SUBMIT REAL TRANSACTION TO DATABASE ---
   confirmTransaction() {
     if (!this.amountInput || this.amountInput <= 0) { alert('Please enter a valid amount.'); return; }
     if (!this.selectedStudent) return;
@@ -137,7 +136,6 @@ export class WalletComponent implements OnInit {
         }
         this.closeModal();
 
-        // --- ALERT FOR LOW BALANCE ---
         if (res.isLowBalance) {
           alert('Transaction Successful!\n\n⚠️ SYSTEM ALERT: This student\'s balance is below RM 20. An automated email has been sent to the parent requesting a Top Up.');
         } else {

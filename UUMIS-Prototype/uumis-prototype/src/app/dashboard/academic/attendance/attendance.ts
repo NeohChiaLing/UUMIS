@@ -64,11 +64,15 @@ export class AttendanceComponent implements OnInit {
         // Filter students by selected Year Group
         const yearStudents = users.filter((u: any) => {
           if ((u.role || '').toLowerCase() !== 'student' || !u.bio || u.bio === 'Unassigned') return false;
-          const parts = u.bio.split('-');
-          const stuLevel = parts[0].trim().toLowerCase();
-          const stuYear = parts.length > 1 ? parts[1].trim().toLowerCase() : stuLevel;
+
+          const parts = u.bio.split(' - ');
+
+          // FIX: Only extract the specific Year Group (the right side of the dash)
+          const stuYear = parts.length > 1 ? parts[1].trim().toLowerCase() : parts[0].trim().toLowerCase();
           const targetYear = this.selectedYear.toLowerCase();
-          return stuYear === targetYear || stuLevel === targetYear;
+
+          // FIX: Only match the exact Year Group! No more matching the broad Academic Level.
+          return stuYear === targetYear;
         });
 
         // Get Attendance Records for the specific Date
