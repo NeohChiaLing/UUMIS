@@ -1,65 +1,102 @@
-<div class="min-h-screen bg-[#f8fcfa] font-display text-[#0e1b13] flex flex-col">
+<div class="min-h-screen bg-transparent font-display text-slate-900 relative flex flex-col overflow-x-hidden">
+
+  <div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
+    <div class="absolute -top-40 -right-40 w-[800px] h-[800px] bg-sky-200/40 rounded-full blur-[120px] bubble-float"></div>
+    <div class="absolute top-1/4 -left-48 w-[600px] h-[600px] bg-blue-400/20 rounded-full blur-[100px] bubble-float-alt" style="animation-delay: -5s;"></div>
+    <div class="absolute -bottom-20 left-1/3 w-[500px] h-[500px] bg-purple-200/30 rounded-full blur-[90px] bubble-float" style="animation-delay: -10s;"></div>
+
+    <div class="absolute top-[15%] right-[15%] w-32 h-32 rounded-full glass-bubble border border-white/40 bubble-float z-10" style="animation-duration: 15s;"></div>
+    <div class="absolute bottom-[20%] left-[10%] w-48 h-48 rounded-full glass-bubble border border-white/30 bubble-float-alt z-10" style="animation-delay: -2s; animation-duration: 25s;"></div>
+    <div class="absolute top-1/2 right-[5%] w-24 h-24 rounded-full glass-bubble border border-white/20 bubble-float z-10" style="animation-delay: -7s;"></div>
+    <div class="absolute top-[10%] left-[20%] w-16 h-16 rounded-full glass-bubble border border-white/30 bubble-float-alt z-10" style="animation-delay: -12s;"></div>
+
+    <div class="absolute top-[20%] left-[10%] opacity-[0.08] transform -rotate-12 bubble-float text-slate-800" style="animation-duration: 20s;">
+      <span translate="no" class="material-symbols-outlined notranslate text-[15rem]" style="font-variation-settings: 'wght' 100;">menu_book</span>
+    </div>
+    <div class="absolute bottom-[15%] right-[10%] opacity-[0.08] transform rotate-12 bubble-float-alt text-slate-800" style="animation-duration: 25s;">
+      <span translate="no" class="material-symbols-outlined notranslate text-[18rem]" style="font-variation-settings: 'wght' 100;">school</span>
+    </div>
+  </div>
+
   <app-navbar></app-navbar>
 
-  <main class="flex-grow w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12 relative">
+  <section class="relative w-full h-[calc(100vh-80px)] min-h-[600px] flex items-center justify-center text-center group rounded-b-[3rem] sm:rounded-b-[4rem] overflow-hidden shadow-2xl mt-0">
+    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105 z-0"
+         [style.background-image]="'url(' + pageData.bgImage + ')'">
+    </div>
+    <div class="absolute inset-0 bg-black/30 z-0"></div>
+
+    <button *ngIf="isAdmin" (click)="openEditModal('header')" class="absolute top-6 right-6 z-50 bg-white hover:bg-sky-500 hover:text-white text-slate-800 rounded-full px-4 py-2 shadow-lg font-bold text-sm flex items-center gap-2 transition-all opacity-0 group-hover:opacity-100">
+      <span translate="no" class="material-symbols-outlined notranslate text-[18px]">edit</span> Edit Background
+    </button>
+
+    <div class="relative z-10 flex flex-col items-center gap-8 max-w-4xl mx-auto px-4 sm:px-6 animate-fade-in-up mt-8">
+      <div class="flex flex-col gap-4 items-center">
+        <span class="inline-block px-4 py-1.5 rounded-full bg-sky-500/30 backdrop-blur-md border border-sky-400/30 text-sky-100 text-xs font-black uppercase tracking-wider w-fit shadow-lg">
+          {{ pageData.badge }}
+        </span>
+        <h1 class="text-5xl sm:text-7xl md:text-8xl font-black leading-[1.1] tracking-tighter text-white drop-shadow-2xl uppercase">
+          {{ pageData.titleStart }} <br/>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-300 to-sky-100 drop-shadow-lg">{{ pageData.titleHighlight }}</span>
+        </h1>
+        <p class="text-white text-lg sm:text-xl font-bold max-w-2xl mx-auto leading-relaxed mt-2 drop-shadow-xl italic">
+          {{ pageData.description }}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <main class="flex-grow w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12 relative z-10">
 
     <div class="fixed bottom-8 right-8 z-[90] flex flex-col items-end gap-4">
-
-      <button *ngIf="isAdmin" (click)="publishChanges()" class="bg-[#0e1b13] text-white px-6 py-3 rounded-full font-black text-sm shadow-2xl hover:bg-[#30e87a] hover:text-[#0e1b13] hover:scale-105 transition-all flex items-center gap-2 animate-fade-in-up border border-[#e7f3ec]">
+      <button *ngIf="isAdmin" (click)="publishChanges()" class="bg-slate-900 text-white px-6 py-3 rounded-full font-black text-sm shadow-2xl hover:bg-sky-500 transition-all flex items-center gap-2 animate-fade-in-up border border-slate-700">
         <span translate="no" class="material-symbols-outlined notranslate text-[18px]">cloud_upload</span> Publish Changes
       </button>
 
       @if (showLangModal) {
-        <div class="bg-white rounded-2xl shadow-2xl border border-[#e7f3ec] p-3 w-48 animate-fade-in-up flex flex-col gap-1">
-          <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 px-3 mt-1">Select Language</h3>
-          <button (click)="switchLanguage('en')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-[#f0fdf4] hover:text-[#30e87a] font-bold text-sm transition-colors flex items-center gap-3"><span class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-black">EN</span> English</button>
-          <button (click)="switchLanguage('ms')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-[#f0fdf4] hover:text-[#30e87a] font-bold text-sm transition-colors flex items-center gap-3"><span class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-black">MS</span> Melayu</button>
-        </div>
+      <div class="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-white p-3 w-48 animate-fade-in-up flex flex-col gap-1">
+        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 px-3 mt-1">Select Language</h3>
+        <button (click)="switchLanguage('en')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-sky-50 hover:text-sky-500 font-bold text-sm transition-colors flex items-center gap-3"><span class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-black">EN</span> English</button>
+        <button (click)="switchLanguage('ms')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-sky-50 hover:text-sky-500 font-bold text-sm transition-colors flex items-center gap-3"><span class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-black">MS</span> Melayu</button>
+      </div>
       }
-      <button (click)="toggleLangModal()" class="size-14 rounded-full bg-[#0e1b13] text-white flex items-center justify-center shadow-2xl hover:scale-110 hover:bg-[#30e87a] hover:text-[#0e1b13] transition-all cursor-pointer group">
+      <button (click)="toggleLangModal()" class="size-14 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-2xl hover:scale-110 hover:bg-sky-500 transition-all cursor-pointer group border border-slate-700">
         <span translate="no" class="material-symbols-outlined notranslate text-2xl group-hover:scale-110 transition-transform">translate</span>
       </button>
     </div>
 
-    <div class="text-center animate-fade-in-up">
-      <h1 class="text-3xl md:text-5xl font-black text-[#0e1b13] tracking-tight leading-tight uppercase">
-        Student <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#30e87a] to-emerald-600">Registration Form</span>
-      </h1>
-      <p class="text-slate-500 mt-4 italic font-medium">All details provided will be kept confidential.</p>
-    </div>
-
-    <section class="bg-white border-l-8 border-[#30e87a] rounded-r-3xl p-8 md:p-10 shadow-xl animate-fade-in-up relative group">
-      <h3 class="text-xl font-bold text-[#0e1b13] mb-4 flex items-center gap-2 uppercase tracking-wide">
-        <span translate="no" class="material-symbols-outlined notranslate text-[#30e87a]">description</span> Required Documents
+    <section class="bg-white/90 backdrop-blur-md border-l-8 border-sky-500 border-white rounded-r-[2rem] p-8 md:p-10 shadow-xl animate-fade-in-up relative group mt-8">
+      <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2 uppercase tracking-wide border-b border-slate-200/50 pb-4">
+        <span translate="no" class="material-symbols-outlined notranslate text-sky-500">description</span> Required Documents
       </h3>
 
       <div class="grid md:grid-cols-2 gap-8 mt-6">
         <div class="space-y-3">
           <div class="flex justify-between items-center">
-            <h4 class="font-bold text-emerald-600 text-sm uppercase tracking-wider">Malaysian Citizens</h4>
-            <button *ngIf="isAdmin" (click)="addDoc('my')" class="text-[10px] bg-emerald-100 text-emerald-700 px-2 py-1 rounded font-bold hover:bg-emerald-200">+ Add</button>
+            <h4 class="font-bold text-blue-600 text-sm uppercase tracking-wider">Malaysian Citizens</h4>
+            <button *ngIf="isAdmin" (click)="addDoc('my')" class="text-[10px] bg-blue-100 text-blue-700 px-2 py-1 rounded font-bold hover:bg-blue-200">+ Add</button>
           </div>
           <ul class="space-y-2 text-sm text-slate-600 font-medium">
             <li *ngFor="let doc of malaysianDocs; let i = index; trackBy: trackByIndex" class="flex items-start gap-2">
-              <span translate="no" class="material-symbols-outlined notranslate text-[#30e87a] text-base">check_circle</span>
-              <input *ngIf="isAdmin" [(ngModel)]="malaysianDocs[i]" class="border-b border-dashed border-slate-300 outline-none bg-transparent w-full text-emerald-700">
+              <span translate="no" class="material-symbols-outlined notranslate text-sky-500 text-base">check_circle</span>
+              <input *ngIf="isAdmin" [(ngModel)]="malaysianDocs[i]" [ngModelOptions]="{standalone: true}" class="border-b border-dashed border-slate-300 outline-none bg-transparent w-full text-blue-700">
               <span *ngIf="!isAdmin">{{ doc }}</span>
-              <button *ngIf="isAdmin" (click)="removeDoc('my', i)" class="text-red-400 hover:text-red-600 ml-auto"><span translate="no" class="material-symbols-outlined text-sm notranslate">close</span></button>
+              <button *ngIf="isAdmin" (click)="removeDoc('my', i)" class="text-red-400 hover:text-red-600 ml-auto"><span translate="no" class="material-symbols-outlined notranslate text-sm">close</span></button>
             </li>
           </ul>
         </div>
 
         <div class="space-y-3">
           <div class="flex justify-between items-center">
-            <h4 class="font-bold text-sky-600 text-sm uppercase tracking-wider">Foreign Students</h4>
-            <button *ngIf="isAdmin" (click)="addDoc('foreign')" class="text-[10px] bg-sky-100 text-sky-700 px-2 py-1 rounded font-bold hover:bg-sky-200">+ Add</button>
+            <h4 class="font-bold text-indigo-600 text-sm uppercase tracking-wider">Foreign Students</h4>
+            <button *ngIf="isAdmin" (click)="addDoc('foreign')" class="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-bold hover:bg-indigo-200">+ Add</button>
           </div>
           <ul class="space-y-2 text-sm text-slate-600 font-medium">
             <li *ngFor="let doc of foreignDocs; let i = index; trackBy: trackByIndex" class="flex items-start gap-2">
               <span translate="no" class="material-symbols-outlined notranslate text-sky-500 text-base">check_circle</span>
-              <input *ngIf="isAdmin" [(ngModel)]="foreignDocs[i]" class="border-b border-dashed border-slate-300 outline-none bg-transparent w-full text-sky-700">
+              <input *ngIf="isAdmin" [(ngModel)]="foreignDocs[i]" [ngModelOptions]="{standalone: true}" class="border-b border-dashed border-slate-300 outline-none bg-transparent w-full text-indigo-700">
               <span *ngIf="!isAdmin">{{ doc }}</span>
-              <button *ngIf="isAdmin" (click)="removeDoc('foreign', i)" class="text-red-400 hover:text-red-600 ml-auto"><span translate="no" class="material-symbols-outlined text-sm notranslate">close</span></button>
+              <button *ngIf="isAdmin" (click)="removeDoc('foreign', i)" class="text-red-400 hover:text-red-600 ml-auto"><span translate="no" class="material-symbols-outlined notranslate text-sm">close</span></button>
             </li>
           </ul>
         </div>
@@ -68,140 +105,128 @@
 
     <form (submit)="submitForm($event)" class="space-y-8 animate-fade-in-up">
 
-      <div class="bg-white border border-[#e7f3ec] rounded-[2rem] p-8 md:p-10 shadow-sm">
-        <h3 class="text-xl font-bold text-[#0e1b13] mb-6 border-b border-[#e7f3ec] pb-4 uppercase">Admission Information</h3>
+      <div class="bg-white/80 backdrop-blur-md border border-white rounded-[2rem] p-8 md:p-10 shadow-lg hover:border-sky-500/30 transition-colors">
+        <h3 class="text-xl font-bold text-slate-900 mb-6 border-b border-white pb-4 uppercase tracking-wide">Admission Information</h3>
         <div class="grid md:grid-cols-3 gap-6">
           <div class="space-y-4">
             <p class="text-xs font-bold text-slate-400 uppercase">Application Type</p>
             <div class="flex flex-col gap-2">
-              <label class="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer hover:text-[#30e87a]"><input type="radio" name="admType" class="accent-[#30e87a] size-4"> New Admission</label>
-              <label class="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer hover:text-[#30e87a]"><input type="radio" name="admType" class="accent-[#30e87a] size-4"> Current Student</label>
-              <label class="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer hover:text-[#30e87a]"><input type="radio" name="admType" class="accent-[#30e87a] size-4"> Trial Student</label>
+              <label class="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer hover:text-sky-500"><input type="radio" [(ngModel)]="formData.admType" value="New Admission" name="admType" class="accent-sky-500 size-4"> New Admission</label>
+              <label class="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer hover:text-sky-500"><input type="radio" [(ngModel)]="formData.admType" value="Current Student" name="admType" class="accent-sky-500 size-4"> Current Student</label>
+              <label class="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer hover:text-sky-500"><input type="radio" [(ngModel)]="formData.admType" value="Trial Student" name="admType" class="accent-sky-500 size-4"> Trial Student</label>
             </div>
           </div>
           <div class="space-y-4">
             <p class="text-xs font-bold text-slate-400 uppercase">Intake Month</p>
             <div class="flex flex-col gap-2">
-              <label class="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer hover:text-[#30e87a]"><input type="checkbox" class="accent-[#30e87a] size-4"> August Intake</label>
-              <label class="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer hover:text-[#30e87a]"><input type="checkbox" class="accent-[#30e87a] size-4"> January Intake</label>
+              <label class="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer hover:text-sky-500"><input type="checkbox" [(ngModel)]="formData.intakeAug" name="intakeAug" class="accent-sky-500 size-4"> August Intake</label>
+              <label class="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer hover:text-sky-500"><input type="checkbox" [(ngModel)]="formData.intakeJan" name="intakeJan" class="accent-sky-500 size-4"> January Intake</label>
             </div>
           </div>
           <div class="space-y-2">
             <label class="text-xs font-bold text-slate-400 uppercase">Intake Year</label>
-            <input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold focus:border-[#30e87a] focus:ring-2 focus:ring-[#30e87a]/20 outline-none transition-all" placeholder="e.g., 2025">
+            <input type="text" [(ngModel)]="formData.intakeYear" name="intakeYear" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition-all" placeholder="e.g., 2026">
           </div>
         </div>
       </div>
 
-      <div class="bg-white border border-[#e7f3ec] rounded-[2rem] p-8 md:p-10 shadow-sm">
-        <h3 class="text-xl font-bold text-[#0e1b13] mb-6 border-b border-[#e7f3ec] pb-4 uppercase">Personal Details - Student</h3>
+      <div class="bg-white/80 backdrop-blur-md border border-white rounded-[2rem] p-8 md:p-10 shadow-lg hover:border-sky-500/30 transition-colors">
+        <h3 class="text-xl font-bold text-slate-900 mb-6 border-b border-white pb-4 uppercase tracking-wide">Personal Details - Student</h3>
         <div class="grid md:grid-cols-3 gap-6">
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">First Name</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] focus:ring-2 focus:ring-[#30e87a]/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Middle Name</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] focus:ring-2 focus:ring-[#30e87a]/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Family Name</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] focus:ring-2 focus:ring-[#30e87a]/20 transition-all"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">First Name <span class="text-red-500">*</span></label><input type="text" required [(ngModel)]="formData.firstName" name="firstName" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Middle Name</label><input type="text" [(ngModel)]="formData.middleName" name="middleName" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Family Name</label><input type="text" [(ngModel)]="formData.familyName" name="familyName" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
           <div class="space-y-2">
             <label class="text-xs font-bold text-slate-400 uppercase">Gender</label>
-            <select class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] focus:ring-2 focus:ring-[#30e87a]/20 transition-all cursor-pointer">
-              <option>Male</option>
-              <option>Female</option>
+            <select [(ngModel)]="formData.gender" name="gender" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all cursor-pointer">
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
             </select>
           </div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Date of Birth</label><input type="date" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] focus:ring-2 focus:ring-[#30e87a]/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Age</label><input type="number" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] focus:ring-2 focus:ring-[#30e87a]/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Place of Birth</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] focus:ring-2 focus:ring-[#30e87a]/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Nationality</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] focus:ring-2 focus:ring-[#30e87a]/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Religion</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] focus:ring-2 focus:ring-[#30e87a]/20 transition-all"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Date of Birth</label><input type="date" [(ngModel)]="formData.dob" name="dob" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Age</label><input type="number" [(ngModel)]="formData.age" name="age" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Place of Birth</label><input type="text" [(ngModel)]="formData.pob" name="pob" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Nationality</label><input type="text" [(ngModel)]="formData.nationality" name="nationality" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Religion</label><input type="text" [(ngModel)]="formData.religion" name="religion" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
         </div>
 
-        <div class="mt-6 pt-6 border-t border-[#e7f3ec] grid md:grid-cols-3 gap-6">
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">IC / Passport Number</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] focus:ring-2 focus:ring-[#30e87a]/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Date of Issue</label><input type="date" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] focus:ring-2 focus:ring-[#30e87a]/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Date of Expiration</label><input type="date" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] focus:ring-2 focus:ring-[#30e87a]/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">First Language</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] focus:ring-2 focus:ring-[#30e87a]/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Second Language</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] focus:ring-2 focus:ring-[#30e87a]/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Student Mobile Number</label><input type="tel" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] focus:ring-2 focus:ring-[#30e87a]/20 transition-all"></div>
+        <div class="mt-6 pt-6 border-t border-white grid md:grid-cols-3 gap-6">
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">IC / Passport Number</label><input type="text" [(ngModel)]="formData.ic" name="ic" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Date of Issue</label><input type="date" [(ngModel)]="formData.doi" name="doi" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Date of Expiration</label><input type="date" [(ngModel)]="formData.doe" name="doe" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">First Language</label><input type="text" [(ngModel)]="formData.lang1" name="lang1" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Second Language</label><input type="text" [(ngModel)]="formData.lang2" name="lang2" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Student Mobile Number</label><input type="tel" [(ngModel)]="formData.studentMobile" name="studentMobile" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
         </div>
 
         <div class="mt-6 space-y-2">
           <label class="text-xs font-bold text-slate-400 uppercase">Medical Information (If applicable)</label>
-          <textarea class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] focus:ring-2 focus:ring-[#30e87a]/20 transition-all h-20" placeholder="List any medical conditions or allergies..."></textarea>
+          <textarea [(ngModel)]="formData.medical" name="medical" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all h-20" placeholder="List any medical conditions or allergies..."></textarea>
         </div>
       </div>
 
-      <div class="bg-white border border-[#e7f3ec] rounded-[2rem] p-8 md:p-10 shadow-sm">
-        <h3 class="text-xl font-bold text-[#0e1b13] mb-6 border-b border-[#e7f3ec] pb-4 uppercase">Educational History</h3>
+      <div class="bg-white/80 backdrop-blur-md border border-white rounded-[2rem] p-8 md:p-10 shadow-lg hover:border-sky-500/30 transition-colors">
+        <h3 class="text-xl font-bold text-slate-900 mb-6 border-b border-white pb-4 uppercase tracking-wide">Educational History</h3>
         <p class="text-xs text-slate-400 mb-4 italic font-medium">List all schools attended in descending order.</p>
         <div class="space-y-4">
-          <div *ngFor="let school of educationalHistory; let i = index" class="grid md:grid-cols-4 gap-4 p-4 bg-[#f8fcfa] rounded-xl border border-[#e7f3ec]">
-            <input type="text" [(ngModel)]="school.school" name="school{{i}}" placeholder="Name of School" class="bg-transparent border-b border-[#e7f3ec] p-2 focus:border-[#30e87a] outline-none col-span-1 md:col-span-2 text-[#0e1b13] font-medium placeholder:text-slate-400">
-            <input type="text" [(ngModel)]="school.country" name="country{{i}}" placeholder="Country" class="bg-transparent border-b border-[#e7f3ec] p-2 focus:border-[#30e87a] outline-none text-[#0e1b13] font-medium placeholder:text-slate-400">
-            <input type="text" [(ngModel)]="school.language" name="language{{i}}" placeholder="Language" class="bg-transparent border-b border-[#e7f3ec] p-2 focus:border-[#30e87a] outline-none text-[#0e1b13] font-medium placeholder:text-slate-400">
-            <input type="text" [(ngModel)]="school.dates" name="dates{{i}}" placeholder="Dates of Attendance" class="bg-transparent border-b border-[#e7f3ec] p-2 focus:border-[#30e87a] outline-none col-span-1 md:col-span-2 text-[#0e1b13] font-medium placeholder:text-slate-400">
-            <input type="text" [(ngModel)]="school.grade" name="grade{{i}}" placeholder="Grade Level(s)" class="bg-transparent border-b border-[#e7f3ec] p-2 focus:border-[#30e87a] outline-none col-span-1 md:col-span-2 text-[#0e1b13] font-medium placeholder:text-slate-400">
+          <div *ngFor="let school of educationalHistory; let i = index" class="grid md:grid-cols-4 gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-200">
+            <input type="text" [(ngModel)]="school.school" name="school{{i}}" placeholder="Name of School" class="bg-transparent border-b border-slate-300 p-2 focus:border-sky-500 outline-none col-span-1 md:col-span-2 text-slate-900 font-medium placeholder:text-slate-400">
+            <input type="text" [(ngModel)]="school.country" name="country{{i}}" placeholder="Country" class="bg-transparent border-b border-slate-300 p-2 focus:border-sky-500 outline-none text-slate-900 font-medium placeholder:text-slate-400">
+            <input type="text" [(ngModel)]="school.language" name="language{{i}}" placeholder="Language" class="bg-transparent border-b border-slate-300 p-2 focus:border-sky-500 outline-none text-slate-900 font-medium placeholder:text-slate-400">
+            <input type="text" [(ngModel)]="school.dates" name="dates{{i}}" placeholder="Dates of Attendance" class="bg-transparent border-b border-slate-300 p-2 focus:border-sky-500 outline-none col-span-1 md:col-span-2 text-slate-900 font-medium placeholder:text-slate-400">
+            <input type="text" [(ngModel)]="school.grade" name="grade{{i}}" placeholder="Grade Level(s)" class="bg-transparent border-b border-slate-300 p-2 focus:border-sky-500 outline-none col-span-1 md:col-span-2 text-slate-900 font-medium placeholder:text-slate-400">
           </div>
 
-          <button type="button" (click)="addSchool()" class="text-[#30e87a] text-xs font-black uppercase flex items-center gap-1 hover:underline cursor-pointer hover:bg-green-50 px-2 py-1 rounded-lg w-fit">
+          <button type="button" (click)="addSchool()" class="text-sky-500 text-xs font-black uppercase flex items-center gap-1 hover:underline cursor-pointer hover:bg-sky-50 px-2 py-1 rounded-lg w-fit">
             <span translate="no" class="material-symbols-outlined notranslate text-sm">add_circle</span> Add another school
           </button>
         </div>
       </div>
 
-      <div class="bg-white border border-[#e7f3ec] rounded-[2rem] p-8 md:p-10 shadow-sm">
-        <h3 class="text-xl font-bold text-[#0e1b13] mb-6 border-b border-[#e7f3ec] pb-4 uppercase">Family Information</h3>
+      <div class="bg-white/80 backdrop-blur-md border border-white rounded-[2rem] p-8 md:p-10 shadow-lg hover:border-sky-500/30 transition-colors">
+        <h3 class="text-xl font-bold text-slate-900 mb-6 border-b border-white pb-4 uppercase tracking-wide">Family Information</h3>
 
-        <h4 class="text-[#30e87a] font-black mb-4 uppercase text-sm tracking-widest">Father's Details</h4>
+        <h4 class="text-sky-500 font-black mb-4 uppercase text-sm tracking-widest">Father's Details</h4>
         <div class="grid md:grid-cols-3 gap-6 mb-8">
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Full Name</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">IC/Passport No.</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Date of Birth</label><input type="date" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Nationality</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Mobile Number</label><input type="tel" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Email Address</label><input type="email" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Occupation</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
-          <div class="space-y-2 md:col-span-2"><label class="text-xs font-bold text-slate-400 uppercase">Work Address</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Full Name</label><input type="text" [(ngModel)]="formData.fatherName" name="fatherName" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Mobile Number</label><input type="tel" [(ngModel)]="formData.fatherMobile" name="fatherMobile" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Occupation</label><input type="text" [(ngModel)]="formData.fatherOcc" name="fatherOcc" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500"></div>
         </div>
 
-        <h4 class="text-[#30e87a] font-black mb-4 uppercase text-sm tracking-widest">Mother's Details</h4>
+        <h4 class="text-sky-500 font-black mb-4 uppercase text-sm tracking-widest">Mother's Details</h4>
         <div class="grid md:grid-cols-3 gap-6 mb-8">
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Full Name</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">IC/Passport No.</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Date of Birth</label><input type="date" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Nationality</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Mobile Number</label><input type="tel" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Email Address</label><input type="email" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Occupation</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
-          <div class="space-y-2 md:col-span-2"><label class="text-xs font-bold text-slate-400 uppercase">Work Address</label><input type="text" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Full Name</label><input type="text" [(ngModel)]="formData.motherName" name="motherName" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Mobile Number</label><input type="tel" [(ngModel)]="formData.motherMobile" name="motherMobile" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500"></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Occupation</label><input type="text" [(ngModel)]="formData.motherOcc" name="motherOcc" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500"></div>
         </div>
 
-        <h4 class="text-[#30e87a] font-black mb-4 uppercase text-sm tracking-widest">Siblings Information</h4>
+        <h4 class="text-sky-500 font-black mb-4 uppercase text-sm tracking-widest">Siblings Information</h4>
         <div class="space-y-3">
-          <div *ngFor="let sib of siblings; let j = index" class="grid md:grid-cols-4 gap-4 bg-[#f8fcfa] p-4 rounded-xl border border-[#e7f3ec]">
-            <input type="text" [(ngModel)]="sib.name" name="sibName{{j}}" placeholder="Sibling Name" class="bg-transparent border-b border-[#e7f3ec] p-2 outline-none text-[#0e1b13] font-medium placeholder:text-slate-400 focus:border-[#30e87a]">
-            <input type="number" [(ngModel)]="sib.age" name="sibAge{{j}}" placeholder="Age" class="bg-transparent border-b border-[#e7f3ec] p-2 outline-none text-[#0e1b13] font-medium placeholder:text-slate-400 focus:border-[#30e87a]">
-            <select [(ngModel)]="sib.gender" name="sibGender{{j}}" class="bg-transparent border-b border-[#e7f3ec] p-2 outline-none text-slate-500 font-medium focus:border-[#30e87a] cursor-pointer">
+          <div *ngFor="let sib of siblings; let j = index" class="grid md:grid-cols-4 gap-4 bg-slate-50/50 p-4 rounded-xl border border-slate-200">
+            <input type="text" [(ngModel)]="sib.name" name="sibName{{j}}" placeholder="Sibling Name" class="bg-transparent border-b border-slate-300 p-2 outline-none text-slate-900 font-medium placeholder:text-slate-400 focus:border-sky-500">
+            <input type="number" [(ngModel)]="sib.age" name="sibAge{{j}}" placeholder="Age" class="bg-transparent border-b border-slate-300 p-2 outline-none text-slate-900 font-medium placeholder:text-slate-400 focus:border-sky-500">
+            <select [(ngModel)]="sib.gender" name="sibGender{{j}}" class="bg-transparent border-b border-slate-300 p-2 outline-none text-slate-500 font-medium focus:border-sky-500 cursor-pointer">
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
-            <input type="text" [(ngModel)]="sib.currentSchool" name="sibSchool{{j}}" placeholder="Current School" class="bg-transparent border-b border-[#e7f3ec] p-2 outline-none text-[#0e1b13] font-medium placeholder:text-slate-400 focus:border-[#30e87a]">
+            <input type="text" [(ngModel)]="sib.currentSchool" name="sibSchool{{j}}" placeholder="Current School" class="bg-transparent border-b border-slate-300 p-2 outline-none text-slate-900 font-medium placeholder:text-slate-400 focus:border-sky-500">
           </div>
-          <button type="button" (click)="addSibling()" class="text-[#30e87a] text-xs font-black uppercase flex items-center gap-1 hover:underline cursor-pointer hover:bg-green-50 px-2 py-1 rounded-lg w-fit">
+          <button type="button" (click)="addSibling()" class="text-sky-500 text-xs font-black uppercase flex items-center gap-1 hover:underline cursor-pointer hover:bg-sky-50 px-2 py-1 rounded-lg w-fit">
             <span translate="no" class="material-symbols-outlined notranslate text-sm">add_circle</span> Add sibling
           </button>
         </div>
       </div>
 
-      <div class="bg-white border border-[#e7f3ec] rounded-[2rem] p-8 md:p-10 shadow-sm">
-        <h3 class="text-xl font-bold text-[#0e1b13] mb-6 border-b border-[#e7f3ec] pb-4 uppercase">Family Contact Information</h3>
+      <div class="bg-white/80 backdrop-blur-md border border-white rounded-[2rem] p-8 md:p-10 shadow-lg hover:border-sky-500/30 transition-colors">
+        <h3 class="text-xl font-bold text-slate-900 mb-6 border-b border-white pb-4 uppercase tracking-wide">Family Contact Information</h3>
         <div class="space-y-6">
           <div class="grid md:grid-cols-2 gap-6">
-            <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Primary Email</label><input type="email" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
-            <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Alternate Email</label><input type="email" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
+            <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Primary Email <span class="text-red-500">*</span></label><input type="email" required [(ngModel)]="formData.primaryEmail" name="primaryEmail" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500"></div>
+            <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Alternate Email</label><input type="email" [(ngModel)]="formData.altEmail" name="altEmail" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500"></div>
           </div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Current Home Address</label><textarea class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] h-24"></textarea></div>
+          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Current Home Address</label><textarea [(ngModel)]="formData.address" name="address" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 h-24"></textarea></div>
           <div class="grid md:grid-cols-3 gap-6">
-            <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Home Phone</label><input type="tel" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
-            <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Primary Mobile (Father/Mother/Other)</label><input type="tel" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
-            <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Alternate Mobile (Father/Mother/Other)</label><input type="tel" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a]"></div>
+            <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Home Phone</label><input type="tel" [(ngModel)]="formData.homePhone" name="homePhone" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500"></div>
           </div>
         </div>
       </div>
@@ -214,28 +239,28 @@
           </button>
         </div>
 
-        <div *ngFor="let section of customSections; let sIndex = index" class="bg-white border border-indigo-200 rounded-[2rem] p-8 md:p-10 shadow-sm relative group/section mb-8">
+        <div *ngFor="let section of customSections; let sIndex = index" class="bg-white/80 backdrop-blur-md border border-indigo-200 rounded-[2rem] p-8 md:p-10 shadow-lg relative group/section mb-8 hover:border-indigo-300 transition-colors">
 
-          <button *ngIf="isAdmin" type="button" (click)="removeSection(sIndex)" class="absolute top-4 right-4 text-red-400 hover:text-red-600 opacity-0 group-hover/section:opacity-100 transition-opacity bg-red-50 p-1 rounded-lg shadow-sm">
+          <button *ngIf="isAdmin" type="button" (click)="removeSection(sIndex)" class="absolute top-4 right-4 text-red-400 hover:text-red-600 opacity-0 group-hover/section:opacity-100 transition-opacity bg-white p-1 rounded-lg shadow-sm border border-red-100">
             <span translate="no" class="material-symbols-outlined text-[18px] notranslate">delete</span>
           </button>
 
-          <h3 class="text-xl font-bold text-indigo-900 mb-6 border-b border-indigo-100 pb-4 uppercase">
+          <h3 class="text-xl font-bold text-indigo-900 mb-6 border-b border-indigo-100 pb-4 uppercase tracking-wide">
             <input *ngIf="isAdmin" [(ngModel)]="section.sectionTitle" name="secTitle{{sIndex}}" class="bg-transparent border-b border-dashed border-indigo-300 outline-none w-1/2">
             <span *ngIf="!isAdmin">{{ section.sectionTitle }}</span>
           </h3>
 
           <div class="space-y-6">
-            <div *ngFor="let row of section.rows; let rIndex = index" class="relative group/row bg-indigo-50/30 p-4 rounded-2xl border border-indigo-50">
+            <div *ngFor="let row of section.rows; let rIndex = index" class="relative group/row bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100">
 
-              <button *ngIf="isAdmin" type="button" (click)="removeRow(sIndex, rIndex)" class="absolute -left-3 top-1/2 -translate-y-1/2 text-red-400 hover:text-red-600 opacity-0 group-hover/row:opacity-100 transition-opacity bg-white rounded-full shadow-sm p-1">
+              <button *ngIf="isAdmin" type="button" (click)="removeRow(sIndex, rIndex)" class="absolute -left-3 top-1/2 -translate-y-1/2 text-red-400 hover:text-red-600 opacity-0 group-hover/row:opacity-100 transition-opacity bg-white rounded-full shadow-sm p-1 border border-red-100">
                 <span translate="no" class="material-symbols-outlined text-[14px] notranslate">remove</span>
               </button>
 
               <div class="grid grid-cols-1 md:grid-cols-{{row.columns.length}} gap-6">
                 <div *ngFor="let col of row.columns; let cIndex = index" class="relative group/col">
 
-                  <div *ngIf="isAdmin" class="bg-indigo-100 p-3 rounded-lg mb-2 shadow-inner border border-indigo-200">
+                  <div *ngIf="isAdmin" class="bg-white/80 p-3 rounded-lg mb-2 shadow-sm border border-indigo-200">
                     <div class="flex justify-between items-center mb-2">
                       <span class="text-[10px] font-black text-indigo-500 uppercase tracking-widest">Edit Question</span>
                       <button type="button" (click)="removeColumn(sIndex, rIndex, cIndex)" class="text-red-500 hover:text-red-700"><span translate="no" class="material-symbols-outlined text-[14px] notranslate">close</span></button>
@@ -254,28 +279,28 @@
 
                   <label class="text-xs font-bold text-slate-500 uppercase">{{ col.label }}</label>
 
-                  <input *ngIf="col.type === 'text'" type="text" [(ngModel)]="col.value" name="v_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] mt-2">
+                  <input *ngIf="col.type === 'text'" type="text" [(ngModel)]="col.value" name="v_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 mt-2">
 
-                  <input *ngIf="col.type === 'date'" type="date" [(ngModel)]="col.value" name="v_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] mt-2">
+                  <input *ngIf="col.type === 'date'" type="date" [(ngModel)]="col.value" name="v_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 mt-2">
 
-                  <select *ngIf="col.type === 'dropdown'" [(ngModel)]="col.value" name="v_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="w-full bg-[#f8fcfa] border border-[#e7f3ec] rounded-xl p-3 text-[#0e1b13] font-bold outline-none focus:border-[#30e87a] cursor-pointer mt-2">
+                  <select *ngIf="col.type === 'dropdown'" [(ngModel)]="col.value" name="v_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 cursor-pointer mt-2">
                     <option *ngFor="let opt of col.options.split(',')" [value]="opt.trim()">{{ opt.trim() }}</option>
                   </select>
 
                   <div *ngIf="col.type === 'checkbox'" class="mt-4 flex items-center gap-2">
-                    <input type="checkbox" [(ngModel)]="col.value" name="v_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="accent-[#30e87a] size-5 rounded cursor-pointer">
+                    <input type="checkbox" [(ngModel)]="col.value" name="v_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="accent-sky-500 size-5 rounded cursor-pointer">
                     <span class="text-sm font-bold text-slate-600">Yes / Agree</span>
                   </div>
 
                 </div>
 
-                <div *ngIf="isAdmin && row.columns.length < 3" class="flex items-center justify-center border-2 border-dashed border-indigo-200 rounded-xl opacity-50 hover:opacity-100 hover:bg-indigo-50 transition-all cursor-pointer min-h-[60px]" (click)="addColumn(sIndex, rIndex)">
+                <div *ngIf="isAdmin && row.columns.length < 3" class="flex items-center justify-center border-2 border-dashed border-indigo-200 rounded-xl opacity-50 hover:opacity-100 hover:bg-white transition-all cursor-pointer min-h-[60px]" (click)="addColumn(sIndex, rIndex)">
                   <span translate="no" class="material-symbols-outlined text-indigo-400 notranslate">add</span>
                 </div>
               </div>
             </div>
 
-            <button *ngIf="isAdmin" type="button" (click)="addRow(sIndex)" class="text-xs bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 hover:bg-indigo-200 transition-colors w-fit mx-auto mt-4">
+            <button *ngIf="isAdmin" type="button" (click)="addRow(sIndex)" class="text-xs bg-white border border-indigo-100 text-indigo-600 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 hover:bg-indigo-50 transition-colors w-fit mx-auto mt-4 shadow-sm">
               <span translate="no" class="material-symbols-outlined text-[14px] notranslate">add</span> Add Row Here
             </button>
 
@@ -283,12 +308,12 @@
         </div>
       </div>
 
-      <div class="flex justify-between items-center bg-white p-8 rounded-[2rem] border border-[#e7f3ec] shadow-lg">
-        <div class="flex items-center gap-2 text-slate-500 font-bold text-sm">
-          <input type="checkbox" required class="accent-[#30e87a] size-5 rounded cursor-pointer">
+      <div class="flex justify-between items-center bg-white/90 backdrop-blur-md p-8 rounded-[2rem] border border-white shadow-xl hover:border-sky-500/30 transition-all mt-8">
+        <div class="flex items-center gap-2 text-slate-600 font-bold text-sm">
+          <input type="checkbox" required class="accent-sky-500 size-5 rounded cursor-pointer">
           <span>I verify that all information provided is accurate and complete.</span>
         </div>
-        <button type="submit" class="bg-[#30e87a] hover:bg-[#25d366] text-[#0e1b13] font-black rounded-full px-12 py-4 transition-all hover:scale-105 shadow-lg shadow-green-200 text-lg uppercase tracking-widest cursor-pointer">
+        <button type="submit" class="bg-sky-500 hover:bg-sky-400 text-white font-black rounded-full px-12 py-4 transition-all hover:scale-105 shadow-lg shadow-sky-500/50 text-lg uppercase tracking-widest cursor-pointer">
           Submit Form
         </button>
       </div>
@@ -296,4 +321,35 @@
     </form>
   </main>
   <app-footer></app-footer>
+
+  <div *ngIf="editMode" class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+        <h2 class="text-xl font-black text-slate-800 uppercase tracking-tight">Edit Section</h2>
+        <button (click)="closeEditModal()" class="text-slate-400 hover:text-red-500 transition-colors"><span translate="no" class="material-symbols-outlined notranslate">close</span></button>
+      </div>
+
+      <div class="p-6 flex flex-col gap-4 overflow-y-auto custom-scrollbar">
+        <ng-container *ngIf="editMode === 'header'">
+          <div><label class="text-xs font-bold text-slate-500 uppercase block mb-1">Badge Text</label><input type="text" [(ngModel)]="editData.badge" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500"></div>
+          <div><label class="text-xs font-bold text-slate-500 uppercase block mb-1">Title Start</label><input type="text" [(ngModel)]="editData.titleStart" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500"></div>
+          <div><label class="text-xs font-bold text-slate-500 uppercase block mb-1">Title Highlight</label><input type="text" [(ngModel)]="editData.titleHighlight" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500"></div>
+          <div><label class="text-xs font-bold text-slate-500 uppercase block mb-1">Description</label><textarea [(ngModel)]="editData.description" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500"></textarea></div>
+          <div>
+            <label class="text-xs font-bold text-slate-500 uppercase block mb-1 mt-2">Background Image</label>
+            <div class="flex items-center gap-4">
+              <input type="file" #bgInput (change)="onFileSelected($event, 'bgImage')" accept="image/*" class="hidden">
+              <button (click)="bgInput.click()" class="px-4 py-2 bg-sky-100 text-sky-700 font-bold rounded-lg hover:bg-sky-200 flex items-center gap-2"><span translate="no" class="material-symbols-outlined notranslate text-[18px]">upload_file</span> Choose Image</button>
+              <div *ngIf="editData.bgImage" class="h-10 w-16 rounded bg-cover bg-center border border-slate-200 shadow-inner" [style.background-image]="'url(' + editData.bgImage + ')'"></div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/50 mt-auto">
+        <button (click)="closeEditModal()" class="px-6 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-slate-200 transition-colors">Cancel</button>
+        <button (click)="saveEdits()" class="px-6 py-2.5 rounded-xl font-bold bg-slate-900 text-white hover:bg-sky-500 shadow-lg transition-all flex items-center gap-2"><span translate="no" class="material-symbols-outlined text-[18px] notranslate">save</span> Save</button>
+      </div>
+    </div>
+  </div>
 </div>

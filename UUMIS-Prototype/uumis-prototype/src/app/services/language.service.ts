@@ -50,6 +50,9 @@ export class LanguageService {
     if (lang === 'ms') {
       // Tell Google to translate English to Malay
       document.cookie = "googtrans=/en/ms; path=/";
+    } else if (lang === 'th') {
+      // Tell Google to translate English to Thai
+      document.cookie = "googtrans=/en/th; path=/";
     } else {
       // Clear translation (Return to English)
       document.cookie = "googtrans=/en/en; path=/";

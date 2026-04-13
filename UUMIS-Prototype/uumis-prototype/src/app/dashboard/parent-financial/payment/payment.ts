@@ -12,7 +12,11 @@ import { AuthService } from '../../../services/auth.service';
 })
 export class PaymentComponent implements OnInit {
 
-  // --- REAL DATABASE VARIABLES ---
+  currentUser: any = null;
+  viewState: string = 'children';
+  myChildren: any[] = [];
+  selectedChild: any = null;
+
   totalOutstanding = 0.00;
   childId: number | null = null;
 
@@ -28,33 +32,41 @@ export class PaymentComponent implements OnInit {
   constructor(private location: Location, private authService: AuthService) {}
 
   ngOnInit() {
-    const currentUser = this.authService.getCurrentUser();
-    if (currentUser && currentUser.childUserId) {
-      this.childId = currentUser.childUserId;
-      this.loadData();
+    this.currentUser = this.authService.getCurrentUser();
+    if (this.currentUser && this.currentUser.role.toLowerCase() === 'parent') {
+      this.authService.getStudents().subscribe({
+        next: (students: any[]) => {
+          this.myChildren = students.filter(s => s.parentId === this.currentUser.id);
+        }
+      });
     }
+  }
+
+  getInitials(name: string): string {
+    if (!name) return 'NA';
+    return name.trim().slice(0, 2).toUpperCase();
+  }
+
+  selectChild(child: any) {
+    this.selectedChild = child;
+    this.childId = child.id;
+    this.viewState = 'details';
+    this.loadData();
   }
 
   loadData() {
     if (!this.childId) return;
 
-    // Fetch exact Outstanding Balance
     this.authService.getStudentDashboardData(this.childId).subscribe({
       next: (data: any) => this.totalOutstanding = data.outstandingDue || 0,
       error: (err) => console.error(err)
     });
 
-    // Fetch exact Transaction History
     this.authService.getStudentPayments(this.childId).subscribe({
       next: (txns: any[]) => {
         this.transactions = txns.map(t => ({
-          id: t.id,
-          date: t.date,
-          desc: t.description || t.invoiceNumber,
-          amount: t.amount,
-          status: t.status,
-          receiptUrl: t.fileUrl,
-          receiptFile: t.receiptFile
+          id: t.id, date: t.date, desc: t.description || t.invoiceNumber,
+          amount: t.amount, status: t.status, receiptUrl: t.fileUrl, receiptFile: t.receiptFile
         }));
       },
       error: (err) => console.error(err)
@@ -62,7 +74,13 @@ export class PaymentComponent implements OnInit {
   }
 
   goBack(): void {
-    this.location.back();
+    if (this.viewState === 'details') {
+      this.viewState = 'children';
+      this.selectedChild = null;
+      this.childId = null;
+    } else {
+      this.location.back();
+    }
   }
 
   onFileSelect(event: any): void {
@@ -83,21 +101,17 @@ export class PaymentComponent implements OnInit {
     if (!this.uploadData.fileUrl) { alert('Select a receipt file to upload.'); return; }
 
     const payload = {
-      date: this.uploadData.date,
-      description: 'Payment Proof Uploaded',
-      invoiceNumber: 'REF-' + Math.floor(Math.random() * 100000),
-      method: 'Bank Transfer',
-      amount: this.uploadData.amount,
-      status: 'Pending', // Puts it in 'Pending Verification'
-      receiptFile: this.uploadData.fileName,
-      fileUrl: this.uploadData.fileUrl
+      date: this.uploadData.date, description: 'Payment Proof Uploaded',
+      invoiceNumber: 'REF-' + Math.floor(Math.random() * 100000), method: 'Bank Transfer',
+      amount: this.uploadData.amount, status: 'Pending',
+      receiptFile: this.uploadData.fileName, fileUrl: this.uploadData.fileUrl
     };
 
     this.authService.addPayment(this.childId, payload).subscribe({
       next: () => {
         alert('Payment proof submitted successfully! Awaiting Admin approval.');
         this.uploadData = { date: new Date().toISOString().split('T')[0], amount: null, fileName: '', fileUrl: null };
-        this.loadData(); // Refresh table instantly
+        this.loadData();
       },
       error: () => alert('Failed to submit payment proof.')
     });

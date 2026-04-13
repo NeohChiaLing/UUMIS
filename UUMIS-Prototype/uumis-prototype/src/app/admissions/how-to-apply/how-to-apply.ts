@@ -45,11 +45,11 @@ export class HowToApplyComponent implements OnInit {
       titleStart: 'How to', titleHighlight: 'Apply',
       findOutTitle: 'Find out more', findOutDesc: 'Find out more about our admissions process...',
       sem1: 'August To December', sem2: 'January To June', phone: '04-928 8790',
-      brochureImage: '/assets/MAIN-BROCHURE.jpg', brochurePdf: '/assets/MAIN-BROCHURE.jpg'
+      brochureImage: 'assets/MAIN-BROCHURE.jpg', brochurePdf: 'assets/MAIN-BROCHURE.jpg'
     };
 
     // DB LOAD
-    this.http.get('http://localhost:8080/api/content/how_to_apply', { responseType: 'text' }).subscribe({
+    this.http.get('/api/content/how_to_apply', { responseType: 'text' }).subscribe({
       next: (data) => { this.pageData = (data && data.length > 5) ? JSON.parse(data) : defaultData; },
       error: () => { this.pageData = defaultData; }
     });
@@ -58,7 +58,7 @@ export class HowToApplyComponent implements OnInit {
   // DB SAVE
   publishChanges() {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    this.http.post('http://localhost:8080/api/content/how_to_apply', JSON.stringify(this.pageData), { headers, responseType: 'text' }).subscribe({
+    this.http.post('/api/content/how_to_apply', JSON.stringify(this.pageData), { headers, responseType: 'text' }).subscribe({
       next: () => alert('Changes published successfully to the database!'),
       error: (err) => { console.error(err); alert('Error saving to database.'); }
     });

@@ -15,7 +15,6 @@ export class StudentGradesComponent implements OnInit {
 
   studentGrades: any[] = [];
 
-  // Dynamic user data
   studentName: string = 'Student';
   studentYear: string = 'Unknown Grade';
   studentUsername: string = '';
@@ -23,20 +22,21 @@ export class StudentGradesComponent implements OnInit {
   constructor(private location: Location, private authService: AuthService) {}
 
   ngOnInit() {
-    // 1. Get logged-in student info securely from Local Storage
     if (typeof localStorage !== 'undefined') {
       const userStr = localStorage.getItem('user');
       if (userStr) {
         try {
           const user = JSON.parse(userStr);
-          this.studentName = user.fullName || user.username;
-          this.studentUsername = user.username;
+          this.studentName = user.fullName || user.username || 'Student';
+
+          // THE FIX: Strictly use username!
+          this.studentUsername = user.username || '';
+
           this.studentYear = user.bio && user.bio !== 'Unassigned' ? user.bio : 'Unknown Grade';
         } catch (e) {}
       }
     }
 
-    // 2. Fetch grades from database
     this.loadMyGrades();
   }
 
@@ -49,7 +49,6 @@ export class StudentGradesComponent implements OnInit {
       },
       error: (err) => {
         console.error(err);
-        // This popup will appear if the Java server rejects the request!
         alert('Could not connect to the grading database! Please ensure your Spring Boot server has the getStudentGrades endpoint and is currently running.');
       }
     });

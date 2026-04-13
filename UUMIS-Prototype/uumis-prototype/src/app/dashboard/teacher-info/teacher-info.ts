@@ -26,9 +26,39 @@ export class TeacherInfoComponent implements OnInit {
   openScheduleDropdownSlot: any = null;
   groupedSchedule: any[] = [];
 
-  // ==========================================
-  // --- STATE PERSISTENCE (SURVIVES REFRESH) ---
-  // ==========================================
+  academicLevels = ['Kindergarten', 'Primary', 'Lower Secondary', 'Upper Secondary'];
+
+  // Temps for the dropdown before adding to the array
+  tempLevel: string = '';
+  tempYear: string = '';
+
+  getYearsForLevel(level: string): string[] {
+    if (level === 'Kindergarten') return ['Pre-Kindergarten', 'Kindergarten'];
+    if (level === 'Primary') return ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6'];
+    if (level === 'Lower Secondary') return ['Year 7', 'Year 8', 'Year 9'];
+    if (level === 'Upper Secondary') return ['Year 10', 'Year 11'];
+    return [];
+  }
+
+  // --- NEW: Smart Subject Filter for Multiple Classes ---
+  get filteredSubjectsForTeacher() {
+    if (!this.selectedTeacher.assignedClassesArray || this.selectedTeacher.assignedClassesArray.length === 0) {
+      return [];
+    }
+    return this.availableSubjects.filter(s => {
+      const subjLevel = (s.level || '').toLowerCase();
+      const subjYear = (s.yearGroup || '').toLowerCase();
+
+      // Check if this subject matches ANY of the teacher's assigned classes
+      return this.selectedTeacher.assignedClassesArray.some((c: string) => {
+        const parts = c.split(' - ');
+        const cLevel = (parts[0] || '').trim().toLowerCase();
+        const cYear = (parts[1] || '').trim().toLowerCase();
+        return subjLevel === cLevel && subjYear === cYear;
+      });
+    });
+  }
+
   private _viewMode: 'list' | 'profile' | 'teaching' | 'schedule' | 'certs' = 'list';
   get viewMode() { return this._viewMode; }
   set viewMode(val: 'list' | 'profile' | 'teaching' | 'schedule' | 'certs') {
@@ -49,7 +79,6 @@ export class TeacherInfoComponent implements OnInit {
     this._selectedTeacher = val;
     sessionStorage.setItem('uumis_selectedTeacher', JSON.stringify(val));
   }
-  // ==========================================
 
   constructor(private authService: AuthService, private router: Router, private location: Location) {}
 
@@ -60,7 +89,6 @@ export class TeacherInfoComponent implements OnInit {
     this.isAdmin = this.userRole === 'admin';
     this.isTeacher = this.userRole === 'teacher';
 
-    // --- RESTORE STATE ON PAGE REFRESH ---
     const savedMode = sessionStorage.getItem('uumis_viewMode');
     if (savedMode) this._viewMode = savedMode as any;
 
@@ -72,52 +100,49 @@ export class TeacherInfoComponent implements OnInit {
       try {
         this._selectedTeacher = JSON.parse(savedTeacher);
         if (this._viewMode !== 'list') {
-          this.buildGroupedSchedule(); // Rebuild the schedule UI if we are inside a profile
+          this.buildGroupedSchedule();
         }
       } catch(e) {}
     }
-    // --------------------------------------
 
     this.loadTeachers();
     this.loadSubjects();
   }
 
-  get canAddTeacher() {
-    return true;
-  }
-
-  get canEditProfile() {
-    return true;
-  }
+  get canAddTeacher() { return true; }
+  get canEditProfile() { return true; }
 
   loadTeachers() {
     this.authService.getTeachers().subscribe({
       next: (data) => {
-        this.teachers = data.map((t: any, index: number) => ({
-          dbId: t.id,
-          no: index + 1,
-          name: t.fullName || t.username,
-          phone: t.phone || '',
-          email: t.email || '',
-          assignedSubjectsArray: t.assignedSubjects ? t.assignedSubjects.split(',') : [],
+        this.teachers = data.map((t: any, index: number) => {
+          // --- NEW: Parse multi-class assignments ---
+          const classArray = t.bio && t.bio !== 'Unassigned' ? t.bio.split(',').map((c: string) => c.trim()) : [];
 
-          website: '', linkedIn: '', emergencyContact: '',
-
-          summary: t.summary || 'Experienced educator dedicated to student success.',
-          education: '', experience: '',
-          hardSkills: t.hardSkills || '',
-          softSkills: t.softSkills || '',
-          philosophy: t.philosophy || 'Engaging students through interactive learning.',
-
-          schedule: t.scheduleJson ? JSON.parse(t.scheduleJson) : [
-            { day: 'Sunday', time: '', subject: '', class: '' },
-            { day: 'Monday', time: '', subject: '', class: '' },
-            { day: 'Tuesday', time: '', subject: '', class: '' },
-            { day: 'Wednesday', time: '', subject: '', class: '' },
-            { day: 'Thursday', time: '', subject: '', class: '' }
-          ],
-          certificates: t.certificatesJson ? JSON.parse(t.certificatesJson) : []
-        }));
+          return {
+            dbId: t.id,
+            no: index + 1,
+            name: t.fullName || t.username,
+            phone: t.phone || '',
+            email: t.email || '',
+            assignedSubjectsArray: t.assignedSubjects ? t.assignedSubjects.split(',').map((s: string) => s.trim()) : [],
+            assignedClassesArray: classArray,
+            website: '', linkedIn: '', emergencyContact: '',
+            summary: t.summary || 'Experienced educator dedicated to student success.',
+            education: '', experience: '',
+            hardSkills: t.hardSkills || '',
+            softSkills: t.softSkills || '',
+            philosophy: t.philosophy || 'Engaging students through interactive learning.',
+            schedule: t.scheduleJson ? JSON.parse(t.scheduleJson) : [
+              { day: 'Sunday', time: '', subject: '', class: '' },
+              { day: 'Monday', time: '', subject: '', class: '' },
+              { day: 'Tuesday', time: '', subject: '', class: '' },
+              { day: 'Wednesday', time: '', subject: '', class: '' },
+              { day: 'Thursday', time: '', subject: '', class: '' }
+            ],
+            certificates: t.certificatesJson ? JSON.parse(t.certificatesJson) : []
+          };
+        });
       },
       error: () => console.log('Failed to fetch teachers')
     });
@@ -125,15 +150,13 @@ export class TeacherInfoComponent implements OnInit {
 
   loadSubjects() {
     this.authService.getSubjects().subscribe({
-      next: (data) => {
-        this.availableSubjects = data.filter(s => s.active);
-      }
+      next: (data) => this.availableSubjects = data.filter(s => s.active)
     });
   }
 
   getNewTeacherTemplate() {
     return {
-      dbId: null, no: null, name: '', assignedSubjectsArray: [],
+      dbId: null, no: null, name: '', assignedSubjectsArray: [], assignedClassesArray: [],
       phone: '', email: '', website: '', linkedIn: '', emergencyContact: '',
       summary: '', education: '', experience: '', hardSkills: '', softSkills: '', philosophy: '',
       schedule: [
@@ -156,6 +179,7 @@ export class TeacherInfoComponent implements OnInit {
   addNewTeacher() {
     this.selectedTeacher = this.getNewTeacherTemplate();
     this.selectedTeacher.no = this.teachers.length + 1;
+    this.tempLevel = ''; this.tempYear = '';
     this.isAddMode = true;
     this.isEditMode = true;
     this.viewMode = 'profile';
@@ -164,10 +188,33 @@ export class TeacherInfoComponent implements OnInit {
 
   selectTeacher(teacher: any) {
     this.selectedTeacher = JSON.parse(JSON.stringify(teacher));
+    this.tempLevel = ''; this.tempYear = '';
     this.isAddMode = false;
     this.isEditMode = false;
     this.viewMode = 'profile';
     this.buildGroupedSchedule();
+  }
+
+  // --- NEW: Add & Remove Multi-Classes ---
+  addClass() {
+    if (this.tempLevel && this.tempYear) {
+      const combo = `${this.tempLevel} - ${this.tempYear}`;
+      if (!this.selectedTeacher.assignedClassesArray.includes(combo)) {
+        this.selectedTeacher.assignedClassesArray.push(combo);
+        // Clear temp inputs after adding
+        this.tempLevel = '';
+        this.tempYear = '';
+        // Clear assigned subjects because the scope has changed
+        this.selectedTeacher.assignedSubjectsArray = [];
+        this.selectedTeacher = this.selectedTeacher;
+      }
+    }
+  }
+
+  removeClass(className: string) {
+    this.selectedTeacher.assignedClassesArray = this.selectedTeacher.assignedClassesArray.filter((c: string) => c !== className);
+    this.selectedTeacher.assignedSubjectsArray = []; // Clear subjects on class removal
+    this.selectedTeacher = this.selectedTeacher;
   }
 
   buildGroupedSchedule() {
@@ -182,8 +229,6 @@ export class TeacherInfoComponent implements OnInit {
 
   addSlot(dayName: string) {
     this.selectedTeacher.schedule.push({ day: dayName, time: '', subject: '', class: '' });
-
-    // Force setter to trigger a save to session storage
     this.selectedTeacher = this.selectedTeacher;
     this.buildGroupedSchedule();
   }
@@ -192,8 +237,6 @@ export class TeacherInfoComponent implements OnInit {
     const idx = this.selectedTeacher.schedule.indexOf(slot);
     if (idx > -1) {
       this.selectedTeacher.schedule.splice(idx, 1);
-
-      // Force setter to trigger a save to session storage
       this.selectedTeacher = this.selectedTeacher;
       this.buildGroupedSchedule();
     }
@@ -207,7 +250,7 @@ export class TeacherInfoComponent implements OnInit {
 
   selectScheduleSubject(slot: any, subjectName: string) {
     slot.subject = subjectName;
-    this.selectedTeacher = this.selectedTeacher; // Save state
+    this.selectedTeacher = this.selectedTeacher;
     this.openScheduleDropdownSlot = null;
   }
 
@@ -224,14 +267,14 @@ export class TeacherInfoComponent implements OnInit {
     } else {
       this.selectedTeacher.assignedSubjectsArray.push(subjectName);
     }
-    this.selectedTeacher = this.selectedTeacher; // Save state
+    this.selectedTeacher = this.selectedTeacher;
   }
 
   removeSubject(subjectName: string, event: Event) {
     event.stopPropagation();
     if (!this.isEditMode) return;
     this.selectedTeacher.assignedSubjectsArray = this.selectedTeacher.assignedSubjectsArray.filter((s: string) => s !== subjectName);
-    this.selectedTeacher = this.selectedTeacher; // Save state
+    this.selectedTeacher = this.selectedTeacher;
   }
 
   saveData() {
@@ -240,9 +283,15 @@ export class TeacherInfoComponent implements OnInit {
       return;
     }
 
+    // Join array into comma separated string for the DB
+    const combinedBio = this.selectedTeacher.assignedClassesArray.length > 0
+      ? this.selectedTeacher.assignedClassesArray.join(', ')
+      : 'Unassigned';
+
     const payload = {
       fullName: this.selectedTeacher.name,
       phone: this.selectedTeacher.phone,
+      bio: combinedBio,
       assignedSubjects: this.selectedTeacher.assignedSubjectsArray.join(','),
       summary: this.selectedTeacher.summary,
       hardSkills: this.selectedTeacher.hardSkills,
@@ -284,7 +333,7 @@ export class TeacherInfoComponent implements OnInit {
           fileName: file.name,
           fileUrl: e.target.result
         });
-        this.selectedTeacher = this.selectedTeacher; // Save state
+        this.selectedTeacher = this.selectedTeacher;
       };
       reader.readAsDataURL(file);
     }

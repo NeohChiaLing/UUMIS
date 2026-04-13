@@ -1,0 +1,311 @@
+<div class="min-h-screen bg-transparent font-display text-slate-900 relative overflow-x-hidden">
+
+  <div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
+    <div class="absolute -top-40 -right-40 w-[800px] h-[800px] bg-sky-200/40 rounded-full blur-[120px] bubble-float"></div>
+    <div class="absolute top-1/4 -left-48 w-[600px] h-[600px] bg-blue-400/20 rounded-full blur-[100px] bubble-float-alt" style="animation-delay: -5s;"></div>
+    <div class="absolute -bottom-20 left-1/3 w-[500px] h-[500px] bg-purple-200/30 rounded-full blur-[90px] bubble-float" style="animation-delay: -10s;"></div>
+
+    <div class="absolute top-[15%] right-[15%] w-32 h-32 rounded-full glass-bubble border border-white/40 bubble-float z-10" style="animation-duration: 15s;"></div>
+    <div class="absolute bottom-[20%] left-[10%] w-48 h-48 rounded-full glass-bubble border border-white/30 bubble-float-alt z-10" style="animation-delay: -2s; animation-duration: 25s;"></div>
+    <div class="absolute top-1/2 right-[5%] w-24 h-24 rounded-full glass-bubble border border-white/20 bubble-float z-10" style="animation-delay: -7s;"></div>
+    <div class="absolute top-[10%] left-[20%] w-16 h-16 rounded-full glass-bubble border border-white/30 bubble-float-alt z-10" style="animation-delay: -12s;"></div>
+
+    <div class="absolute top-[20%] left-[10%] opacity-[0.08] transform -rotate-12 bubble-float text-slate-800" style="animation-duration: 20s;">
+      <span translate="no" class="material-symbols-outlined notranslate text-[15rem]" style="font-variation-settings: 'wght' 100;">menu_book</span>
+    </div>
+    <div class="absolute bottom-[15%] right-[10%] opacity-[0.08] transform rotate-12 bubble-float-alt text-slate-800" style="animation-duration: 25s;">
+      <span translate="no" class="material-symbols-outlined notranslate text-[18rem]" style="font-variation-settings: 'wght' 100;">school</span>
+    </div>
+  </div>
+
+  <app-navbar></app-navbar>
+
+  <section class="relative w-full h-[calc(100vh-80px)] min-h-[600px] flex items-center justify-center text-center group rounded-b-[3rem] sm:rounded-b-[4rem] overflow-hidden shadow-2xl mt-0">
+
+    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105 z-0"
+         [style.background-image]="'url(' + (pageData.hero?.bgImage || 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1920&q=80') + ')'">
+    </div>
+
+    <div class="absolute inset-0 bg-black/30 z-0"></div>
+
+    <button *ngIf="isAdmin" (click)="openEditModal('hero')" class="absolute top-6 right-6 z-50 bg-white hover:bg-sky-500 hover:text-white text-slate-800 rounded-full px-4 py-2 shadow-lg font-bold text-sm flex items-center gap-2 transition-all opacity-0 group-hover:opacity-100">
+      <span translate="no" class="material-symbols-outlined notranslate text-[18px]">edit</span> Edit Cover
+    </button>
+
+    <div class="relative z-10 flex flex-col items-center gap-8 max-w-4xl mx-auto px-4 sm:px-6 animate-fade-in-up mt-8">
+      <div class="flex flex-col gap-4 items-center">
+        <span class="inline-block px-4 py-1.5 rounded-full bg-sky-500/30 backdrop-blur-md border border-sky-400/30 text-sky-100 text-xs font-black uppercase tracking-wider w-fit shadow-lg">
+          {{ pageData.hero?.badge || 'FACULTY & STAFF' }}
+        </span>
+        <h1 class="text-5xl sm:text-7xl md:text-8xl font-black leading-[1.1] tracking-tighter text-white drop-shadow-2xl">
+          {{ pageData.hero?.titleStart || 'Our' }} <br/>
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-300 to-sky-100 drop-shadow-lg">{{ pageData.hero?.titleHighlight || 'Educators' }}</span>
+        </h1>
+        <p class="text-white text-lg sm:text-xl font-bold max-w-2xl mx-auto leading-relaxed mt-2 drop-shadow-xl">
+          {{ pageData.hero?.desc || 'World-class professionals dedicated to student success.' }}
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <main class="flex-grow w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16 relative z-10">
+
+    <div class="fixed bottom-8 right-8 z-[90] flex flex-col items-end gap-4">
+      <button *ngIf="isAdmin" (click)="publishChanges()" class="bg-slate-900 text-white px-6 py-3 rounded-full font-black text-sm shadow-2xl hover:bg-sky-500 hover:scale-105 transition-all flex items-center gap-2 animate-fade-in-up border border-slate-700">
+        <span translate="no" class="material-symbols-outlined notranslate text-[18px]">cloud_upload</span> Publish Changes
+      </button>
+    </div>
+
+    <div *ngIf="isFetchingUsers" class="py-24 flex flex-col items-center justify-center text-sky-500 animate-pulse mt-8">
+      <span translate="no" class="material-symbols-outlined notranslate text-5xl mb-4">cloud_download</span>
+      <p class="font-bold uppercase tracking-widest text-sm text-slate-500">Syncing with Live Database...</p>
+    </div>
+
+    <section *ngIf="!isFetchingUsers" class="mt-8">
+      <div class="flex items-center justify-between mb-8 border-b border-slate-200/50 pb-4">
+        <h3 class="text-2xl font-black text-slate-900 flex items-center gap-3">
+          <span class="flex items-center justify-center size-10 rounded-full bg-sky-50 border border-white text-sky-500 shadow-sm">
+            <span translate="no" class="material-symbols-outlined notranslate">admin_panel_settings</span>
+          </span>
+          Administration Team
+        </h3>
+        <span *ngIf="isAdmin" class="text-[10px] font-black uppercase text-sky-500 bg-sky-50 border border-white px-3 py-1 rounded-lg shadow-sm">Managed via Portal</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+        <div *ngFor="let staff of liveAdmins" class="relative group bg-white/80 backdrop-blur-md border border-white rounded-[2rem] overflow-hidden hover:border-sky-500/40 transition-all hover:-translate-y-1 hover:shadow-xl flex flex-col h-full cursor-pointer shadow-lg" (click)="viewCV(staff)">
+
+          <div class="w-full relative bg-slate-50/50 overflow-hidden h-64 border-b border-white/50">
+            <img *ngIf="staff.image" [src]="staff.image" alt="Staff" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 relative z-10 mix-blend-darken opacity-90">
+            <div *ngIf="!staff.image" class="w-full h-full flex items-center justify-center text-slate-300"><span translate="no" class="material-symbols-outlined notranslate text-6xl">person</span></div>
+
+            <div class="absolute inset-0 bg-slate-900/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20">
+              <span class="bg-white/90 backdrop-blur text-slate-900 font-black text-xs uppercase px-4 py-2 rounded-full shadow-lg">View Profile</span>
+            </div>
+          </div>
+          <div class="p-8 flex flex-col flex-grow relative z-30">
+            <h4 class="text-xl font-bold text-slate-900 mb-1 leading-snug">{{ staff.name }}</h4>
+            <p class="text-sky-600 text-xs font-black uppercase tracking-wide mt-2 mb-4">{{ staff.role }}</p>
+            <p class="text-slate-500 text-sm font-medium leading-relaxed border-t border-slate-200/50 pt-4 mt-auto line-clamp-3">{{ staff.desc }}</p>
+          </div>
+        </div>
+        <div *ngIf="liveAdmins.length === 0" class="col-span-full text-center text-slate-400 font-bold py-12">No administration staff registered in database.</div>
+      </div>
+    </section>
+
+    <section *ngIf="!isFetchingUsers">
+      <div class="flex items-center justify-between mb-8 border-b border-slate-200/50 pb-4">
+        <h3 class="text-2xl font-black text-slate-900 flex items-center gap-3">
+          <span class="flex items-center justify-center size-10 rounded-full bg-sky-50 border border-white text-sky-500 shadow-sm">
+            <span translate="no" class="material-symbols-outlined notranslate">school</span>
+          </span>
+          Teaching Faculty
+        </h3>
+        <span *ngIf="isAdmin" class="text-[10px] font-black uppercase text-sky-500 bg-sky-50 border border-white px-3 py-1 rounded-lg shadow-sm">Managed via Portal</span>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+        <div *ngFor="let teacher of liveTeachers" class="relative group bg-white/80 backdrop-blur-md border border-white rounded-[2rem] overflow-hidden hover:border-sky-500/40 transition-all hover:-translate-y-1 hover:shadow-xl flex flex-col h-full cursor-pointer shadow-lg" (click)="viewCV(teacher)">
+
+          <div class="w-full relative bg-slate-50/50 overflow-hidden h-64 border-b border-white/50">
+            <img *ngIf="teacher.image" [src]="teacher.image" alt="Teacher" class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500 relative z-10 mix-blend-darken opacity-90">
+            <div *ngIf="!teacher.image" class="w-full h-full flex items-center justify-center text-slate-300"><span translate="no" class="material-symbols-outlined notranslate text-6xl">person</span></div>
+
+            <div class="absolute inset-0 bg-slate-900/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-20">
+              <span class="bg-white/90 backdrop-blur text-slate-900 font-black text-xs uppercase px-4 py-2 rounded-full shadow-lg">View Profile</span>
+            </div>
+          </div>
+          <div class="p-8 flex flex-col flex-grow relative z-30">
+            <h4 class="text-xl font-bold text-slate-900 mb-1 leading-snug">{{ teacher.name }}</h4>
+            <p class="text-sky-600 text-xs font-black uppercase tracking-wide mt-2 mb-4">{{ teacher.role }}</p>
+            <p class="text-slate-500 text-sm font-medium leading-relaxed border-t border-slate-200/50 pt-4 mt-auto line-clamp-3">{{ teacher.desc }}</p>
+          </div>
+        </div>
+        <div *ngIf="liveTeachers.length === 0" class="col-span-full text-center text-slate-400 font-bold py-12">No teaching faculty registered in database.</div>
+      </div>
+    </section>
+
+  </main>
+  <app-footer></app-footer>
+
+
+  <div *ngIf="showCVModal" class="fixed inset-0 z-[250] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-fade-in" (click)="closeCVModal()">
+    <div class="bg-white/95 backdrop-blur-xl border border-white rounded-[2.5rem] shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden flex flex-col relative" (click)="$event.stopPropagation()">
+
+      <button (click)="closeCVModal()" class="absolute top-6 right-6 size-10 bg-white/50 backdrop-blur-md hover:bg-white text-slate-800 rounded-full flex items-center justify-center shadow-lg transition-all z-50">
+        <span translate="no" class="material-symbols-outlined notranslate">close</span>
+      </button>
+
+      <div class="h-32 sm:h-40 bg-gradient-to-r from-sky-100 to-sky-500/30 w-full relative shrink-0"></div>
+
+      <div class="px-8 sm:px-12 pb-8 flex-1 overflow-y-auto custom-scrollbar -mt-16 sm:-mt-20 relative z-10">
+
+        <div class="flex flex-col sm:flex-row gap-6 sm:items-end mb-8 border-b border-slate-200 pb-8">
+          <div class="size-32 sm:size-40 rounded-[2rem] bg-white border border-white p-2 shadow-xl shrink-0">
+            <img *ngIf="selectedCV?.image" [src]="selectedCV.image" class="w-full h-full object-cover rounded-[1.5rem] mix-blend-darken">
+            <div *ngIf="!selectedCV?.image" class="w-full h-full rounded-[1.5rem] bg-slate-50 flex items-center justify-center text-slate-300">
+              <span translate="no" class="material-symbols-outlined notranslate text-6xl">person</span>
+            </div>
+          </div>
+          <div class="flex-1 pb-2">
+            <h2 class="text-3xl sm:text-4xl font-black text-slate-900 leading-none tracking-tight">{{ selectedCV?.name }}</h2>
+            <p class="text-sky-500 font-black uppercase tracking-widest text-sm mt-2">{{ selectedCV?.role }}</p>
+
+            <div *ngIf="selectedCV?.email" class="flex flex-wrap items-center gap-4 mt-4">
+              <a [href]="'mailto:' + selectedCV.email" class="flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-sky-500 transition-colors"><span translate="no" class="material-symbols-outlined notranslate text-[16px]">mail</span> {{ selectedCV.email }}</a>
+              <span *ngIf="selectedCV?.phone" class="flex items-center gap-1.5 text-xs font-bold text-slate-500"><span translate="no" class="material-symbols-outlined notranslate text-[16px]">call</span> {{ selectedCV.phone }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-8 animate-fade-in-up">
+
+          <ng-container *ngIf="selectedCV?.type === 'admin'">
+            <div class="space-y-3">
+              <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest">Professional Overview</h3>
+              <p class="text-slate-600 leading-relaxed font-medium text-lg">{{ selectedCV?.summary || selectedCV?.desc }}</p>
+            </div>
+
+            <div *ngIf="selectedCV?.foundInDB" class="grid grid-cols-1 sm:grid-cols-2 gap-8 border-t border-slate-200 pt-8 mt-8">
+              <div class="space-y-4">
+                <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-4">Key Responsibilities</h3>
+                <p class="text-sm font-medium text-slate-600">{{ selectedCV.hardSkills || 'Not specified.' }}</p>
+              </div>
+              <div class="space-y-4">
+                <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-4">Management Traits</h3>
+                <p class="text-sm font-medium text-slate-600">{{ selectedCV.softSkills || 'Not specified.' }}</p>
+              </div>
+            </div>
+
+            <div *ngIf="selectedCV?.foundInDB" class="pt-6 border-t border-slate-200 mt-8">
+              <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-4">Official Certifications</h3>
+              <div *ngIf="selectedCV?.certificates && selectedCV.certificates.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div *ngFor="let cert of selectedCV.certificates" class="p-4 bg-white/50 border border-white rounded-2xl flex items-center justify-between group hover:border-sky-500 transition-all shadow-sm">
+                  <div class="flex items-center gap-3 overflow-hidden">
+                    <div class="p-2 bg-sky-50 text-sky-500 rounded-xl shrink-0"><span translate="no" class="material-symbols-outlined notranslate text-lg">workspace_premium</span></div>
+                    <div class="min-w-0">
+                      <p class="text-xs font-black text-slate-900 uppercase truncate">{{ cert.name }}</p>
+                      <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{{ cert.date }}</p>
+                    </div>
+                  </div>
+                  <button (click)="downloadCert(cert)" class="shrink-0 size-8 flex items-center justify-center rounded-full bg-white border border-slate-100 text-slate-400 hover:bg-sky-500 hover:text-white transition-colors shadow-sm">
+                    <span translate="no" class="material-symbols-outlined notranslate text-[16px]">download</span>
+                  </button>
+                </div>
+              </div>
+              <div *ngIf="!selectedCV?.certificates || selectedCV.certificates.length === 0" class="p-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50 text-center">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">No certifications uploaded yet.</p>
+              </div>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="selectedCV?.type === 'teacher'">
+            <div *ngIf="selectedCV?.summary || selectedCV?.desc" class="space-y-3">
+              <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest">Professional Overview</h3>
+              <p class="text-slate-600 leading-relaxed font-medium text-lg">{{ selectedCV.summary || selectedCV.desc }}</p>
+            </div>
+
+            <div *ngIf="selectedCV?.philosophy" class="p-6 bg-sky-50/80 backdrop-blur rounded-[2rem] border border-white shadow-sm">
+              <h3 class="text-xs font-black text-sky-500 uppercase tracking-widest mb-3 flex items-center gap-2"><span translate="no" class="material-symbols-outlined notranslate text-[18px]">lightbulb</span> Teaching Philosophy</h3>
+              <p class="text-slate-900 leading-relaxed font-medium italic">"{{ selectedCV.philosophy }}"</p>
+            </div>
+
+            <div *ngIf="selectedCV?.foundInDB" class="grid grid-cols-1 sm:grid-cols-2 gap-8 border-t border-slate-200 pt-8 mt-8">
+              <div class="space-y-4">
+                <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Academic Portfolio</h3>
+                <div class="space-y-4">
+                  <div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Assigned Classes</p>
+                    <div class="flex flex-wrap gap-2">
+                      <span *ngIf="selectedCV.assignedClasses?.length === 0" class="text-xs text-slate-400 font-bold">Unassigned</span>
+                      <span *ngFor="let c of selectedCV.assignedClasses" class="px-3 py-1.5 bg-slate-100 text-slate-900 rounded-lg text-[10px] font-black uppercase">{{ c }}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Subject Specializations</p>
+                    <div class="flex flex-wrap gap-2">
+                      <span *ngIf="selectedCV.assignedSubjects?.length === 0" class="text-xs text-slate-400 font-bold">Unassigned</span>
+                      <span *ngFor="let s of selectedCV.assignedSubjects" class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-black uppercase">{{ s }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-4">
+                <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">Professional Skills</h3>
+                <div class="space-y-4">
+                  <div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Hard Skills</p>
+                    <p class="text-sm font-medium text-slate-600">{{ selectedCV.hardSkills || 'Not specified.' }}</p>
+                  </div>
+                  <div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase mb-2">Soft Skills</p>
+                    <p class="text-sm font-medium text-slate-600">{{ selectedCV.softSkills || 'Not specified.' }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="selectedCV?.foundInDB" class="pt-6 border-t border-slate-200 mt-8">
+              <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-4">Official Certifications</h3>
+              <div *ngIf="selectedCV?.certificates && selectedCV.certificates.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div *ngFor="let cert of selectedCV.certificates" class="p-4 bg-white/50 border border-white rounded-2xl flex items-center justify-between group hover:border-sky-500 transition-all shadow-sm">
+                  <div class="flex items-center gap-3 overflow-hidden">
+                    <div class="p-2 bg-sky-50 text-sky-500 rounded-xl shrink-0"><span translate="no" class="material-symbols-outlined notranslate text-lg">workspace_premium</span></div>
+                    <div class="min-w-0">
+                      <p class="text-xs font-black text-slate-900 uppercase truncate">{{ cert.name }}</p>
+                      <p class="text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">{{ cert.date }}</p>
+                    </div>
+                  </div>
+                  <button (click)="downloadCert(cert)" class="shrink-0 size-8 flex items-center justify-center rounded-full bg-white border border-slate-100 text-slate-400 hover:bg-sky-500 hover:text-white transition-colors shadow-sm">
+                    <span translate="no" class="material-symbols-outlined notranslate text-[16px]">download</span>
+                  </button>
+                </div>
+              </div>
+              <div *ngIf="!selectedCV?.certificates || selectedCV.certificates.length === 0" class="p-4 rounded-2xl border border-dashed border-slate-200 bg-slate-50 text-center">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">No certifications uploaded yet.</p>
+              </div>
+            </div>
+          </ng-container>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="editMode === 'hero'" class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+        <h2 class="text-xl font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
+          <span translate="no" class="material-symbols-outlined notranslate text-sky-500">edit_square</span> Edit {{ editMode }}
+        </h2>
+        <button (click)="closeEditModal()" class="text-slate-400 hover:text-red-500 transition-colors"><span translate="no" class="material-symbols-outlined notranslate">close</span></button>
+      </div>
+
+      <div class="p-6 flex flex-col gap-4 overflow-y-auto custom-scrollbar">
+        <ng-container *ngIf="editMode === 'hero'">
+          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Badge Text</label><input type="text" [(ngModel)]="editData.badge" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></div>
+          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Title (Black)</label><input type="text" [(ngModel)]="editData.titleStart" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></div>
+          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Title (Highlight)</label><input type="text" [(ngModel)]="editData.titleHighlight" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></div>
+          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Description</label><textarea [(ngModel)]="editData.description" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></textarea></div>
+          <div>
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Background Image</label>
+            <div class="flex items-center gap-4">
+              <input type="file" #bgInput (change)="onFileSelected($event, 'bgImage')" accept="image/*" class="hidden">
+              <button (click)="bgInput.click()" class="px-4 py-2 bg-sky-100 text-sky-700 font-bold rounded-lg hover:bg-sky-200 transition-colors flex items-center gap-2"><span translate="no" class="material-symbols-outlined notranslate text-[18px]">upload_file</span> Choose File</button>
+              <div *ngIf="editData.bgImage" class="h-10 w-16 rounded bg-cover bg-center border border-slate-200" [style.background-image]="'url(' + editData.bgImage + ')'"></div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50 mt-auto">
+        <button (click)="closeEditModal()" class="px-6 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-slate-200 transition-colors">Cancel</button>
+        <button (click)="saveEdits()" class="px-6 py-2.5 rounded-xl font-bold bg-slate-900 text-white hover:bg-sky-500 shadow-lg transition-all flex items-center gap-2">
+          <span translate="no" class="material-symbols-outlined notranslate text-[18px]">save</span> Save
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

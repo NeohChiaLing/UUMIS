@@ -14,13 +14,21 @@ export class StudentDashboardComponent implements OnInit {
 
   currentUser: any = null;
   studentName: string = 'Student';
+
+  // ==========================================================
+  // THE FIX: Added missing variables required by the HTML template
+  // ==========================================================
+  studentInitials: string = 'ST';
+  studentGrade: string = 'Unassigned';
+  showDashboardContent: boolean = true;
+
   todayDate: string = '';
   todayDayName: string = '';
 
   // Time-aware Arrays
   currentSubject: any = null;
   upcomingSubjects: any[] = [];
-  completedSubjects: any[] = []; // NEW: Holds finished classes
+  completedSubjects: any[] = [];
 
   fullHeaders: string[] = [];
   fullRows: string[][] = [];
@@ -54,10 +62,15 @@ export class StudentDashboardComponent implements OnInit {
             return;
           }
 
+          // THE FIX: Safely populate the initials and grade for the UI
           if (role === 'parent') {
             this.studentName = "My Child's Dashboard";
+            this.studentInitials = "PR";
+            this.studentGrade = "N/A";
           } else {
             this.studentName = this.currentUser.fullName || this.currentUser.username;
+            this.studentInitials = this.getInitials(this.studentName);
+            this.studentGrade = this.currentUser.bio || 'Unassigned';
           }
 
           let studentLevel = 'Kindergarten';
@@ -120,7 +133,6 @@ export class StudentDashboardComponent implements OnInit {
             const now = new Date();
             const currentMins = now.getHours() * 60 + now.getMinutes();
 
-            // Logic to convert "8:00 AM" or "10.00" into raw minutes for math comparison
             const parseTime = (timeStr: string) => {
               const match = timeStr.match(/(\d+)[.:](\d+)\s*(AM|PM|am|pm)?/i);
               if (!match) return 0;
@@ -129,7 +141,7 @@ export class StudentDashboardComponent implements OnInit {
               const ampm = match[3]?.toUpperCase();
               if (ampm === 'PM' && h < 12) h += 12;
               if (ampm === 'AM' && h === 12) h = 0;
-              if (!ampm && h < 7) h += 12; // Assume 1-6 without PM means afternoon
+              if (!ampm && h < 7) h += 12;
               return h * 60 + m;
             };
 
@@ -153,17 +165,14 @@ export class StudentDashboardComponent implements OnInit {
               }
             }
 
-            // Sort chronologically
             validSlots.sort((a, b) => a.startMins - b.startMins);
 
             this.completedSubjects = [];
             this.currentSubject = null;
             this.upcomingSubjects = [];
 
-            // Intelligently distribute classes based on REAL computer time
             for (let i = 0; i < validSlots.length; i++) {
               const slot = validSlots[i];
-              // Close gaps between end time and next start time
               if (!slot.endTimeStr && i < validSlots.length - 1) {
                 slot.endMins = validSlots[i+1].startMins;
               }

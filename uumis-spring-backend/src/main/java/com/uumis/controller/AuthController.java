@@ -48,9 +48,10 @@ public class AuthController {
         return ResponseEntity.status(401).body(Map.of("message", "Invalid credentials"));
     }
 
-    // --- 2. REGISTER (Send Verification Code) ---
-    @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
+    // --- NEW: APPLICATION FORM SUBMISSION (WITH WELCOME EMAIL) ---
+    @PostMapping("/apply")
+    public ResponseEntity<?> submitApplication(@RequestBody User user) {
+        // 1. Check if user already exists
         if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             return ResponseEntity.badRequest().body(Map.of("message", "Username taken"));
         }
@@ -58,18 +59,28 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("message", "Email already registered"));
         }
 
-        // Generate 6-digit code
-        String code = String.valueOf((int)(Math.random() * 900000) + 100000);
-        user.setVerificationCode(code);
-        user.setEnabled(false); // Locked until verified
+        // 2. Set to INACTIVE so they show up in the Admin list for review
+        user.setEnabled(false);
 
+        // 3. Save to Database (Student List)
         userRepository.save(user);
 
-        // Send Email
-        emailService.sendEmail(user.getEmail(), "Verify your UUMIS Account",
-                "Welcome! Your verification code is: " + code);
+        // 4. SEND THE CUSTOM WELCOME EMAIL (No verification code!)
+        String subject = "Application Received - UUMIS Registration";
+        String body = "Dear " + user.getFullName() + ",\n\n" +
+                "Your registration application has been successfully received! " +
+                "Our administration team will review your details shortly.\n\n" +
+                "Once your account is approved and activated by the school, you can log in to the student portal using this link:\n" +
+                "http://localhost:4200/login\n\n" +
+                "Thank you,\nUUMIS Administration";
 
-        return ResponseEntity.ok(Map.of("message", "Registration successful"));
+        try {
+            emailService.sendEmail(user.getEmail(), subject, body);
+        } catch (Exception e) {
+            System.out.println("Failed to send welcome email to: " + user.getEmail());
+        }
+
+        return ResponseEntity.ok(Map.of("message", "Application submitted successfully"));
     }
 
     // --- 3. VERIFY EMAIL (New API) ---
@@ -172,16 +183,49 @@ public class AuthController {
                 .toList();
     }
 
-    // --- 10. APPROVE STUDENT (Update Status) ---
+    // --- 10. APPROVE STUDENT & ASSIGN SEQUENTIAL ID ---
     @PutMapping("/students/{id}/approve")
     public ResponseEntity<?> approveStudent(@PathVariable Integer id) {
         return userRepository.findById(id).map(user -> {
-            user.setEnabled(true); // 'Active' status maps to isEnabled = true
+
+            // 1. Set them to Active
+            user.setEnabled(true);
+
+            // 2. Only assign a new ID if they don't already have one
+            if (user.getStudentId() == null || user.getStudentId().isEmpty()) {
+
+                // Set a starting base number (e.g., 1000)
+                int maxId = 1000;
+
+                // Fetch all students who already have an ID
+                List<User> allStudents = userRepository.findAll().stream()
+                        .filter(u -> "student".equalsIgnoreCase(u.getRole()) && u.getStudentId() != null)
+                        .toList();
+
+                // Loop through to find the highest ID number currently in use
+                for (User s : allStudents) {
+                    try {
+                        int currentId = Integer.parseInt(s.getStudentId());
+                        if (currentId > maxId) {
+                            maxId = currentId;
+                        }
+                    } catch (NumberFormatException e) {
+                        // Ignore if someone accidentally typed letters into an ID
+                    }
+                }
+
+                // Add 1 to the highest ID and assign it to this newly approved student!
+                user.setStudentId(String.valueOf(maxId + 1));
+            }
+
             userRepository.save(user);
-            return ResponseEntity.ok(Map.of("message", "Student approved successfully!"));
+            return ResponseEntity.ok(Map.of("message", "Student approved successfully! Assigned ID: " + user.getStudentId()));
+
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    // --- 11. ADMIN UPDATE STUDENT DETAILS ---
+    // --- 11. ADMIN UPDATE STUDENT DETAILS ---
     // --- 11. ADMIN UPDATE STUDENT DETAILS ---
     @PutMapping("/students/{id}")
     public ResponseEntity<?> adminUpdateStudent(@PathVariable Integer id, @RequestBody User userDetails) {
@@ -190,43 +234,40 @@ public class AuthController {
             // Update standard fields
             if (userDetails.getFullName() != null) user.setFullName(userDetails.getFullName());
             if (userDetails.getPhone() != null) user.setPhone(userDetails.getPhone());
-            if (userDetails.getBio() != null) user.setBio(userDetails.getBio()); // Still using Bio for Grade
+            if (userDetails.getBio() != null) user.setBio(userDetails.getBio());
 
             if (userDetails.getStudentId() != null) {
                 user.setStudentId(userDetails.getStudentId());
             }
 
-            // ==========================================
-            // --- NEW: SAVE FINANCIAL BALANCES ---
-            // (Used by the Financial Manager in Payment Portal)
-            // ==========================================
+            // THE FIX: Actually save the Active/Pending Status to the database!
+            if (userDetails.isEnabled() != null) user.setEnabled(userDetails.isEnabled());
+
+            if (userDetails.getProfileJson() != null) user.setProfileJson(userDetails.getProfileJson());
+            if (userDetails.getProfileStatus() != null) user.setProfileStatus(userDetails.getProfileStatus());
+            if (userDetails.getAvatar() != null) user.setAvatar(userDetails.getAvatar());
+
+            // Save Financial Balances
             if (userDetails.getTotalPaid() != null) user.setTotalPaid(userDetails.getTotalPaid());
             if (userDetails.getOutstandingDue() != null) user.setOutstandingDue(userDetails.getOutstandingDue());
 
-            // ==========================================
-            // --- NEW: AUTO-LINKING PARENT TO STUDENT ---
-            // (Used by Register Manager in Student Portal)
-            // ==========================================
+            // Auto-Link Parent
             if (userDetails.getParentId() != null) {
                 user.setParentId(userDetails.getParentId());
-
-                // Instantly update the Parent's account to know who their child is!
                 userRepository.findById(userDetails.getParentId()).ifPresent(parent -> {
-                    parent.setChildUserId(user.getId()); // Sets the student's ID into the Parent
+                    parent.setChildUserId(user.getId());
                     userRepository.save(parent);
                 });
             }
 
             User updatedUser = userRepository.save(user);
 
-            // Important: Don't send password or sensitive token back in the response
             updatedUser.setPassword(null);
             updatedUser.setVerificationCode(null);
 
             return ResponseEntity.ok(Map.of("message", "Student details updated successfully!", "user", updatedUser));
         }).orElse(ResponseEntity.notFound().build());
     }
-
     // ... inside AuthController.java ...
 
     // --- 12. GET ALL TEACHERS (For Admin Dashboard) ---
@@ -246,6 +287,11 @@ public class AuthController {
             if (teacherDetails.getFullName() != null) user.setFullName(teacherDetails.getFullName());
             if (teacherDetails.getPhone() != null) user.setPhone(teacherDetails.getPhone());
             if (teacherDetails.getAssignedSubjects() != null) user.setAssignedSubjects(teacherDetails.getAssignedSubjects());
+
+            // ==========================================
+            // THE FIX: Tell the backend to actually save the Level & Year (bio)
+            // ==========================================
+            if (teacherDetails.getBio() != null) user.setBio(teacherDetails.getBio());
 
             // --- NEW: Save Profile, Schedule, and Certs ---
             if (teacherDetails.getSummary() != null) user.setSummary(teacherDetails.getSummary());
@@ -533,5 +579,82 @@ public class AuthController {
         return ResponseEntity.ok(refundRepository.findAll());
     }
 
+    // ==========================================
+    // --- 15. RUN YEAR-END STUDENT PROMOTION ---
+    // ==========================================
+    @PostMapping("/students/promote-all")
+    public ResponseEntity<?> promoteAllStudents() {
 
+        // This list defines the exact order students should be promoted.
+        // Make sure these match the EXACT text used in your system!
+        List<String> gradeProgression = java.util.Arrays.asList(
+                "Kindergarten - Pre-Kindergarten",
+                "Kindergarten - Kindergarten",
+                "Primary - Year 1",
+                "Primary - Year 2",
+                "Primary - Year 3",
+                "Primary - Year 4",
+                "Primary - Year 5",
+                "Primary - Year 6",
+                "Secondary - Year 7",
+                "Secondary - Year 8",
+                "Secondary - Year 9",
+                "Secondary - Year 10",
+                "Secondary - Year 11",
+                "Alumni - Graduated"
+        );
+
+        // Fetch only students who are ACTIVE (isEnabled = true)
+        List<User> students = userRepository.findAll().stream()
+                .filter(user -> "student".equalsIgnoreCase(user.getRole()) && user.isEnabled())
+                .toList();
+
+        int promotedCount = 0;
+
+        for (User student : students) {
+            String currentGrade = student.getBio();
+
+            if (currentGrade != null && !currentGrade.isEmpty()) {
+                int currentIndex = gradeProgression.indexOf(currentGrade.trim());
+
+                // If they are in the list, and NOT already graduated, bump them up 1 level!
+                if (currentIndex >= 0 && currentIndex < gradeProgression.size() - 1) {
+                    student.setBio(gradeProgression.get(currentIndex + 1));
+                    userRepository.save(student);
+                    promotedCount++;
+                }
+            }
+        }
+
+        return ResponseEntity.ok(Map.of("message", "Success! Promoted " + promotedCount + " students to their next academic level."));
+    }
+
+    // ==========================================
+    // --- SEND APPROVAL WELCOME EMAILS ---
+    // ==========================================
+    @PostMapping("/send-approval-email")
+    public ResponseEntity<?> sendApprovalEmail(@RequestBody Map<String, String> payload) {
+        String studentName = payload.get("studentName");
+        String studentEmail = payload.get("studentEmail");
+        String fatherEmail = payload.get("fatherEmail");
+        String motherEmail = payload.get("motherEmail");
+
+        String subject = "Application Approved - Welcome to UUMIS!";
+        String body = "Dear " + studentName + " and Family,\n\n" +
+                "Congratulations! Your registration application has been officially APPROVED by the administration.\n\n" +
+                "You can now log in to the UUMIS Student Portal using your registered email address:\n" +
+                "http://localhost:4200/login\n\n" +
+                "We look forward to welcoming you to the school!\n\n" +
+                "Best regards,\nUUMIS Administration";
+
+        try {
+            if (studentEmail != null && !studentEmail.isEmpty()) emailService.sendEmail(studentEmail, subject, body);
+            if (fatherEmail != null && !fatherEmail.isEmpty()) emailService.sendEmail(fatherEmail, subject, body);
+            if (motherEmail != null && !motherEmail.isEmpty()) emailService.sendEmail(motherEmail, subject, body);
+        } catch (Exception e) {
+            System.out.println("Failed to send approval emails.");
+        }
+
+        return ResponseEntity.ok(Map.of("message", "Approval emails dispatched."));
+    }
 }

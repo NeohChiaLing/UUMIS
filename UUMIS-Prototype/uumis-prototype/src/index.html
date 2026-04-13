@@ -23,7 +23,8 @@
   function googleTranslateElementInit() {
     new google.translate.TranslateElement({
       pageLanguage: 'en',
-      includedLanguages: 'en,ms',
+      // THE FIX: Added 'th' right here!
+      includedLanguages: 'en,ms,th',
       autoDisplay: false
     }, 'google_translate_element');
   }

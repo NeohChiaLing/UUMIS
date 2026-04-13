@@ -36,13 +36,14 @@
         <tr>
           <th class="p-6 text-[10px] font-black uppercase text-emerald-800 tracking-widest">No.</th>
           <th class="p-6 text-[10px] font-black uppercase text-emerald-800 tracking-widest">Teacher Name</th>
+          <th class="p-6 text-[10px] font-black uppercase text-emerald-800 tracking-widest">Assigned Classes</th>
           <th class="p-6 text-[10px] font-black uppercase text-emerald-800 tracking-widest">Assigned Subjects</th>
           <th class="p-6 text-center text-[10px] font-black uppercase text-emerald-800 tracking-widest">Action</th>
         </tr>
         </thead>
         <tbody class="divide-y divide-emerald-50">
         <tr *ngIf="filteredTeachers.length === 0">
-          <td colspan="4" class="p-8 text-center text-sm font-bold text-slate-400 uppercase tracking-widest">No teachers found in database.</td>
+          <td colspan="5" class="p-8 text-center text-sm font-bold text-slate-400 uppercase tracking-widest">No teachers found in database.</td>
         </tr>
         <tr *ngFor="let t of filteredTeachers" class="hover:bg-emerald-50/30 transition-colors group">
           <td class="p-6 font-bold text-slate-400 text-xs">{{t.no}}</td>
@@ -52,6 +53,14 @@
               <span class="font-black text-slate-700 uppercase text-sm tracking-tight">{{t.name}}</span>
             </div>
           </td>
+
+          <td class="p-6">
+            <div class="flex flex-wrap gap-2">
+              <span *ngIf="t.assignedClassesArray.length === 0" class="text-xs font-bold text-slate-400">UNASSIGNED</span>
+              <span *ngFor="let c of t.assignedClassesArray" class="px-2 py-1 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-lg text-[9px] font-black uppercase tracking-wider">{{c}}</span>
+            </div>
+          </td>
+
           <td class="p-6">
             <div class="flex flex-wrap gap-2">
               <span *ngIf="t.assignedSubjectsArray.length === 0" class="text-xs font-bold text-slate-400">UNASSIGNED</span>
@@ -78,11 +87,43 @@
 
     <div *ngIf="viewMode === 'profile'" class="grid md:grid-cols-2 gap-8">
       <div class="bg-white p-10 rounded-[2.5rem] border border-emerald-50 shadow-sm space-y-8">
-        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-emerald-50 pb-4">Personal Details</h3>
+        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-emerald-50 pb-4">Personal & Assignment Details</h3>
         <div class="space-y-6">
           <div class="space-y-1">
             <label class="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Full Name</label>
             <input [(ngModel)]="selectedTeacher.name" name="n" [readonly]="!isEditMode" class="w-full bg-slate-50 border border-slate-100 rounded-xl p-4 text-sm font-black uppercase outline-none focus:ring-2 ring-emerald-100">
+          </div>
+
+          <div class="space-y-3">
+            <label class="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Assign Academic Classes</label>
+
+            <div *ngIf="isEditMode" class="grid grid-cols-12 gap-2 items-center bg-slate-50 p-2 rounded-xl border border-slate-100">
+              <div class="col-span-5">
+                <select [(ngModel)]="tempLevel" (change)="tempYear = ''" class="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs font-bold outline-none focus:ring-2 ring-emerald-100">
+                  <option value="" disabled selected>Select Level</option>
+                  <option *ngFor="let lvl of academicLevels" [value]="lvl">{{lvl}}</option>
+                </select>
+              </div>
+              <div class="col-span-5">
+                <select [(ngModel)]="tempYear" [disabled]="!tempLevel" class="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs font-bold outline-none focus:ring-2 ring-emerald-100 disabled:opacity-50">
+                  <option value="" disabled selected>Select Year</option>
+                  <option *ngFor="let yr of getYearsForLevel(tempLevel)" [value]="yr">{{yr}}</option>
+                </select>
+              </div>
+              <div class="col-span-2">
+                <button (click)="addClass()" [disabled]="!tempLevel || !tempYear" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg p-2.5 flex items-center justify-center transition-all disabled:opacity-50 shadow-sm">
+                  <span class="material-symbols-outlined text-sm font-bold">add</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2 w-full bg-slate-50 border border-slate-100 rounded-xl p-3 min-h-[52px]">
+              <span *ngIf="selectedTeacher.assignedClassesArray.length === 0" class="text-xs font-bold text-slate-400 px-1 py-1">No classes assigned</span>
+              <span *ngFor="let c of selectedTeacher.assignedClassesArray" class="flex items-center gap-1 bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase">
+                 {{c}}
+                <span *ngIf="isEditMode" (click)="removeClass(c)" class="material-symbols-outlined text-[14px] hover:text-emerald-900 cursor-pointer ml-1">close</span>
+              </span>
+            </div>
           </div>
 
           <div class="space-y-1 relative">
@@ -94,32 +135,37 @@
 
               <span *ngIf="selectedTeacher.assignedSubjectsArray.length === 0" class="text-sm font-bold text-slate-400 px-1">Select Subjects...</span>
 
-              <span *ngFor="let s of selectedTeacher.assignedSubjectsArray" class="flex items-center gap-1 bg-emerald-100 text-emerald-700 px-3 py-1 rounded-lg text-[10px] font-black uppercase">
+              <span *ngFor="let s of selectedTeacher.assignedSubjectsArray" class="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-lg text-[10px] font-black uppercase">
                  {{s}}
-                <span *ngIf="isEditMode" (click)="removeSubject(s, $event)" class="material-symbols-outlined text-[14px] hover:text-emerald-900 cursor-pointer ml-1">close</span>
+                <span *ngIf="isEditMode" (click)="removeSubject(s, $event)" class="material-symbols-outlined text-[14px] hover:text-blue-900 cursor-pointer ml-1">close</span>
                </span>
 
               <span *ngIf="isEditMode" class="material-symbols-outlined absolute right-4 text-slate-400">arrow_drop_down</span>
             </div>
 
             <div *ngIf="showSubjectDropdown" (click)="$event.stopPropagation()" class="absolute top-full left-0 w-full mt-2 bg-white border border-emerald-100 rounded-2xl shadow-2xl z-50 max-h-48 overflow-y-auto p-2">
-              <div *ngFor="let s of availableSubjects"
+
+              <div *ngFor="let s of filteredSubjectsForTeacher"
                    (click)="toggleSubjectSelection(s.name)"
-                   class="px-4 py-3 hover:bg-emerald-50 rounded-xl cursor-pointer flex items-center gap-3 transition-colors">
+                   class="px-4 py-3 hover:bg-blue-50 rounded-xl cursor-pointer flex items-center gap-3 transition-colors">
 
                 <div class="size-5 rounded border flex items-center justify-center transition-all"
-                     [class.bg-emerald-500]="selectedTeacher.assignedSubjectsArray.includes(s.name)"
-                     [class.border-emerald-500]="selectedTeacher.assignedSubjectsArray.includes(s.name)"
+                     [class.bg-blue-500]="selectedTeacher.assignedSubjectsArray.includes(s.name)"
+                     [class.border-blue-500]="selectedTeacher.assignedSubjectsArray.includes(s.name)"
                      [class.border-slate-300]="!selectedTeacher.assignedSubjectsArray.includes(s.name)">
                   <span *ngIf="selectedTeacher.assignedSubjectsArray.includes(s.name)" class="material-symbols-outlined text-white text-[14px] font-black">check</span>
                 </div>
                 <span class="text-xs font-bold text-slate-700 uppercase tracking-wider">{{s.name}}</span>
               </div>
-              <div *ngIf="availableSubjects.length === 0" class="p-4 text-xs font-bold text-slate-400 text-center uppercase tracking-widest">No Subjects Found in DB</div>
+
+              <div *ngIf="filteredSubjectsForTeacher.length === 0" class="p-4 text-xs font-bold text-slate-400 text-center uppercase tracking-widest">
+                Please assign Classes first.
+              </div>
             </div>
           </div>
         </div>
       </div>
+
       <div class="bg-white p-10 rounded-[2.5rem] border border-emerald-50 shadow-sm space-y-8">
         <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-emerald-50 pb-4">Contact Information</h3>
         <div class="space-y-6">
@@ -157,7 +203,6 @@
     </div>
 
     <div *ngIf="viewMode === 'schedule'" class="space-y-8">
-
       <div class="flex justify-between items-center bg-white p-6 px-10 rounded-[2rem] border border-emerald-100 shadow-sm">
         <div>
           <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight">Class Timetable</h3>
@@ -166,7 +211,6 @@
       </div>
 
       <div *ngFor="let group of groupedSchedule" class="bg-white rounded-[2.5rem] border border-emerald-100 overflow-visible shadow-xl shadow-emerald-500/5 transition-all">
-
         <div class="bg-slate-800 p-4 px-8 flex justify-between items-center rounded-t-[2.5rem]">
           <span class="text-[11px] font-black text-white uppercase tracking-widest">{{ group.day }}</span>
           <button *ngIf="isEditMode" (click)="addSlot(group.day)" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-1">
@@ -191,7 +235,6 @@
             </tr>
 
             <tr *ngFor="let slot of group.slots" class="hover:bg-emerald-50/20 transition-colors group/row">
-
               <td class="py-4 px-4">
                 <input [(ngModel)]="slot.time" [readonly]="!isEditMode" placeholder="e.g. 08:00 AM - 10:00 AM" class="bg-transparent border-none outline-none font-medium text-slate-600 placeholder-slate-300 w-full focus:ring-2 focus:ring-emerald-100 rounded-xl p-3 transition-all text-xs">
               </td>
@@ -207,22 +250,21 @@
                   </div>
 
                   <div *ngIf="openScheduleDropdownSlot === slot" (click)="$event.stopPropagation()" class="absolute top-full left-0 w-full mt-2 bg-white border border-emerald-100 rounded-2xl shadow-2xl z-[100] max-h-48 overflow-y-auto p-2">
-                    <div *ngFor="let sub of availableSubjects"
-                         (click)="selectScheduleSubject(slot, sub.name)"
+                    <div *ngFor="let sub of selectedTeacher.assignedSubjectsArray"
+                         (click)="selectScheduleSubject(slot, sub)"
                          class="px-4 py-3 hover:bg-emerald-50 rounded-xl cursor-pointer flex items-center gap-3 transition-colors">
 
                       <div class="size-5 rounded border flex items-center justify-center transition-all shrink-0"
-                           [class.bg-emerald-500]="slot.subject === sub.name"
-                           [class.border-emerald-500]="slot.subject === sub.name"
-                           [class.border-slate-300]="slot.subject !== sub.name">
-                        <span *ngIf="slot.subject === sub.name" class="material-symbols-outlined text-white text-[14px] font-black">check</span>
+                           [class.bg-emerald-500]="slot.subject === sub"
+                           [class.border-emerald-500]="slot.subject === sub"
+                           [class.border-slate-300]="slot.subject !== sub">
+                        <span *ngIf="slot.subject === sub" class="material-symbols-outlined text-white text-[14px] font-black">check</span>
                       </div>
-                      <span class="text-[10px] font-bold text-slate-700 uppercase tracking-wider leading-tight">{{sub.name}}</span>
+                      <span class="text-[10px] font-bold text-slate-700 uppercase tracking-wider leading-tight">{{sub}}</span>
                     </div>
-                    <div *ngIf="availableSubjects.length === 0" class="p-4 text-[10px] font-bold text-slate-400 text-center uppercase tracking-widest">No Subjects Found</div>
+                    <div *ngIf="selectedTeacher.assignedSubjectsArray.length === 0" class="p-4 text-[10px] font-bold text-slate-400 text-center uppercase tracking-widest">No Subjects Found</div>
                   </div>
                 </div>
-
                 <span *ngIf="!isEditMode" class="font-black text-slate-700 uppercase text-[11px] block px-2">{{slot.subject || '-'}}</span>
               </td>
 
@@ -246,15 +288,12 @@
       <div class="bg-white rounded-[3rem] border border-emerald-100 overflow-hidden shadow-xl shadow-emerald-500/5">
         <div class="bg-emerald-600 p-5 px-10 text-[10px] font-black text-white uppercase flex justify-between items-center tracking-widest">
           <span>Official Certifications & Records</span>
-
           <input type="file" #fileInput class="hidden" accept="application/pdf, image/*" (change)="onFileSelected($event)">
-
           <button (click)="fileInput.click()" [disabled]="!isEditMode"
                   [class.opacity-50]="!isEditMode" [class.cursor-not-allowed]="!isEditMode"
                   class="bg-white/20 hover:bg-white/30 px-5 py-2 rounded-xl flex items-center gap-2 transition-all">
             <span translate="no" class="material-symbols-outlined notranslate text-sm">upload_file</span> Upload New Cert
           </button>
-
         </div>
         <div class="p-10 space-y-6">
           <div *ngFor="let cert of selectedTeacher.certificates" class="bg-slate-50 p-7 rounded-[2rem] border border-slate-100 flex justify-between items-center group hover:border-emerald-200 transition-all">
@@ -262,7 +301,6 @@
               <div class="size-12 rounded-2xl bg-white flex items-center justify-center text-emerald-500 shadow-sm"><span translate="no" class="material-symbols-outlined notranslate">description</span></div>
               <div><p class="font-black text-slate-700 uppercase text-sm">{{cert.name}}</p><p class="text-[10px] text-slate-400 font-bold uppercase mt-1">{{cert.date}}</p></div>
             </div>
-
             <button (click)="downloadFile(cert)" class="text-emerald-600 text-[10px] font-black uppercase flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-sm hover:bg-emerald-500 hover:text-white transition-all">
               <span translate="no" class="material-symbols-outlined notranslate text-sm">download</span> Download
             </button>

@@ -9,9 +9,20 @@ import { ApplicationFormComponent } from './admissions/application-form/applicat
 import { FeesComponent } from './admissions/fees/fees';
 import { CalendarComponent } from './calendar/calendar/calendar';
 import { ContactComponent } from './contact/contact';
-
+import { FacultyStaffComponent } from './about/faculty-staff/faculty-staff';
+import { ParentChildrenListComponent } from './dashboard/parent-children-list/parent-children-list';
+import { ParentCoursesComponent } from './dashboard/parent-courses/parent-courses';
+import { ParentGradesComponent } from './dashboard/parent-grades/parent-grades';
+import { ParentAttendanceComponent } from './dashboard/parent-attendance/parent-attendance';
+import { ParentFoodComponent } from './dashboard/parent-food/parent-food';
+import { TeacherGradingComponent } from './dashboard/teacher-grading/teacher-grading';
+import { TeacherProfileComponent } from './dashboard/teacher-profile/teacher-profile';
+import { TeacherAttendanceComponent } from './dashboard/teacher-attendance/teacher-attendance';
+import { TeacherAssignmentComponent } from './dashboard/teacher-assignment/teacher-assignment';
+import { StaffProfileComponent } from './dashboard/staff-profile/staff-profile';
 // Admin Dashboards
 import { AdminDashboardComponent } from './dashboard/admin-dashboard/admin-dashboard';
+import { AdminProfileComponent } from './dashboard/admin-profile/admin-profile';
 import { StudentInfoComponent } from './dashboard/student-info/student-info';
 import { TeacherInfoComponent } from './dashboard/teacher-info/teacher-info';
 import { SubjectsComponent } from './dashboard/academic/subjects/subjects';
@@ -90,6 +101,7 @@ export const routes: Routes = [
   { path: 'dashboard/admin/inventory', component: InventoryComponent, title: 'Admin - Inventory' },
   { path: 'dashboard/admin/notification', component: NotificationComponent, title: 'Admin - Notifications' },
   { path: 'dashboard/admin/settings', component: SettingsComponent, title: 'Admin - Settings' },
+  { path: 'dashboard/admin/profile', component: AdminProfileComponent, title: 'Admin Profile' },
   { path: 'dashboard/staff/settings', component: SettingsComponent, title: 'Staff - Settings' },
   { path: 'dashboard/teacher/settings', component: SettingsComponent, title: 'Teacher - Settings' },
   { path: 'dashboard/student/settings', component: SettingsComponent, title: 'Student - Settings' },
@@ -110,6 +122,7 @@ export const routes: Routes = [
   // --- STAFF ROUTES ---
   { path: 'dashboard/staff', component: StaffDashboardComponent, title: 'Staff Portal' },
   { path: 'dashboard/staff/student-info', component: StudentInfoComponent, title: 'Staff - Student Info' },
+  { path: 'dashboard/staff/profile', component: StaffProfileComponent, title: 'Staff Profile' },
   {
     path: 'dashboard/staff/financial',
     children: [
@@ -122,13 +135,13 @@ export const routes: Routes = [
 
   // --- TEACHER ROUTES ---
   { path: 'dashboard/teacher', component: TeacherDashboardComponent, title: 'Teacher Portal' },
-  { path: 'dashboard/teacher/profile', component: TeacherInfoComponent, title: 'Teacher Profile' },
+  { path: 'dashboard/teacher/profile', component: TeacherProfileComponent, title: 'Teacher Profile' },
   {
     path: 'dashboard/teacher/academic',
     children: [
-      { path: 'assignments', component: AssignmentsComponent, title: 'Teacher - Assignments' },
-      { path: 'grading', component: GradingComponent, title: 'Teacher - Grading' },
-      { path: 'attendance', component: AttendanceComponent, title: 'Teacher - Attendance' },
+      { path: 'assignments', component: TeacherAssignmentComponent, title: 'Teacher - Assignments' },
+      { path: 'grading', component: TeacherGradingComponent, title: 'Teacher - Grading' },
+      { path: 'attendance', component: TeacherAttendanceComponent, title: 'Teacher - Attendance' },
       { path: 'lesson-plan', component: TeacherLessonPlanComponent, title: 'Lesson Plan (Teacher)' },
     ]
   },
@@ -139,7 +152,7 @@ export const routes: Routes = [
   { path: 'dashboard/student/profile', component: StudentProfileComponent, title: 'My Profile' },
   { path: 'dashboard/student/assignments', component: StudentAssignmentComponent, title: 'My Courses' },
   { path: 'dashboard/student/grades', component: StudentGradesComponent, title: 'My Grades' },
-  { path: 'dashboard/student/attendance', component: StudentAttendanceComponent, title: 'My Attendance' },
+  { path: 'dashboard/parent/attendance', component: ParentAttendanceComponent, title: 'Child Attendance' },
   { path: 'dashboard/student/food', component: StudentFoodComponent, title: 'Food Menu' },
 
   // --- PARENT ROUTES ---
@@ -158,14 +171,16 @@ export const routes: Routes = [
   },
 
   { path: 'dashboard/parent/profile', component: ParentStudentProfileComponent, title: 'Child Profile' },
-  { path: 'dashboard/parent/courses', component: StudentAssignmentComponent, title: 'Child Courses' },
-  { path: 'dashboard/parent/grades', component: StudentGradesComponent, title: 'Child Grades' },
+  { path: 'dashboard/parent/courses', component: ParentCoursesComponent, title: 'Child Courses' },
+  { path: 'dashboard/parent/grades', component: ParentGradesComponent, title: 'Child Grades' },
   { path: 'dashboard/parent/attendance', component: StudentAttendanceComponent, title: 'Child Attendance' },
-  { path: 'dashboard/parent/food', component: StudentFoodComponent, title: 'Food Ordering' },
+  { path: 'dashboard/parent/food', component: ParentFoodComponent, title: 'Food Ordering' },
 
   // 示例
   // 修复：路径必须包含 'dashboard/' 以匹配按钮的 routerLink
   { path: 'dashboard/user-profile', component: UserProfileComponent, title: 'My Profile' },
   { path: 'dashboard/admin/website', component: WebsiteManagementComponent, title: 'Website Editor' },
-  { path: 'dashboard/admin/user-roles', component: UserRolesComponent }
+  { path: 'dashboard/admin/user-roles', component: UserRolesComponent },
+  { path: 'dashboard/parent/children-list', component: ParentChildrenListComponent, title: 'My Children' },
+  { path: 'about/faculty-staff', component: FacultyStaffComponent }
 ];

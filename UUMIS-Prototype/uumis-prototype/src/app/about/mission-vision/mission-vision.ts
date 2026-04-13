@@ -48,12 +48,12 @@ export class MissionVisionComponent implements OnInit {
     const rawObjectives = ["Acknowledges and values students' diversity...", "Discovers each student's uniqueness...", "Equips students with knowledge...", "Prepares students to be academically...", "Teaches students to respect different cultures..."];
     const defaultData = {
       hero: { badge: 'Est. 2014', titleStart: 'Our Purpose &', titleHighlight: 'Direction', desc: 'Driven by a commitment to excellence...', bgImage: '/assets/UUMIS.jpg' },
-      legacy: { titleStart: 'A Legacy of', titleHighlight: 'Excellence', p1: 'UUM International School was formed in 2014...', p2: 'UUM International School offers a quality...', p3: 'UUM International School is committed...', image: '/assets/UUMIS-BROCHURE-1.jpg' },
+      legacy: { titleStart: 'A Legacy of', titleHighlight: 'Excellence', p1: 'UUM International School was formed in 2014...', p2: 'UUM International School offers a quality...', p3: 'UUM International School is committed...', image: 'assets/UUMIS-BROCHURE-1.jpg' },
       objectives: rawObjectives.map(text => ({ text: text, x: 0, y: 0 }))
     };
 
     // DB LOAD
-    this.http.get('http://localhost:8080/api/content/mission_vision', { responseType: 'text' }).subscribe({
+    this.http.get('/api/content/mission_vision', { responseType: 'text' }).subscribe({
       next: (data) => {
         this.pageData = (data && data.length > 5) ? JSON.parse(data) : defaultData;
         this.recalculateCircleLayout();
@@ -68,7 +68,7 @@ export class MissionVisionComponent implements OnInit {
   // DB SAVE
   publishChanges() {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    this.http.post('http://localhost:8080/api/content/mission_vision', JSON.stringify(this.pageData), { headers, responseType: 'text' }).subscribe({
+    this.http.post('/api/content/mission_vision', JSON.stringify(this.pageData), { headers, responseType: 'text' }).subscribe({
       next: () => alert('Changes published successfully!'),
       error: (err) => { console.error(err); alert('Error saving to database.'); }
     });

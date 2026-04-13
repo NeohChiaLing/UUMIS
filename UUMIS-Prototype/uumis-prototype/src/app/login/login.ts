@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
-type AuthView = 'login' | 'register' | 'forgot-password' | 'reset-password';
+type AuthView = 'login' | 'forgot-password' | 'reset-password';
 
 @Component({
   selector: 'app-login',
@@ -19,22 +19,13 @@ export class LoginComponent {
   // UI States
   showPassword = false;
   showSuccessMessage = false;
-  modalType: 'register-success' | 'email-sent' = 'register-success';
+  modalType: 'email-sent' = 'email-sent';
   showResetPass = false;
   showConfirmResetPass = false;
 
   // Data Models
   username = '';
   password = '';
-  verificationCode = ''; // For Registration Verify
-
-  registerData = {
-    role: '',
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: ''
-  };
 
   forgotData = {
     email: ''
@@ -61,7 +52,7 @@ export class LoginComponent {
   // --- 1. LOGIN ---
   onLogin() {
     const credentials = {username: this.username, password: this.password};
-    // Inside your login success response:
+
     this.authService.login(credentials).subscribe({
       next: (res: any) => {
 
@@ -91,40 +82,7 @@ export class LoginComponent {
     });
   }
 
-  // --- 2. REGISTER ---
-  onRegister() {
-    this.authService.register(this.registerData).subscribe({
-      next: (res) => {
-        // Show success modal
-        this.modalType = 'register-success';
-        this.showSuccessMessage = true;
-      },
-      error: (err) => {
-        console.error("Registration Error:", err); // Print full error to F12 Console
-        // Check different places where the error message might be
-        const msg = err.error?.message || err.message || "Registration Failed";
-        alert(msg);
-      }
-    });
-  }
-
-  // --- 3. VERIFY REGISTRATION ---
-  onVerifyAccount() {
-    if (!this.verificationCode) {
-      alert("Please enter the code from your email.");
-      return;
-    }
-    this.authService.verify(this.registerData.email, this.verificationCode).subscribe({
-      next: (res) => {
-        alert("Account Verified! You can now login.");
-        this.showSuccessMessage = false;
-        this.switchView('login');
-      },
-      error: (err) => alert(err.error.message || "Verification Failed")
-    });
-  }
-
-  // --- 4. FORGOT PASSWORD ---
+  // --- 2. FORGOT PASSWORD ---
   onVerifyEmail() {
     if(!this.forgotData.email) return;
     this.authService.forgotPassword(this.forgotData.email).subscribe({
@@ -136,7 +94,7 @@ export class LoginComponent {
     });
   }
 
-  // --- 5. RESET PASSWORD ---
+  // --- 3. RESET PASSWORD ---
   onResetPassword() {
     // 1. Check Code
     if (!this.resetData.code) {
@@ -157,7 +115,7 @@ export class LoginComponent {
     // 3. Send to Backend
     const payload = {
       email: this.forgotData.email,
-      code: this.resetData.code, // Use the input field value
+      code: this.resetData.code,
       newPassword: this.resetData.newPassword
     };
 
@@ -180,13 +138,7 @@ export class LoginComponent {
     this.switchView('reset-password');
   }
 
-  // Update this function to prevent the old behavior
   closeSuccessModal() {
     this.showSuccessMessage = false;
-    if (this.modalType === 'register-success') {
-      // Stay here
-    } else if (this.modalType === 'email-sent') {
-      // Do nothing here, proceedToReset handles it now
-    }
   }
 }

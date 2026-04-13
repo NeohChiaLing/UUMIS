@@ -6,6 +6,7 @@ import com.uumis.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.Map;
 
@@ -16,7 +17,8 @@ public class ContentController {
 
     @Autowired
     private PageContentRepository contentRepository;
-
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
     // GET: Fetch content for ANY page
     @GetMapping("/{pageId}")
     public ResponseEntity<String> getPage(@PathVariable String pageId) {
@@ -74,5 +76,28 @@ public class ContentController {
         emailService.sendEmail("uumis@uum.edu.my", subject, body);
 
         return ResponseEntity.ok("Email sent successfully!");
+    }
+    // === NEW: API FOR FACULTY & STAFF PAGE ===
+
+    @GetMapping("/faculty-staff")
+    public ResponseEntity<String> getFacultyStaffPage() {
+        return jdbcTemplate.query(
+                "SELECT json_data FROM page_content WHERE page_id = 'faculty-staff'",
+                (rs) -> {
+                    if (rs.next()) {
+                        return ResponseEntity.ok(rs.getString("json_data"));
+                    } else {
+                        return ResponseEntity.ok("{}");
+                    }
+                }
+        );
+    }
+
+    @PostMapping("/faculty-staff")
+    public ResponseEntity<String> saveFacultyStaffPage(@RequestBody String jsonData) {
+        String sql = "INSERT INTO page_content (page_id, json_data) VALUES ('faculty-staff', ?) " +
+                "ON DUPLICATE KEY UPDATE json_data = ?";
+        jdbcTemplate.update(sql, jsonData, jsonData);
+        return ResponseEntity.ok("Saved successfully");
     }
 }

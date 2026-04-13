@@ -69,7 +69,22 @@ export class AdminDashboardComponent implements OnInit {
     this.authService.logout();
     this.router.navigate(['/login']);
   }
+// ==========================================
+  // YEAR-END BATCH PROMOTION
+  // ==========================================
+  runYearEndPromotion() {
+    const confirmation = confirm("⚠️ CRITICAL ACTION: Are you sure you want to run the Year-End Promotion? This will instantly advance all active students to the next grade level.");
 
+    if (confirmation) {
+      this.authService.promoteAllStudents().subscribe({
+        next: (res: any) => {
+          alert(res.message);
+          window.location.reload(); // Refresh to see the new data
+        },
+        error: (err) => alert('Failed to promote students. Ensure your backend is running.')
+      });
+    }
+  }
   // ==========================================
   // BULLETPROOF ARRAY EXTRACTOR
   // Handles whatever format Spring Boot throws at us

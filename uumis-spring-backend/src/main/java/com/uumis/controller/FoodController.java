@@ -8,12 +8,14 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/food")
-@CrossOrigin("*")
+// THE FIX: Explicitly allow localhost:4200 and explicitly allow the DELETE method!
+@CrossOrigin(origins = "http://localhost:4200", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
 public class FoodController {
 
     @Autowired private FoodItemRepository itemRepo;
@@ -26,8 +28,8 @@ public class FoodController {
     @PostMapping("/items")
     @Transactional
     public ResponseEntity<?> saveMenu(@RequestBody List<FoodItem> items) {
-        itemRepo.deleteAll(); // Clears old menu
-        List<FoodItem> saved = itemRepo.saveAll(items); // Saves new menu
+        itemRepo.deleteAll();
+        List<FoodItem> saved = itemRepo.saveAll(items);
         return ResponseEntity.ok(Map.of("message", "Menu updated successfully!"));
     }
 
@@ -48,6 +50,15 @@ public class FoodController {
             order.setStatus("COMPLETED");
             orderRepo.save(order);
             return ResponseEntity.ok(Map.of("message", "Order marked as completed!"));
+        }).orElse(ResponseEntity.notFound().build());
+    }
+
+    // --- DELETE ORDER API ---
+    @DeleteMapping("/orders/{id}")
+    public ResponseEntity<?> deleteOrder(@PathVariable Long id) {
+        return orderRepo.findById(id).map(order -> {
+            orderRepo.delete(order);
+            return ResponseEntity.ok(Map.of("message", "Order deleted successfully!"));
         }).orElse(ResponseEntity.notFound().build());
     }
 }

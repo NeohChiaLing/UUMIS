@@ -27,9 +27,19 @@ export class UserRolesComponent implements OnInit {
   loadUsers() {
     this.authService.getAllUsers().subscribe({
       next: (res: any) => {
-        // Safely handle the response whether it's an array or an object
-        this.users = Array.isArray(res) ? res : (res.users || res.data || []);
-        console.log("Loaded Users from DB:", this.users); // Check your browser console!
+        let rawUsers = Array.isArray(res) ? res : (res.users || res.data || []);
+
+        // THE FIX: Added .trim() to catch any hidden spaces coming from the database
+        this.users = rawUsers.map((u: any) => {
+          if (u.role) {
+            u.role = u.role.trim().toLowerCase();
+          } else {
+            u.role = 'student';
+          }
+          return u;
+        });
+
+        console.log("Loaded Users from DB:", this.users);
         this.filterUsers();
       },
       error: (err) => console.error('Failed to fetch users', err)
@@ -47,7 +57,7 @@ export class UserRolesComponent implements OnInit {
         (u.email?.toLowerCase() || '').includes(term) ||
         (u.username?.toLowerCase() || '').includes(term);
 
-      const userRole = u.role?.toLowerCase() || 'student'; // Default to student
+      const userRole = u.role?.toLowerCase() || 'student';
       const matchesRole = this.selectedRoleFilter === 'All' || userRole === this.selectedRoleFilter.toLowerCase();
 
       return matchesSearch && matchesRole;

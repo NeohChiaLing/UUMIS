@@ -1,0 +1,115 @@
+<div class="min-h-screen bg-[#f0fdf4] text-slate-800 p-6 lg:p-10 font-display">
+
+  <div class="max-w-6xl mx-auto flex justify-between items-center mb-10">
+    <div class="flex items-center gap-5">
+      <button (click)="goBack()" class="size-11 flex items-center justify-center rounded-full bg-white border border-emerald-100 text-slate-400 hover:text-emerald-500 shadow-sm transition-all">
+        <span translate="no" class="material-symbols-outlined notranslate">arrow_back</span>
+      </button>
+      <div>
+        <h1 class="text-3xl font-black uppercase tracking-tight">Staff <span class="text-emerald-500">Profile</span></h1>
+        <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Manage your public information</p>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <button (click)="isEditMode = !isEditMode"
+              [class]="isEditMode ? 'bg-orange-500 shadow-orange-100' : 'bg-emerald-500 shadow-emerald-100'"
+              class="px-6 py-3 text-white rounded-full font-black uppercase text-[10px] transition-all shadow-lg flex items-center gap-2">
+        <span translate="no" class="material-symbols-outlined notranslate text-sm">{{isEditMode ? 'lock_open' : 'edit'}}</span>
+        {{ isEditMode ? 'Editing Mode' : 'Edit Profile' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="max-w-6xl mx-auto space-y-8 animate-fade-in-up">
+
+    <nav class="flex gap-8 border-b border-emerald-100 pb-4 overflow-x-auto">
+      <button (click)="viewMode = 'profile'" [class.text-emerald-600]="viewMode === 'profile'" [class.border-emerald-500]="viewMode === 'profile'" class="text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b-2 border-transparent pb-4 transition-all">1. Profile & Contact</button>
+      <button (click)="viewMode = 'skills'" [class.text-emerald-600]="viewMode === 'skills'" [class.border-emerald-500]="viewMode === 'skills'" class="text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b-2 border-transparent pb-4 transition-all">2. Responsibilities & Skills</button>
+      <button (click)="viewMode = 'certs'" [class.text-emerald-600]="viewMode === 'certs'" [class.border-emerald-500]="viewMode === 'certs'" class="text-[10px] font-black uppercase tracking-widest whitespace-nowrap border-b-2 border-transparent pb-4 transition-all">3. Professional & Certs</button>
+    </nav>
+
+    <div *ngIf="viewMode === 'profile'" class="grid md:grid-cols-2 gap-8">
+      <div class="bg-white p-10 rounded-[2.5rem] border border-emerald-50 shadow-sm space-y-8">
+        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-emerald-50 pb-4">Personal Details</h3>
+        <div class="space-y-6">
+          <div class="space-y-1">
+            <label class="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Full Name</label>
+            <input [(ngModel)]="selectedStaff.name" [readonly]="!isEditMode" class="w-full bg-slate-50 border border-slate-100 rounded-xl p-4 text-sm font-black uppercase outline-none focus:ring-2 ring-emerald-100">
+          </div>
+
+          <div class="space-y-1 opacity-70">
+            <label class="text-[9px] font-black text-slate-400 flex items-center gap-1 uppercase tracking-widest">System Role <span translate="no" class="material-symbols-outlined notranslate text-[10px]">lock</span></label>
+            <input [ngModel]="selectedStaff.role" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl p-4 text-xs font-bold text-slate-500 outline-none cursor-not-allowed uppercase">
+            <p class="text-[9px] text-slate-400 mt-1 font-bold">Role is locked by the system.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white p-10 rounded-[2.5rem] border border-emerald-50 shadow-sm space-y-8">
+        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-emerald-50 pb-4">Contact Information</h3>
+        <div class="space-y-6">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1"><label class="text-[9px] font-black text-emerald-600 uppercase">Phone Number</label>
+              <input [(ngModel)]="selectedStaff.phone" [readonly]="!isEditMode" class="w-full bg-slate-50 border border-slate-100 rounded-xl p-4 text-sm outline-none focus:ring-2 ring-emerald-100"></div>
+            <div class="space-y-1"><label class="text-[9px] font-black text-slate-400 flex items-center gap-1 uppercase">Professional Email <span translate="no" class="material-symbols-outlined notranslate text-[10px]">lock</span></label>
+              <input [(ngModel)]="selectedStaff.email" readonly class="w-full bg-slate-100 border border-slate-200 rounded-xl p-4 text-sm outline-none text-slate-500 cursor-not-allowed"></div>
+          </div>
+          <div class="space-y-1"><label class="text-[9px] font-black text-emerald-600 uppercase">LinkedIn / Website</label>
+            <input [(ngModel)]="selectedStaff.linkedIn" [readonly]="!isEditMode" class="w-full bg-slate-50 border border-slate-100 rounded-xl p-4 text-sm outline-none focus:ring-2 ring-emerald-100"></div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="viewMode === 'skills'" class="space-y-8">
+      <div class="bg-white p-10 rounded-[2.5rem] border border-emerald-50 shadow-sm space-y-4">
+        <h3 class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Professional Summary / Bio</h3>
+        <textarea [(ngModel)]="selectedStaff.summary" [readonly]="!isEditMode" placeholder="Enter a brief professional overview for your public profile..." class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-6 text-sm h-32 outline-none resize-none focus:ring-2 ring-emerald-100 transition-all"></textarea>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-white p-10 rounded-[2.5rem] border border-emerald-50 shadow-sm space-y-4">
+          <h4 class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Key Responsibilities (Hard Skills)</h4>
+          <textarea [(ngModel)]="selectedStaff.hardSkills" [readonly]="!isEditMode" placeholder="e.g. Finance Management, Student Registration..." class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-6 text-sm h-32 outline-none resize-none focus:ring-2 ring-emerald-100"></textarea>
+        </div>
+        <div class="bg-white p-10 rounded-[2.5rem] border border-emerald-50 shadow-sm space-y-4">
+          <h4 class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Management Traits (Soft Skills)</h4>
+          <textarea [(ngModel)]="selectedStaff.softSkills" [readonly]="!isEditMode" placeholder="e.g. Detail Oriented, Problem Solving..." class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-6 text-sm h-32 outline-none resize-none focus:ring-2 ring-emerald-100"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="viewMode === 'certs'" class="space-y-8">
+      <div class="bg-white rounded-[3rem] border border-emerald-100 overflow-hidden shadow-xl shadow-emerald-500/5">
+        <div class="bg-emerald-600 p-5 px-10 text-[10px] font-black text-white uppercase flex justify-between items-center tracking-widest">
+          <span>Official Certifications & Records</span>
+          <input type="file" #fileInput class="hidden" accept="application/pdf, image/*" (change)="onFileSelected($event)">
+          <button (click)="fileInput.click()" [disabled]="!isEditMode"
+                  [class.opacity-50]="!isEditMode" [class.cursor-not-allowed]="!isEditMode"
+                  class="bg-white/20 hover:bg-white/30 px-5 py-2 rounded-xl flex items-center gap-2 transition-all">
+            <span translate="no" class="material-symbols-outlined notranslate text-sm">upload_file</span> Upload New Document
+          </button>
+        </div>
+        <div class="p-10 space-y-6">
+          <div *ngFor="let cert of selectedStaff.certificates" class="bg-slate-50 p-7 rounded-[2rem] border border-slate-100 flex justify-between items-center group hover:border-emerald-200 transition-all">
+            <div class="flex items-center gap-5">
+              <div class="size-12 rounded-2xl bg-white flex items-center justify-center text-emerald-500 shadow-sm"><span translate="no" class="material-symbols-outlined notranslate">description</span></div>
+              <div><p class="font-black text-slate-700 uppercase text-sm">{{cert.name}}</p><p class="text-[10px] text-slate-400 font-bold uppercase mt-1">{{cert.date}}</p></div>
+            </div>
+            <button (click)="downloadFile(cert)" class="text-emerald-600 text-[10px] font-black uppercase flex items-center gap-2 px-4 py-2 bg-white rounded-xl shadow-sm hover:bg-emerald-500 hover:text-white transition-all">
+              <span translate="no" class="material-symbols-outlined notranslate text-sm">download</span> Download
+            </button>
+          </div>
+          <div *ngIf="selectedStaff.certificates.length === 0" class="text-center p-6 text-sm font-bold text-slate-400 uppercase tracking-widest">No documents uploaded.</div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="isEditMode" class="flex justify-end pt-4 pb-12">
+      <button (click)="saveData()" class="px-16 py-5 bg-emerald-500 text-white font-black uppercase tracking-widest rounded-full shadow-2xl shadow-emerald-200 hover:scale-105 transition-all flex items-center gap-3">
+        <span translate="no" class="material-symbols-outlined notranslate">save</span>
+        SAVE MY PROFILE
+      </button>
+    </div>
+
+  </div>
+</div>

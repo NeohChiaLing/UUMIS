@@ -17,7 +17,6 @@ interface MenuItem {
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './food-ordering.html'
-  // Custom styles removed: Using pure Tailwind for brighter green toggle
 })
 export class FoodOrderingComponent implements OnInit {
 
@@ -40,26 +39,23 @@ export class FoodOrderingComponent implements OnInit {
         this.breakfastMenu = items.filter(i => i.category === 'BREAKFAST');
         this.lunchMenu = items.filter(i => i.category === 'LUNCH');
       },
-      error: (err) => console.error(err)
+      error: (err: any) => console.error(err) // Fix: added : any
     });
 
     // Load Orders
     this.authService.getFoodOrders().subscribe({
       next: (orders) => this.studentOrders = orders,
-      error: (err) => console.error(err)
+      error: (err: any) => console.error(err) // Fix: added : any
     });
   }
 
   goBack() { this.location.back(); }
 
   // --- MENU MANAGEMENT ---
-
-  // FIX 2: Default active is now FALSE (Grey)
   addBreakfastItem() {
     this.breakfastMenu.push({ name: '', description: '', price: 0.00, active: false, category: 'BREAKFAST' });
   }
 
-  // FIX 2: Default active is now FALSE (Grey)
   addLunchItem() {
     this.lunchMenu.push({ name: '', description: '', price: 0.00, active: false, category: 'LUNCH' });
   }
@@ -75,7 +71,6 @@ export class FoodOrderingComponent implements OnInit {
     this.lunchMenu.forEach(i => i.category = 'LUNCH');
     const allItems = [...this.breakfastMenu, ...this.lunchMenu];
 
-    // FIX 1: Strip 'id' so backend treats them as new entries and doesn't crash
     const payload = allItems.map(item => ({
       name: item.name,
       description: item.description,
@@ -87,9 +82,9 @@ export class FoodOrderingComponent implements OnInit {
     this.authService.saveFoodItems(payload).subscribe({
       next: (res) => {
         alert('Menu updates saved to Database!');
-        this.loadData(); // Reload to get fresh IDs
+        this.loadData();
       },
-      error: (err) => alert('Failed to save menu. Check console.')
+      error: (err: any) => alert('Failed to save menu. Check console.') // Fix: added : any
     });
   }
 
@@ -105,7 +100,21 @@ export class FoodOrderingComponent implements OnInit {
       next: () => {
         order.status = 'COMPLETED';
       },
-      error: (err) => alert('Failed to complete order.')
+      error: (err: any) => alert('Failed to complete order.') // Fix: added : any
     });
+  }
+
+  // --- NEW: DELETE ORDER FUNCTION ---
+  deleteOrder(order: any, index: number) {
+    if (confirm(`Are you sure you want to permanently delete order #${order.id} for ${order.studentName}?`)) {
+      this.authService.deleteFoodOrder(order.id).subscribe({
+        next: () => {
+          this.studentOrders.splice(index, 1);
+          alert('Order deleted successfully.');
+        },
+        // THE FIX: Added `: any` to the err parameter to fix TS7006
+        error: (err: any) => alert('Failed to delete order. Please check backend connection.')
+      });
+    }
   }
 }

@@ -1,0 +1,50 @@
+<div class="min-h-screen bg-[#f0fdf4] font-display text-slate-800 p-8 lg:p-12 overflow-y-auto">
+  <div class="max-w-6xl mx-auto flex flex-col gap-8 animate-fade-in">
+
+    <div class="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest cursor-pointer hover:text-emerald-500 w-fit transition-colors" (click)="goBack()">
+      <span translate="no" class="material-symbols-outlined notranslate text-sm">arrow_back</span> Back to Dashboard
+    </div>
+
+    <div>
+      <h1 class="text-4xl font-black text-emerald-900 tracking-tight">Children <span class="text-emerald-500">Profiles</span></h1>
+      <p class="text-slate-500 mt-2 font-medium">Select a child below to view and manage their personal details and emergency contacts.</p>
+    </div>
+
+    <div *ngIf="isLoading" class="text-center py-20 text-emerald-500 animate-pulse font-bold">
+      Loading your children...
+    </div>
+
+    <div *ngIf="!isLoading && myChildren.length === 0" class="text-center py-20 bg-white rounded-[3rem] border border-emerald-50 shadow-sm">
+      <span translate="no" class="material-symbols-outlined notranslate text-6xl text-orange-300 mb-4">link_off</span>
+      <h3 class="text-2xl font-black text-slate-800 uppercase">No Children Linked</h3>
+      <p class="text-sm text-slate-500 mt-2">Your account is not linked to any students yet. Please contact the administration.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div *ngFor="let child of myChildren" (click)="viewProfile(child.id)" class="bg-white rounded-[2.5rem] p-8 border border-emerald-100 shadow-sm hover:shadow-xl hover:border-emerald-300 transition-all cursor-pointer group relative overflow-hidden">
+        <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+          <span translate="no" class="material-symbols-outlined notranslate text-8xl text-emerald-600">face</span>
+        </div>
+
+        <div class="flex flex-col items-center text-center gap-4 relative z-10">
+          <div class="size-24 rounded-full bg-emerald-50 p-1 shadow-inner group-hover:scale-105 transition-transform">
+            <div class="w-full h-full rounded-full bg-emerald-100 flex items-center justify-center overflow-hidden border-2 border-white">
+              <img *ngIf="child.avatar" [src]="child.avatar" class="w-full h-full object-cover">
+              <span *ngIf="!child.avatar" class="text-2xl font-black text-emerald-600">{{ getInitials(child.fullName || child.username) }}</span>
+            </div>
+          </div>
+
+          <div>
+            <h3 class="text-xl font-black text-slate-800">{{ child.fullName || child.username || 'No Name' }}</h3>
+            <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mt-1">ID: {{ child.studentId || child.verificationCode || 'Pending' }}</p>
+          </div>
+
+          <button class="mt-4 w-full py-3 rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white font-black text-[10px] uppercase tracking-widest transition-all">
+            Open Profile
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

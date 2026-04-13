@@ -151,7 +151,7 @@
             </tr>
             </thead>
             <tbody class="divide-y divide-gray-50">
-            <tr *ngFor="let order of studentOrders" class="hover:bg-gray-50 transition-colors">
+            <tr *ngFor="let order of studentOrders; let i = index" class="hover:bg-gray-50 transition-colors">
               <td class="p-6 font-mono text-sm text-slate-500 font-bold">#{{order.id}}</td>
               <td class="p-6 text-sm font-black text-slate-800">{{order.studentName}}</td>
               <td class="p-6 text-xs text-slate-500 font-medium max-w-xs">{{order.items}}</td>
@@ -161,7 +161,15 @@
                 <span *ngIf="order.status === 'COMPLETED'" class="px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-600 text-[10px] font-black uppercase tracking-wider">Completed</span>
               </td>
               <td class="p-6 text-right">
-                <button *ngIf="order.status === 'PENDING'" (click)="markAsCompleted(order)" class="px-4 py-2 bg-emerald-500 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-colors shadow-md">Mark Ready</button>
+
+                <div class="flex items-center justify-end gap-2">
+                  <button *ngIf="order.status === 'PENDING'" (click)="markAsCompleted(order)" class="px-4 py-2 bg-emerald-500 text-white rounded-lg text-[10px] font-black uppercase tracking-widest hover:bg-emerald-600 transition-colors shadow-md">Mark Ready</button>
+
+                  <button (click)="deleteOrder(order, i)" class="size-8 flex items-center justify-center rounded-lg bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-sm" title="Delete Order">
+                    <span translate="no" class="material-symbols-outlined notranslate text-[16px]">delete</span>
+                  </button>
+                </div>
+
               </td>
             </tr>
             <tr *ngIf="studentOrders.length === 0">

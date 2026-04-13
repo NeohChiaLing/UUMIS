@@ -17,12 +17,15 @@ export class ParentDashboardComponent implements OnInit {
   todayDate: string = '';
   todayDayName: string = '';
 
+  myChildren: any[] = []; // NEW: Holds all linked children
+  isChildDropdownOpen: boolean = false; // NEW: Controls the top dropdown
+
   linkedChildData: any = null;
   recentGrades: any[] = [];
 
   currentSubject: any = null;
   upcomingSubjects: any[] = [];
-  completedSubjects: any[] = []; // NEW: Holds finished classes
+  completedSubjects: any[] = [];
 
   fullHeaders: string[] = [];
   fullRows: string[][] = [];
@@ -57,15 +60,40 @@ export class ParentDashboardComponent implements OnInit {
       this.todayDate = date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
       this.todayDayName = date.toLocaleDateString('en-GB', { weekday: 'long' }).toUpperCase();
 
-      if (this.currentUser.childUserId) {
-        this.loadChildDashboardData(this.currentUser.childUserId);
-        this.loadRecentGrades(this.currentUser.childUserId);
-      } else {
-        alert('This parent account is not yet linked to a student profile. Please contact IT.');
-      }
+      // --- THE FIX: Fetch ALL children for this parent! ---
+      this.authService.getStudents().subscribe({
+        next: (students: any[]) => {
+          this.myChildren = students.filter(s => s.parentId === this.currentUser.id);
+
+          if (this.myChildren.length > 0) {
+            // Check if they previously selected a specific child, otherwise default to the first one
+            const savedChildId = sessionStorage.getItem('parentActiveChildId');
+            const activeChild = savedChildId ? this.myChildren.find(c => c.id === savedChildId) : this.myChildren[0];
+
+            if (activeChild) {
+              this.switchActiveChild(activeChild);
+            } else {
+              this.switchActiveChild(this.myChildren[0]);
+            }
+          }
+        },
+        error: () => console.error("Failed to load children list")
+      });
+
     } else {
       this.router.navigate(['/login']);
     }
+  }
+
+  // --- NEW: Switch active child context for the dashboard ---
+  switchActiveChild(child: any) {
+    this.linkedChildData = child;
+    sessionStorage.setItem('parentActiveChildId', child.id); // Save choice to memory!
+    this.isChildDropdownOpen = false;
+
+    // Reload widgets using this specific child's ID
+    this.loadChildDashboardData(child.id);
+    this.loadRecentGrades(child.id);
   }
 
   toggleFinancialMenu() {
@@ -79,7 +107,8 @@ export class ParentDashboardComponent implements OnInit {
   loadChildDashboardData(childId: number) {
     this.authService.getStudentDashboardData(childId).subscribe({
       next: (res) => {
-        this.linkedChildData = res;
+        // Merge the dashboard specifics (like bio/grade) into the linkedChildData
+        this.linkedChildData = { ...this.linkedChildData, ...res };
         let childLevel = 'Kindergarten';
         if (this.linkedChildData && this.linkedChildData.bio && this.linkedChildData.bio !== 'Unassigned') {
           const parts = this.linkedChildData.bio.split('-');
@@ -122,7 +151,6 @@ export class ParentDashboardComponent implements OnInit {
             const todaySchedule = rows[dayIndex];
             const validSlots = [];
 
-            // Get Current Live Time
             const now = new Date();
             const currentMins = now.getHours() * 60 + now.getMinutes();
 
@@ -164,7 +192,6 @@ export class ParentDashboardComponent implements OnInit {
             this.currentSubject = null;
             this.upcomingSubjects = [];
 
-            // Intelligently distribute classes
             for (let i = 0; i < validSlots.length; i++) {
               const slot = validSlots[i];
               if (!slot.endTimeStr && i < validSlots.length - 1) {

@@ -17,17 +17,24 @@ export class StudentProfileComponent implements OnInit {
     dob: '', gender: 'Male', address: '', passport: '', phone: '',
     bloodGroup: 'O+', allergies: 'None', medicalConditions: 'None',
     father: { name: '', ic: '', phone: '', email: '', job: '' },
-    mother: { name: '', ic: '', phone: '', email: '', job: '' }
+    mother: { name: '', ic: '', phone: '', email: '', job: '' },
+    avatarUrl: null
   };
 
   currentUser: any = null;
+  canEditPicture: boolean = false;
 
   constructor(private location: Location, private authService: AuthService) {}
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
 
-    if (this.currentUser && this.currentUser.role === 'student') {
+    // Rule: Admins, Staff, Register Managers, and Parents can edit. Students CANNOT.
+    const role = this.currentUser?.role ? this.currentUser.role.toLowerCase().trim() : '';
+    this.canEditPicture = role !== 'student';
+
+    if (this.currentUser && role === 'student') {
+      this.studentProfile.avatarUrl = this.currentUser.avatar || null;
 
       if (this.currentUser.profileJson) {
         try {
@@ -37,7 +44,7 @@ export class StudentProfileComponent implements OnInit {
       }
 
       this.studentProfile.name = this.currentUser.fullName || this.currentUser.username || this.studentProfile.name || 'Student Name';
-      this.studentProfile.id = this.currentUser.studentId || this.currentUser.verificationCode || this.studentProfile.id || '---';
+      this.studentProfile.id = this.currentUser.studentId || '';
       this.studentProfile.grade = this.currentUser.bio || this.studentProfile.grade || 'Unassigned';
 
       if (this.studentProfile.grade !== 'Unassigned') {
@@ -50,13 +57,10 @@ export class StudentProfileComponent implements OnInit {
     }
   }
 
-  // --- NEW: DYNAMIC COMPLETION CALCULATOR ---
-  // This automatically runs and calculates the percentage based on empty fields
   get completionPercentage(): number {
     let totalFields = 0;
     let filledFields = 0;
 
-    // Helper function to check if a value is properly filled
     const checkValue = (val: string) => {
       totalFields++;
       if (val && val.trim() !== '' && val.trim() !== '---' && val.trim() !== 'Unassigned') {
@@ -64,7 +68,6 @@ export class StudentProfileComponent implements OnInit {
       }
     };
 
-    // Check main student details
     checkValue(this.studentProfile.name);
     checkValue(this.studentProfile.id);
     checkValue(this.studentProfile.level);
@@ -78,14 +81,12 @@ export class StudentProfileComponent implements OnInit {
     checkValue(this.studentProfile.allergies);
     checkValue(this.studentProfile.medicalConditions);
 
-    // Check Father details
     checkValue(this.studentProfile.father.name);
     checkValue(this.studentProfile.father.ic);
     checkValue(this.studentProfile.father.phone);
     checkValue(this.studentProfile.father.email);
     checkValue(this.studentProfile.father.job);
 
-    // Check Mother details
     checkValue(this.studentProfile.mother.name);
     checkValue(this.studentProfile.mother.ic);
     checkValue(this.studentProfile.mother.phone);
@@ -112,10 +113,41 @@ export class StudentProfileComponent implements OnInit {
     this.location.back();
   }
 
+  triggerFileInput() {
+    if (this.canEditPicture) {
+      document.getElementById('studentAvatarInput')?.click();
+    }
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.studentProfile.avatarUrl = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
   saveUpdates() {
+    // --- THE FIX: Clean up the JSON ---
+    const cleanProfile = {
+      dob: this.studentProfile.dob || '',
+      gender: this.studentProfile.gender || 'Male',
+      address: this.studentProfile.address || '',
+      passport: this.studentProfile.passport || '',
+      bloodGroup: this.studentProfile.bloodGroup || 'O+',
+      allergies: this.studentProfile.allergies || 'None',
+      medicalConditions: this.studentProfile.medicalConditions || 'None',
+      father: this.studentProfile.father || { name: '', ic: '', phone: '', email: '', job: '' },
+      mother: this.studentProfile.mother || { name: '', ic: '', phone: '', email: '', job: '' }
+    };
+
     const payload = {
       profileStatus: 'PENDING',
-      profileJson: JSON.stringify(this.studentProfile)
+      profileJson: JSON.stringify(cleanProfile),
+      avatar: this.studentProfile.avatarUrl
     };
 
     this.authService.adminUpdateStudent(this.currentUser.id, payload).subscribe({

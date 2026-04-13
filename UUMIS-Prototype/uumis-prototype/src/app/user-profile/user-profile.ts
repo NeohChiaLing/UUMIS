@@ -14,6 +14,7 @@ export class UserProfileComponent implements OnInit {
 
   user: any = {};
   isEditMode: boolean = false;
+  isStudent: boolean = false; // THE FIX: Added a flag to track if they are a student
 
   constructor(private location: Location, private authService: AuthService) {}
 
@@ -25,9 +26,13 @@ export class UserProfileComponent implements OnInit {
     const userStr = localStorage.getItem('user');
     if (userStr) {
       const storedUser = JSON.parse(userStr);
+
+      // THE FIX: Check if the user's role is exactly 'student'
+      const rawRole = storedUser.role ? storedUser.role.toLowerCase().trim() : '';
+      this.isStudent = rawRole === 'student';
+
       this.user = {
         id: storedUser.id,
-        // Fallbacks added so Admin/New users don't have blank profiles!
         name: storedUser.fullName || storedUser.username || 'System User',
         role: storedUser.role || 'Standard',
         email: storedUser.email || 'No email provided',
@@ -69,26 +74,18 @@ export class UserProfileComponent implements OnInit {
 
     this.authService.updateUser(this.user.id, payload).subscribe({
       next: (res: any) => {
-        // ====================================================
-        // THE FIX: SAFE MERGE TO PROTECT LOCAL STORAGE
-        // ====================================================
         const existingUserStr = localStorage.getItem('user');
         let updatedUser = res.user;
 
         if (existingUserStr) {
           const existingUser = JSON.parse(existingUserStr);
-          // Blend the old secure data (like role) with the newly saved data
           updatedUser = { ...existingUser, ...res.user };
-
-          // Absolute guarantee the role is never wiped!
           if (!updatedUser.role) {
             updatedUser.role = existingUser.role;
           }
         }
 
         localStorage.setItem('user', JSON.stringify(updatedUser));
-        // ====================================================
-
         alert('Profile Saved Successfully!');
         this.isEditMode = false;
         this.loadRealUser();
@@ -101,7 +98,8 @@ export class UserProfileComponent implements OnInit {
   }
 
   triggerFileInput() {
-    if (this.isEditMode) {
+    // THE FIX: Prevent file input click if they are a student!
+    if (this.isEditMode && !this.isStudent) {
       document.getElementById('avatarInput')?.click();
     }
   }

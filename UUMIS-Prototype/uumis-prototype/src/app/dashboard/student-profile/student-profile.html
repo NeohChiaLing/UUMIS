@@ -50,11 +50,20 @@
       <section id="overview" class="bg-white rounded-[2.5rem] shadow-sm border border-emerald-100 overflow-hidden relative">
         <div class="h-32 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
         <div class="px-8 pb-8 -mt-16 flex flex-col md:flex-row gap-6 items-end relative z-10">
-          <div class="size-32 rounded-[2rem] bg-white p-1.5 shadow-lg">
-            <div class="w-full h-full rounded-[1.5rem] bg-emerald-100 text-emerald-700 flex items-center justify-center text-4xl font-black uppercase">
-              {{ getInitials(studentProfile.name) }}
+
+          <div class="relative group" [class.cursor-pointer]="canEditPicture">
+            <div (click)="triggerFileInput()" class="size-32 rounded-[2rem] bg-white p-1.5 shadow-lg transition-all" [class.hover:scale-105]="canEditPicture">
+              <div class="w-full h-full rounded-[1.5rem] bg-emerald-100 text-emerald-700 flex items-center justify-center overflow-hidden relative">
+                <span *ngIf="!studentProfile.avatarUrl" class="text-4xl font-black uppercase">{{ getInitials(studentProfile.name) }}</span>
+                <img *ngIf="studentProfile.avatarUrl" [src]="studentProfile.avatarUrl" class="w-full h-full object-cover">
+                <div *ngIf="canEditPicture" class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+                  <span translate="no" class="material-symbols-outlined notranslate text-white text-3xl">add_a_photo</span>
+                </div>
+              </div>
             </div>
+            <input *ngIf="canEditPicture" type="file" id="studentAvatarInput" class="hidden" accept="image/*" (change)="onFileSelected($event)">
           </div>
+
           <div class="flex-1 w-full pb-2">
             <h2 class="text-3xl font-black text-slate-800">{{studentProfile.name}}</h2>
             <p class="text-emerald-600 font-bold flex items-center gap-2">

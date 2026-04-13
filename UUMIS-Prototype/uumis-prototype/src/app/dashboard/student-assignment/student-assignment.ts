@@ -31,14 +31,19 @@ export class StudentAssignmentComponent implements OnInit {
   constructor(private location: Location, private authService: AuthService) {}
 
   ngOnInit() {
-    // 1. Safely extract student's specific YEAR from their DB profile
     if (typeof localStorage !== 'undefined') {
       const userStr = localStorage.getItem('user');
       if (userStr) {
         try {
           const user = JSON.parse(userStr);
           if (user.bio && user.bio !== 'Unassigned') {
-            const parts = user.bio.split('-'); // e.g. "Primary - Year 3"
+
+            // ====================================================================
+            // THE FIX: Added spaces around the hyphen so "Pre-Kindergarten"
+            // doesn't accidentally get chopped in half!
+            // ====================================================================
+            const parts = user.bio.split(' - ');
+
             if (parts.length > 1) {
               this.studentLevel = parts[0].trim();
               this.studentYear = parts[1].trim();
@@ -57,8 +62,6 @@ export class StudentAssignmentComponent implements OnInit {
     this.authService.getSubjects().subscribe({
       next: (dbSubjects) => {
 
-        // FIX: Relaxed filtering! We now only match the Year Group (just like the Admin panel does).
-        // This prevents empty screens caused by slight formatting mismatches.
         const mySubjects = dbSubjects.filter(s => {
           const subYear = (s.yearGroup || '').trim().toLowerCase();
           return subYear === this.studentYear.toLowerCase();
@@ -66,13 +69,11 @@ export class StudentAssignmentComponent implements OnInit {
 
         this.authService.getAssignments().subscribe({
           next: (assignmentsRes) => {
-            // Filter assignments specifically for this student's yearGroup
             const myAssignments = assignmentsRes.filter(a => {
               const taskYear = (a.yearGroup || '').trim().toLowerCase();
               return taskYear === this.studentYear.toLowerCase();
             });
 
-            // Map backend keys to match HTML layout
             this.allAssignments = myAssignments.map(a => {
               return {
                 id: a.id,
@@ -88,7 +89,6 @@ export class StudentAssignmentComponent implements OnInit {
               };
             });
 
-            // Build UI Subject Cards
             const colors = ['bg-blue-50 text-blue-600', 'bg-purple-50 text-purple-600', 'bg-pink-50 text-pink-600', 'bg-orange-50 text-orange-600', 'bg-emerald-50 text-emerald-600'];
 
             this.subjects = mySubjects.map((sub, index) => {
@@ -108,7 +108,7 @@ export class StudentAssignmentComponent implements OnInit {
     });
   }
 
-  // --- UI Routing Functions (Unchanged) ---
+  // --- UI Routing Functions ---
   selectSubject(subject: any): void {
     this.selectedSubject = subject;
     this.filteredAssignments = this.allAssignments.filter(a => a.subjectCode === subject.code);
@@ -150,11 +150,25 @@ export class StudentAssignmentComponent implements OnInit {
     }
   }
 
-  onFileSelected(event: any): void { const file = event.target.files[0]; if (file) { this.selectedFile = file; this.selectedFileName = file.name; } }
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      this.selectedFileName = file.name;
+    }
+  }
 
   goBack(): void {
-    if (this.viewState === 'quiz' || this.viewState === 'details') { this.viewState = 'assignments'; this.clickedTask = null; }
-    else if (this.viewState === 'assignments') { this.viewState = 'subjects'; this.selectedSubject = null; }
-    else { this.location.back(); }
+    if (this.viewState === 'quiz' || this.viewState === 'details') {
+      this.viewState = 'assignments';
+      this.clickedTask = null;
+    }
+    else if (this.viewState === 'assignments') {
+      this.viewState = 'subjects';
+      this.selectedSubject = null;
+    }
+    else {
+      this.location.back();
+    }
   }
 }

@@ -26,7 +26,7 @@
 
     <div class="flex-1 space-y-8 max-w-xl text-center lg:text-left relative z-20">
 
-      <div *ngIf="currentView === 'login' || currentView === 'register'" class="animate-fade-in">
+      <div *ngIf="currentView === 'login'" class="animate-fade-in">
         <span class="px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-widest">Academic Portal</span>
         <h1 class="text-6xl lg:text-7xl font-black text-slate-900 mt-6 leading-[1.1] tracking-tighter">
           Welcome <br> <span class="text-emerald-500">Back.</span>
@@ -112,78 +112,7 @@
               </div>
             </div>
 
-            <button type="submit" class="auth-btn">Sign In</button>
-
-            <div class="text-center mt-4">
-              <span class="text-xs font-bold text-slate-400">Don't have an account? </span>
-              <button type="button" (click)="switchView('register')" class="text-xs font-black text-emerald-500 hover:text-emerald-600 uppercase tracking-widest ml-1 cursor-pointer relative z-50">Sign Up</button>
-            </div>
-          </form>
-        </div>
-
-        <div *ngIf="currentView === 'register'" class="animate-fade-in">
-          <div class="mb-8">
-            <h2 class="text-3xl font-black text-slate-900 tracking-tight">Create Account</h2>
-            <p class="text-sm font-bold text-slate-400 mt-2">Please fill in your details to register.</p>
-          </div>
-
-          <form (ngSubmit)="onRegister()" class="space-y-4 relative z-40">
-            <div class="space-y-1">
-              <label class="input-label">I am a...</label>
-              <div class="relative group">
-                <div class="input-icon"><span translate="no" class="material-symbols-outlined notranslate text-slate-300 group-focus-within:text-emerald-500 transition-colors">badge</span></div>
-                <select [(ngModel)]="registerData.role" name="role" class="auth-input cursor-pointer z-50">
-                  <option value="" disabled selected>Select Role</option>
-                  <option value="student">Student</option>
-                  <option value="parent">Parent</option>
-                  <option value="teacher">Teacher</option>
-                  <option value="staff">Staff</option>
-                </select>
-                <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none"><span translate="no" class="material-symbols-outlined notranslate text-slate-400 text-sm">expand_more</span></div>
-              </div>
-            </div>
-
-            <div class="space-y-1">
-              <label class="input-label">Username</label>
-              <div class="relative group">
-                <div class="input-icon"><span translate="no" class="material-symbols-outlined notranslate text-slate-300 group-focus-within:text-emerald-500 transition-colors">person</span></div>
-                <input type="text" [(ngModel)]="registerData.username" name="regUsername" class="auth-input" placeholder="Choose a username">
-              </div>
-            </div>
-
-            <div class="space-y-1">
-              <label class="input-label">Email Address</label>
-              <div class="relative group">
-                <div class="input-icon"><span translate="no" class="material-symbols-outlined notranslate text-slate-300 group-focus-within:text-emerald-500 transition-colors">mail</span></div>
-                <input type="email" [(ngModel)]="registerData.email" name="regEmail" class="auth-input" placeholder="example@school.edu">
-              </div>
-            </div>
-
-            <div class="space-y-1">
-              <label class="input-label">Password</label>
-              <div class="relative group">
-                <div class="input-icon"><span translate="no" class="material-symbols-outlined notranslate text-slate-300 group-focus-within:text-emerald-500 transition-colors">lock</span></div>
-                <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="registerData.password" name="regPassword" class="auth-input pr-12" placeholder="Create password">
-                <button type="button" (click)="showPassword = !showPassword" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-300 hover:text-slate-500 transition-colors cursor-pointer z-50">
-                  <span translate="no" class="material-symbols-outlined notranslate text-xl">{{ showPassword ? 'visibility' : 'visibility_off' }}</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="space-y-1">
-              <label class="input-label">Confirm Password</label>
-              <div class="relative group">
-                <div class="input-icon"><span translate="no" class="material-symbols-outlined notranslate text-slate-300 group-focus-within:text-emerald-500 transition-colors">check_circle</span></div>
-                <input type="password" [(ngModel)]="registerData.confirmPassword" name="regConfirmPassword" class="auth-input" placeholder="Re-enter password">
-              </div>
-            </div>
-
-            <button type="submit" class="auth-btn mt-2">Register</button>
-
-            <div class="text-center mt-4">
-              <span class="text-xs font-bold text-slate-400">Already have an account? </span>
-              <button type="button" (click)="switchView('login')" class="text-xs font-black text-emerald-500 hover:text-emerald-600 uppercase tracking-widest ml-1 cursor-pointer relative z-50">Log In</button>
-            </div>
+            <button type="submit" class="auth-btn mt-4">Sign In</button>
           </form>
         </div>
 
@@ -312,26 +241,10 @@
         </button>
       </ng-container>
 
-      <ng-container *ngIf="modalType === 'register-success'">
-        <h3 class="text-2xl font-black text-slate-900 mb-3 tracking-tight">One Last Step!</h3>
-        <p class="text-sm font-bold text-slate-400 mb-4 leading-relaxed">
-          We sent a code to <span class="text-emerald-500">{{ registerData.email }}</span>.
-          Enter it below to activate your account.
-        </p>
-        <div class="mb-4">
-          <input type="text" [(ngModel)]="verificationCode" placeholder="Enter 6-digit Code"
-                 class="w-full bg-slate-50 border border-emerald-200 rounded-xl p-3 text-center font-black tracking-widest text-lg focus:ring-2 focus:ring-emerald-500 outline-none">
-        </div>
-        <button (click)="onVerifyAccount()" class="w-full text-white bg-emerald-500 hover:bg-emerald-600 font-black rounded-2xl text-sm px-6 py-4 uppercase tracking-widest shadow-lg shadow-emerald-200 transition-all hover:scale-[1.02] cursor-pointer">
-          Verify & Log In
-        </button>
-      </ng-container>
-
     </div>
   </div>
 
 </div>
-
 
 <style>
   .auth-input {

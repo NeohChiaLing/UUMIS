@@ -12,6 +12,11 @@ import { AuthService } from '../../../services/auth.service';
 })
 export class RefundComponent implements OnInit {
 
+  currentUser: any = null;
+  viewState: string = 'children';
+  myChildren: any[] = [];
+  selectedChild: any = null;
+
   childId: number | null = null;
 
   refundReq = {
@@ -27,11 +32,26 @@ export class RefundComponent implements OnInit {
   constructor(private location: Location, private authService: AuthService) {}
 
   ngOnInit() {
-    const currentUser = this.authService.getCurrentUser();
-    if (currentUser && currentUser.childUserId) {
-      this.childId = currentUser.childUserId;
-      this.loadRefundHistory();
+    this.currentUser = this.authService.getCurrentUser();
+    if (this.currentUser && this.currentUser.role.toLowerCase() === 'parent') {
+      this.authService.getStudents().subscribe({
+        next: (students: any[]) => {
+          this.myChildren = students.filter(s => s.parentId === this.currentUser.id);
+        }
+      });
     }
+  }
+
+  getInitials(name: string): string {
+    if (!name) return 'NA';
+    return name.trim().slice(0, 2).toUpperCase();
+  }
+
+  selectChild(child: any) {
+    this.selectedChild = child;
+    this.childId = child.id;
+    this.viewState = 'details';
+    this.loadRefundHistory();
   }
 
   loadRefundHistory() {
@@ -43,7 +63,13 @@ export class RefundComponent implements OnInit {
   }
 
   goBack(): void {
-    this.location.back();
+    if (this.viewState === 'details') {
+      this.viewState = 'children';
+      this.selectedChild = null;
+      this.childId = null;
+    } else {
+      this.location.back();
+    }
   }
 
   submitRefundRequest(): void {
@@ -54,7 +80,7 @@ export class RefundComponent implements OnInit {
       next: () => {
         alert('Refund requested successfully! Awaiting finance review.');
         this.refundReq = { invoiceNo: '', date: '', reason: '', amount: null, bankDetails: '' };
-        this.loadRefundHistory(); // Instantly update the right-side history panel
+        this.loadRefundHistory();
       },
       error: () => alert('Failed to submit request.')
     });

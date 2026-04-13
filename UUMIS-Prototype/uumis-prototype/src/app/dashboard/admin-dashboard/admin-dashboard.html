@@ -25,6 +25,14 @@
           </div>
           <span translate="no" class="material-symbols-outlined text-sm notranslate group-hover:translate-x-1 transition-transform">arrow_forward</span>
         </a>
+
+        <p class="px-4 mt-6 mb-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Personal</p>
+        <a routerLink="/dashboard/admin/profile" routerLinkActive="bg-green-50 text-green-700 border-green-500 shadow-sm"
+           class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-green-50 transition-all group border-l-4 border-transparent">
+          <span translate="no" class="material-symbols-outlined notranslate">person</span>
+          <p class="text-sm font-semibold">My Profile</p>
+        </a>
+
         <p class="px-4 mt-6 mb-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">Management</p>
         <a routerLink="/dashboard/student-info" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-green-50 transition-all group border-l-4 border-transparent"><span translate="no" class="material-symbols-outlined notranslate">school</span><p class="text-sm font-semibold">Students</p></a>
         <a routerLink="/dashboard/teacher-info" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-green-50 transition-all group border-l-4 border-transparent"><span translate="no" class="material-symbols-outlined notranslate">person_apron</span><p class="text-sm font-semibold">Teachers</p></a>
@@ -62,8 +70,7 @@
         </div>
 
         <a routerLink="/dashboard/admin/notification" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-green-50 transition-all group border-l-4 border-transparent"><span translate="no" class="material-symbols-outlined filled notranslate">notifications</span><p class="text-sm font-semibold">Notifications</p></a>
-        <a routerLink="/dashboard/admin/settings" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-green-50 transition-all group border-l-4 border-transparent"><span translate="no" class="material-symbols-outlined text-[20px] group-hover:text-emerald-500 notranslate">settings</span><p class="text-sm font-semibold">Settings</p></a>
-        <a routerLink="/dashboard/admin/user-roles" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-green-50 transition-all group border-l-4 border-transparent"><span translate="no" class="material-symbols-outlined notranslate">manage_accounts</span><p class="text-sm font-semibold">User Roles</p></a>
+        <a routerLink="/dashboard/admin/user-roles" class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-500 hover:bg-green-50 transition-all group border-l-4 border-transparent mt-auto"><span translate="no" class="material-symbols-outlined notranslate">manage_accounts</span><p class="text-sm font-semibold">User Roles</p></a>
       </nav>
     </div>
 
@@ -86,7 +93,7 @@
         <div class="flex items-center gap-5">
           <button class="size-11 rounded-full bg-white border border-emerald-100 text-emerald-600 shadow-sm relative group"><span translate="no" class="material-symbols-outlined notranslate">notifications</span><span class="absolute top-2.5 right-2.5 size-2.5 bg-pink-500 rounded-full ring-2 ring-white"></span></button>
           <div class="h-8 w-px bg-emerald-100 mx-1"></div>
-          <div class="flex items-center gap-3 pl-2 pr-4 py-1.5 rounded-full bg-white border border-emerald-50 shadow-sm cursor-pointer hover:bg-emerald-50 transition-all" routerLink="/dashboard/user-profile">
+          <div class="flex items-center gap-3 pl-2 pr-4 py-1.5 rounded-full bg-white border border-emerald-50 shadow-sm cursor-pointer hover:bg-emerald-50 transition-all" routerLink="/dashboard/admin/profile">
             <div class="size-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-black text-xs">AD</div>
             <div class="hidden md:flex flex-col leading-tight"><p class="text-xs font-black text-slate-800 uppercase">Admin User</p><p class="text-[9px] text-emerald-500 font-bold uppercase tracking-widest">Administrator</p></div>
           </div>
@@ -193,6 +200,21 @@
               <a routerLink="/dashboard/admin/user-roles" class="flex flex-col items-center justify-center gap-4 p-8 rounded-[2rem] bg-white border border-purple-50 hover:border-purple-300 hover:shadow-xl transition-all group shadow-sm cursor-pointer"><div class="size-14 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-all"><span translate="no" class="material-symbols-outlined text-3xl notranslate">manage_accounts</span></div><span class="text-[10px] font-black text-slate-600 uppercase tracking-widest text-center">User Roles</span></a>
               <a routerLink="/dashboard/admin/notification" class="flex flex-col items-center justify-center gap-4 p-8 rounded-[2rem] bg-white border border-pink-50 hover:border-pink-300 hover:shadow-xl transition-all group shadow-sm cursor-pointer"><div class="size-14 rounded-2xl bg-pink-100 text-pink-600 flex items-center justify-center group-hover:bg-pink-500 group-hover:text-white transition-all"><span translate="no" class="material-symbols-outlined text-3xl notranslate">campaign</span></div><span class="text-[10px] font-black text-slate-600 uppercase tracking-widest text-center">Broadcast</span></a>
               <a routerLink="/dashboard/admin/inventory" class="flex flex-col items-center justify-center gap-4 p-8 rounded-[2rem] bg-white border border-sky-50 hover:border-sky-300 hover:shadow-xl transition-all group shadow-sm cursor-pointer"><div class="size-14 rounded-2xl bg-sky-100 text-sky-600 flex items-center justify-center group-hover:bg-sky-500 group-hover:text-white transition-all"><span translate="no" class="material-symbols-outlined text-3xl notranslate">inventory_2</span></div><span class="text-[10px] font-black text-slate-600 uppercase tracking-widest text-center">Inventory</span></a>
+            </div>
+
+            <div class="mt-2 bg-red-50 border border-red-200 rounded-[2rem] p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+              <div class="flex items-center gap-4">
+                <div class="p-3 bg-red-100 text-red-600 rounded-2xl hidden sm:flex">
+                  <span translate="no" class="material-symbols-outlined text-3xl notranslate">warning</span>
+                </div>
+                <div>
+                  <h4 class="text-sm font-black text-red-900 uppercase tracking-widest">Year-End Batch Promotion</h4>
+                  <p class="text-xs text-red-600 font-bold mt-1">Automatically advance all active students to the next grade level.</p>
+                </div>
+              </div>
+              <button (click)="runYearEndPromotion()" class="shrink-0 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-red-200 transition-all hover:scale-105 w-full sm:w-auto">
+                Run Promotion
+              </button>
             </div>
           </div>
 

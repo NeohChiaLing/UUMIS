@@ -1,64 +1,106 @@
-<div class="flex h-screen bg-[#f8fcfa] font-display text-[#0e1b13] overflow-hidden relative">
+<div class="flex h-screen bg-[#f8fcfa] font-display text-[#0e1b13] overflow-hidden relative w-full">
 
-  <section class="w-64 flex-none border-r border-[#e7f3ec] bg-white flex flex-col h-full">
-    <div class="p-5 border-b border-[#e7f3ec] flex items-center gap-3">
-      <button (click)="goBack()" class="size-8 flex-none flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:bg-emerald-50 hover:text-emerald-600 transition-all shadow-sm">
-        <span translate="no" class="material-symbols-outlined notranslate text-lg">arrow_back</span>
-      </button>
-      <h2 class="text-[#0e1b13] text-lg font-bold">My E-Wallet</h2>
-    </div>
-  </section>
-
-  <section class="flex-1 flex flex-col h-full overflow-hidden p-10">
-
-    <div class="w-full bg-[#0e1b13] rounded-[3rem] p-10 text-white shadow-2xl shadow-emerald-900/20 relative overflow-hidden mb-8 shrink-0">
-      <div class="absolute -right-10 -top-10 size-64 bg-[#30e87a] rounded-full blur-[80px] opacity-20"></div>
-
-      <div class="relative z-10 flex justify-between items-end">
+  <div *ngIf="viewState === 'children'" class="flex-1 flex flex-col h-full animate-fade-in p-8 lg:p-12 w-full overflow-y-auto">
+    <div class="max-w-6xl mx-auto w-full">
+      <header class="flex items-center gap-6 mb-10">
+        <button (click)="goBack()" class="size-11 flex items-center justify-center rounded-full bg-white border border-emerald-100 text-slate-400 hover:text-emerald-500 shadow-sm transition-all">
+          <span translate="no" class="material-symbols-outlined notranslate font-bold">arrow_back</span>
+        </button>
         <div>
-          <p class="text-emerald-400 font-bold text-sm uppercase tracking-[0.2em] mb-2">Available Balance</p>
-          <h1 class="text-6xl font-black tracking-tight">RM {{ walletBalance | number:'1.2-2' }}</h1>
-          <p class="text-gray-400 text-xs font-bold mt-4 flex items-center gap-2"><span translate="no" class="material-symbols-outlined notranslate text-base">info</span> Can be used for Canteen & Bookstore</p>
+          <h1 class="text-3xl font-black text-emerald-900 uppercase">E-<span class="text-emerald-500">Wallet</span></h1>
+          <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">Select a child to view their cafeteria balance</p>
         </div>
-        <div class="size-16 rounded-full bg-[#30e87a] text-[#0e1b13] flex items-center justify-center shadow-lg animate-pulse">
-          <span translate="no" class="material-symbols-outlined notranslate text-3xl">account_balance_wallet</span>
+      </header>
+
+      <div *ngIf="myChildren.length === 0" class="h-64 flex flex-col items-center justify-center text-slate-400 opacity-60 bg-white rounded-[3rem] border border-emerald-50 shadow-sm">
+        <span translate="no" class="material-symbols-outlined notranslate text-6xl mb-4">link_off</span>
+        <p class="text-sm font-black uppercase tracking-widest">No Children Linked</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div *ngFor="let child of myChildren" (click)="selectChild(child)" class="bg-white p-8 rounded-[2.5rem] border border-emerald-50 shadow-sm hover:shadow-xl hover:border-emerald-300 hover:scale-[1.02] transition-all cursor-pointer group flex flex-col items-center text-center gap-4 relative overflow-hidden">
+          <div class="size-24 rounded-full bg-emerald-50 p-1 shadow-inner group-hover:scale-105 transition-transform relative z-10">
+            <div class="w-full h-full rounded-full bg-emerald-100 flex items-center justify-center overflow-hidden border-2 border-white">
+              <img *ngIf="child.avatar" [src]="child.avatar" class="w-full h-full object-cover">
+              <span *ngIf="!child.avatar" class="text-2xl font-black text-emerald-600">{{ getInitials(child.fullName || child.username) }}</span>
+            </div>
+          </div>
+          <div class="relative z-10">
+            <h3 class="text-xl font-black text-slate-800">{{ child.fullName || child.username || 'No Name' }}</h3>
+            <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mt-1">ID: {{ child.studentId || 'Pending' }}</p>
+          </div>
+          <button class="mt-4 w-full py-3 rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white font-black text-[10px] uppercase tracking-widest transition-all relative z-10">
+            View E-Wallet
+          </button>
         </div>
       </div>
     </div>
+  </div>
 
-    <h3 class="text-xl font-black text-[#0e1b13] mb-5 px-2">Wallet Activity</h3>
-
-    <div class="flex-1 bg-white border border-[#e7f3ec] rounded-[2.5rem] shadow-sm overflow-hidden flex flex-col">
-      <div class="flex-1 overflow-y-auto">
-        <table class="w-full text-left border-collapse">
-          <thead class="bg-[#f8fcfa] sticky top-0 z-10">
-          <tr class="border-b border-[#e7f3ec]">
-            <th class="p-6 pl-8 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Date & Time</th>
-            <th class="p-6 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Type</th>
-            <th class="p-6 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Note</th>
-            <th class="p-6 pr-8 text-[10px] font-black text-[#4e976b] uppercase tracking-widest text-right">Amount</th>
-          </tr>
-          </thead>
-          <tbody class="divide-y divide-[#e7f3ec]">
-          <tr *ngFor="let txn of transactions" class="group hover:bg-gray-50 transition-colors">
-            <td class="p-6 pl-8">
-              <p class="text-sm font-bold text-[#0e1b13]">{{ txn.date }}</p>
-              <p class="text-[10px] text-gray-400">{{ txn.time }}</p>
-            </td>
-            <td class="p-6">
-                                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wide" [ngClass]="{'bg-emerald-50 text-emerald-700': txn.type === 'Top Up', 'bg-red-50 text-red-700': txn.type === 'Deduct' || txn.type === 'Purchase'}">
-                                    <span translate="no" class="material-symbols-outlined notranslate text-[14px]">{{ txn.type === 'Top Up' ? 'add' : 'remove' }}</span> {{ txn.type }}
-                                </span>
-            </td>
-            <td class="p-6 text-sm font-medium text-gray-500">{{ txn.note || '-' }}</td>
-            <td class="p-6 pr-8 text-right text-base font-black" [ngClass]="txn.type === 'Top Up' ? 'text-emerald-500' : 'text-red-500'">
-              {{ txn.type === 'Top Up' ? '+' : '-' }} RM {{ txn.amount | number:'1.2-2' }}
-            </td>
-          </tr>
-          </tbody>
-        </table>
+  <ng-container *ngIf="viewState === 'details'">
+    <section class="w-64 flex-none border-r border-[#e7f3ec] bg-white flex flex-col h-full animate-fade-in">
+      <div class="p-5 border-b border-[#e7f3ec] flex items-center gap-3">
+        <button (click)="goBack()" class="size-8 flex-none flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:bg-emerald-50 hover:text-emerald-600 transition-all shadow-sm">
+          <span translate="no" class="material-symbols-outlined notranslate text-lg">arrow_back</span>
+        </button>
+        <h2 class="text-[#0e1b13] text-sm font-black uppercase">{{ selectedChild ? (selectedChild.fullName || 'Child').split(' ')[0] + "'s" : 'My' }} E-Wallet</h2>
       </div>
-    </div>
+    </section>
 
-  </section>
+    <section class="flex-1 flex flex-col h-full overflow-hidden p-10 animate-fade-in">
+
+      <div class="w-full bg-[#0e1b13] rounded-[3rem] p-10 text-white shadow-2xl shadow-emerald-900/20 relative overflow-hidden mb-8 shrink-0">
+        <div class="absolute -right-10 -top-10 size-64 bg-[#30e87a] rounded-full blur-[80px] opacity-20"></div>
+
+        <div class="relative z-10 flex justify-between items-end">
+          <div>
+            <p class="text-emerald-400 font-bold text-sm uppercase tracking-[0.2em] mb-2">Available Balance</p>
+            <h1 class="text-6xl font-black tracking-tight">RM {{ walletBalance | number:'1.2-2' }}</h1>
+            <p class="text-gray-400 text-xs font-bold mt-4 flex items-center gap-2"><span translate="no" class="material-symbols-outlined notranslate text-base">info</span> Can be used for Canteen & Bookstore</p>
+          </div>
+          <div class="size-16 rounded-full bg-[#30e87a] text-[#0e1b13] flex items-center justify-center shadow-lg animate-pulse">
+            <span translate="no" class="material-symbols-outlined notranslate text-3xl">account_balance_wallet</span>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="text-xl font-black text-[#0e1b13] mb-5 px-2">Wallet Activity</h3>
+
+      <div class="flex-1 bg-white border border-[#e7f3ec] rounded-[2.5rem] shadow-sm overflow-hidden flex flex-col">
+        <div class="flex-1 overflow-y-auto">
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-[#f8fcfa] sticky top-0 z-10">
+            <tr class="border-b border-[#e7f3ec]">
+              <th class="p-6 pl-8 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Date & Time</th>
+              <th class="p-6 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Type</th>
+              <th class="p-6 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Note</th>
+              <th class="p-6 pr-8 text-[10px] font-black text-[#4e976b] uppercase tracking-widest text-right">Amount</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-[#e7f3ec]">
+            <tr *ngIf="transactions.length === 0">
+              <td colspan="4" class="p-8 text-center text-sm font-bold text-gray-300 uppercase tracking-widest">No wallet activity found.</td>
+            </tr>
+            <tr *ngFor="let txn of transactions" class="group hover:bg-gray-50 transition-colors">
+              <td class="p-6 pl-8">
+                <p class="text-sm font-bold text-[#0e1b13]">{{ txn.date }}</p>
+                <p class="text-[10px] text-gray-400">{{ txn.time }}</p>
+              </td>
+              <td class="p-6">
+                <span class="inline-flex items-center gap-2 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wide" [ngClass]="{'bg-emerald-50 text-emerald-700': txn.type === 'Top Up', 'bg-red-50 text-red-700': txn.type === 'Deduct' || txn.type === 'Purchase'}">
+                    <span translate="no" class="material-symbols-outlined notranslate text-[14px]">{{ txn.type === 'Top Up' ? 'add' : 'remove' }}</span> {{ txn.type }}
+                </span>
+              </td>
+              <td class="p-6 text-sm font-medium text-gray-500">{{ txn.note || '-' }}</td>
+              <td class="p-6 pr-8 text-right text-base font-black" [ngClass]="txn.type === 'Top Up' ? 'text-emerald-500' : 'text-red-500'">
+                {{ txn.type === 'Top Up' ? '+' : '-' }} RM {{ txn.amount | number:'1.2-2' }}
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+  </ng-container>
 </div>

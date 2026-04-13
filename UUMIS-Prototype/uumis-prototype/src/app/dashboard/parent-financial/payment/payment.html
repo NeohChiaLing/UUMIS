@@ -1,92 +1,134 @@
-<div class="flex h-screen bg-[#f8fcfa] font-display text-[#0e1b13] overflow-hidden relative">
+<div class="flex h-screen bg-[#f8fcfa] font-display text-[#0e1b13] overflow-hidden relative w-full">
 
-  <section class="w-64 flex-none border-r border-[#e7f3ec] bg-white flex flex-col h-full overflow-hidden">
-    <div class="p-5 border-b border-[#e7f3ec] flex items-center gap-3">
-      <button (click)="goBack()" class="size-8 flex-none flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:bg-emerald-50 hover:text-emerald-600 transition-all shadow-sm">
-        <span translate="no" class="material-symbols-outlined notranslate text-lg">arrow_back</span>
-      </button>
-      <div><h2 class="text-[#0e1b13] text-lg font-bold leading-tight">Payments</h2><p class="text-[#4e976b] text-[10px]">Fee Management</p></div>
-    </div>
-    <div class="p-4">
-      <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
-        <p class="text-[10px] font-black text-[#4e976b] uppercase tracking-widest mb-1">Total Outstanding</p>
-        <p class="text-3xl font-black text-[#0e1b13]">RM {{ totalOutstanding | number:'1.2-2' }}</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="flex-1 flex flex-col h-full overflow-hidden bg-[#f8fcfa] p-8 gap-8">
-
-    <div class="bg-white p-8 rounded-[2.5rem] border border-[#e7f3ec] shadow-sm flex flex-col md:flex-row gap-8 items-start">
-      <div class="flex-1 space-y-2">
-        <div class="flex items-center gap-3">
-          <div class="size-10 rounded-full bg-[#30e87a] text-[#0e1b13] flex items-center justify-center"><span translate="no" class="material-symbols-outlined notranslate">upload_file</span></div>
-          <h3 class="text-xl font-black text-[#0e1b13] uppercase">Upload Payment Proof</h3>
+  <div *ngIf="viewState === 'children'" class="flex-1 flex flex-col h-full animate-fade-in p-8 lg:p-12 w-full overflow-y-auto">
+    <div class="max-w-6xl mx-auto w-full">
+      <header class="flex items-center gap-6 mb-10">
+        <button (click)="goBack()" class="size-11 flex items-center justify-center rounded-full bg-white border border-emerald-100 text-slate-400 hover:text-emerald-500 shadow-sm transition-all">
+          <span translate="no" class="material-symbols-outlined notranslate font-bold">arrow_back</span>
+        </button>
+        <div>
+          <h1 class="text-3xl font-black text-emerald-900 uppercase">Fee <span class="text-emerald-500">Payments</span></h1>
+          <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">Select a child to view their outstanding fees</p>
         </div>
-        <p class="text-sm text-gray-500 font-bold leading-relaxed">Please upload your bank transfer receipt here. The status will be updated once the admin verifies the transaction.</p>
+      </header>
+
+      <div *ngIf="myChildren.length === 0" class="h-64 flex flex-col items-center justify-center text-slate-400 opacity-60 bg-white rounded-[3rem] border border-emerald-50 shadow-sm">
+        <span translate="no" class="material-symbols-outlined notranslate text-6xl mb-4">link_off</span>
+        <p class="text-sm font-black uppercase tracking-widest">No Children Linked</p>
       </div>
 
-      <div class="flex-1 w-full space-y-4 bg-[#f8fcfa] p-6 rounded-[2rem] border border-[#e7f3ec]">
-        <div class="grid grid-cols-2 gap-4">
-          <div><label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Amount Paid (RM)</label><input type="number" [(ngModel)]="uploadData.amount" class="w-full mt-1 p-3 bg-white border border-gray-100 rounded-xl text-lg font-black text-[#0e1b13] outline-none focus:ring-2 focus:ring-[#30e87a]"></div>
-          <div><label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Payment Date</label><input type="date" [(ngModel)]="uploadData.date" class="w-full mt-1 p-3.5 bg-white border border-gray-100 rounded-xl text-xs font-bold text-[#0e1b13]"></div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div *ngFor="let child of myChildren" (click)="selectChild(child)" class="bg-white p-8 rounded-[2.5rem] border border-emerald-50 shadow-sm hover:shadow-xl hover:border-emerald-300 hover:scale-[1.02] transition-all cursor-pointer group flex flex-col items-center text-center gap-4 relative overflow-hidden">
+          <div class="size-24 rounded-full bg-emerald-50 p-1 shadow-inner group-hover:scale-105 transition-transform relative z-10">
+            <div class="w-full h-full rounded-full bg-emerald-100 flex items-center justify-center overflow-hidden border-2 border-white">
+              <img *ngIf="child.avatar" [src]="child.avatar" class="w-full h-full object-cover">
+              <span *ngIf="!child.avatar" class="text-2xl font-black text-emerald-600">{{ getInitials(child.fullName || child.username) }}</span>
+            </div>
+          </div>
+          <div class="relative z-10">
+            <h3 class="text-xl font-black text-slate-800">{{ child.fullName || child.username || 'No Name' }}</h3>
+            <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mt-1">ID: {{ child.studentId || 'Pending' }}</p>
+          </div>
+          <button class="mt-4 w-full py-3 rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white font-black text-[10px] uppercase tracking-widest transition-all relative z-10">
+            Manage Payments
+          </button>
         </div>
-        <div (click)="receiptInput.click()" class="w-full border-2 border-dashed border-gray-200 rounded-xl p-4 flex items-center justify-center gap-3 cursor-pointer hover:bg-white hover:border-[#30e87a] transition-all">
-          <span translate="no" class="material-symbols-outlined notranslate text-gray-400">attach_file</span>
-          <span class="text-xs font-bold text-gray-500">{{ uploadData.fileName || 'Click to select Receipt PDF/Image' }}</span>
-          <input #receiptInput type="file" class="hidden" (change)="onFileSelect($event)" accept=".pdf,.jpg,.png">
-        </div>
-        <button (click)="submitPaymentProof()" class="w-full py-3 bg-[#0e1b13] text-white font-black rounded-xl uppercase text-xs tracking-widest shadow-lg hover:scale-[1.02] transition-transform">Submit Payment</button>
       </div>
     </div>
+  </div>
 
-    <div class="flex-1 bg-white border border-[#e7f3ec] rounded-[2.5rem] shadow-sm flex flex-col overflow-hidden">
-      <div class="p-6 border-b border-[#e7f3ec] flex justify-between items-center bg-white">
-        <h3 class="text-lg font-black text-[#0e1b13] uppercase flex items-center gap-2"><span translate="no" class="material-symbols-outlined notranslate text-gray-300">history</span> Payment History</h3>
+  <ng-container *ngIf="viewState === 'details'">
+    <section class="w-64 flex-none border-r border-[#e7f3ec] bg-white flex flex-col h-full overflow-hidden animate-fade-in">
+      <div class="p-5 border-b border-[#e7f3ec] flex items-center gap-3">
+        <button (click)="goBack()" class="size-8 flex-none flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-500 hover:bg-emerald-50 hover:text-emerald-600 transition-all shadow-sm">
+          <span translate="no" class="material-symbols-outlined notranslate text-lg">arrow_back</span>
+        </button>
+        <div>
+          <h2 class="text-[#0e1b13] text-sm font-black leading-tight uppercase">{{ selectedChild ? (selectedChild.fullName || 'Child').split(' ')[0] + "'s" : 'My' }} Payments</h2>
+          <p class="text-[#4e976b] text-[10px] uppercase font-bold">Fee Management</p>
+        </div>
+      </div>
+      <div class="p-4">
+        <div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
+          <p class="text-[10px] font-black text-[#4e976b] uppercase tracking-widest mb-1">Total Outstanding</p>
+          <p class="text-3xl font-black text-[#0e1b13]">RM {{ totalOutstanding | number:'1.2-2' }}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="flex-1 flex flex-col h-full overflow-hidden bg-[#f8fcfa] p-8 gap-8 animate-fade-in">
+
+      <div class="bg-white p-8 rounded-[2.5rem] border border-[#e7f3ec] shadow-sm flex flex-col md:flex-row gap-8 items-start">
+        <div class="flex-1 space-y-2">
+          <div class="flex items-center gap-3">
+            <div class="size-10 rounded-full bg-[#30e87a] text-[#0e1b13] flex items-center justify-center"><span translate="no" class="material-symbols-outlined notranslate">upload_file</span></div>
+            <h3 class="text-xl font-black text-[#0e1b13] uppercase">Upload Payment Proof</h3>
+          </div>
+          <p class="text-sm text-gray-500 font-bold leading-relaxed">Please upload your bank transfer receipt here. The status will be updated once the admin verifies the transaction.</p>
+        </div>
+
+        <div class="flex-1 w-full space-y-4 bg-[#f8fcfa] p-6 rounded-[2rem] border border-[#e7f3ec]">
+          <div class="grid grid-cols-2 gap-4">
+            <div><label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Amount Paid (RM)</label><input type="number" [(ngModel)]="uploadData.amount" class="w-full mt-1 p-3 bg-white border border-gray-100 rounded-xl text-lg font-black text-[#0e1b13] outline-none focus:ring-2 focus:ring-[#30e87a]"></div>
+            <div><label class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Payment Date</label><input type="date" [(ngModel)]="uploadData.date" class="w-full mt-1 p-3.5 bg-white border border-gray-100 rounded-xl text-xs font-bold text-[#0e1b13]"></div>
+          </div>
+          <div (click)="receiptInput.click()" class="w-full border-2 border-dashed border-gray-200 rounded-xl p-4 flex items-center justify-center gap-3 cursor-pointer hover:bg-white hover:border-[#30e87a] transition-all">
+            <span translate="no" class="material-symbols-outlined notranslate text-gray-400">attach_file</span>
+            <span class="text-xs font-bold text-gray-500">{{ uploadData.fileName || 'Click to select Receipt PDF/Image' }}</span>
+            <input #receiptInput type="file" class="hidden" (change)="onFileSelect($event)" accept=".pdf,.jpg,.png">
+          </div>
+          <button (click)="submitPaymentProof()" class="w-full py-3 bg-[#0e1b13] text-white font-black rounded-xl uppercase text-xs tracking-widest shadow-lg hover:scale-[1.02] transition-transform">Submit Payment</button>
+        </div>
       </div>
 
-      <div class="flex-1 overflow-auto p-0">
-        <table class="w-full text-left border-collapse">
-          <thead class="bg-[#f8fcfa] sticky top-0 z-10">
-          <tr class="border-b border-[#e7f3ec]">
-            <th class="p-5 pl-8 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Date</th>
-            <th class="p-5 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Description</th>
-            <th class="p-5 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Amount</th>
-            <th class="p-5 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Status</th>
-            <th class="p-5 pr-8 text-[10px] font-black text-[#4e976b] uppercase tracking-widest text-right">Receipt</th>
-          </tr>
-          </thead>
-          <tbody class="divide-y divide-[#e7f3ec]">
+      <div class="flex-1 bg-white border border-[#e7f3ec] rounded-[2.5rem] shadow-sm flex flex-col overflow-hidden">
+        <div class="p-6 border-b border-[#e7f3ec] flex justify-between items-center bg-white">
+          <h3 class="text-lg font-black text-[#0e1b13] uppercase flex items-center gap-2"><span translate="no" class="material-symbols-outlined notranslate text-gray-300">history</span> Payment History</h3>
+        </div>
 
-          <tr *ngIf="transactions.length === 0">
-            <td colspan="5" class="p-8 text-center text-sm font-bold text-gray-300 uppercase tracking-widest">No payment records found.</td>
-          </tr>
+        <div class="flex-1 overflow-auto p-0">
+          <table class="w-full text-left border-collapse">
+            <thead class="bg-[#f8fcfa] sticky top-0 z-10">
+            <tr class="border-b border-[#e7f3ec]">
+              <th class="p-5 pl-8 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Date</th>
+              <th class="p-5 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Description</th>
+              <th class="p-5 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Amount</th>
+              <th class="p-5 text-[10px] font-black text-[#4e976b] uppercase tracking-widest">Status</th>
+              <th class="p-5 pr-8 text-[10px] font-black text-[#4e976b] uppercase tracking-widest text-right">Receipt</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-[#e7f3ec]">
 
-          <tr *ngFor="let txn of transactions" class="group hover:bg-gray-50">
-            <td class="p-5 pl-8 text-sm font-bold text-[#0e1b13]">{{ txn.date }}</td>
-            <td class="p-5 text-sm font-bold text-gray-500">{{ txn.desc }}</td>
-            <td class="p-5 text-sm font-black text-[#0e1b13]">RM {{ txn.amount | number:'1.2-2' }}</td>
-            <td class="p-5">
-              <span [ngClass]="{
-                'bg-green-100 text-green-700': txn.status==='Completed',
-                'bg-orange-100 text-orange-700': txn.status==='Pending',
-                'bg-red-100 text-red-700': txn.status==='Rejected',
-                'bg-blue-100 text-blue-700': txn.status==='UNPAID'
-                }" class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide">
-                {{ txn.status }}
-              </span>
-            </td>
-            <td class="p-5 pr-8 text-right">
-              <button *ngIf="txn.receiptUrl" (click)="downloadReceipt(txn)" class="size-8 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-500 hover:text-white transition-all inline-flex items-center justify-center">
-                <span translate="no" class="material-symbols-outlined notranslate text-sm">download</span>
-              </button>
-              <span *ngIf="!txn.receiptUrl" class="text-[10px] font-bold text-gray-300">No Proof</span>
-            </td>
-          </tr>
-          </tbody>
-        </table>
+            <tr *ngIf="transactions.length === 0">
+              <td colspan="5" class="p-8 text-center text-sm font-bold text-gray-300 uppercase tracking-widest">No payment records found.</td>
+            </tr>
+
+            <tr *ngFor="let txn of transactions" class="group hover:bg-gray-50">
+              <td class="p-5 pl-8 text-sm font-bold text-[#0e1b13]">{{ txn.date }}</td>
+              <td class="p-5 text-sm font-bold text-gray-500">{{ txn.desc }}</td>
+              <td class="p-5 text-sm font-black text-[#0e1b13]">RM {{ txn.amount | number:'1.2-2' }}</td>
+              <td class="p-5">
+                <span [ngClass]="{
+                  'bg-green-100 text-green-700': txn.status==='Completed',
+                  'bg-orange-100 text-orange-700': txn.status==='Pending',
+                  'bg-red-100 text-red-700': txn.status==='Rejected',
+                  'bg-blue-100 text-blue-700': txn.status==='UNPAID'
+                  }" class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide">
+                  {{ txn.status }}
+                </span>
+              </td>
+              <td class="p-5 pr-8 text-right">
+                <button *ngIf="txn.receiptUrl" (click)="downloadReceipt(txn)" class="size-8 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-500 hover:text-white transition-all inline-flex items-center justify-center">
+                  <span translate="no" class="material-symbols-outlined notranslate text-sm">download</span>
+                </button>
+                <span *ngIf="!txn.receiptUrl" class="text-[10px] font-bold text-gray-300">No Proof</span>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
 
-  </section>
+    </section>
+  </ng-container>
 </div>

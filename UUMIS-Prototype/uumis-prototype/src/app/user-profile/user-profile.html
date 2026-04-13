@@ -27,22 +27,24 @@
     <div class="px-10 pb-10">
 
       <div class="flex flex-col md:flex-row gap-8 items-end -mt-16 mb-8 relative z-10">
-        <div class="relative group">
+
+        <div class="relative" [class.group]="!isStudent">
           <div (click)="triggerFileInput()"
-               [class.cursor-pointer]="isEditMode"
-               class="size-36 rounded-[2.5rem] bg-white p-1.5 shadow-2xl transition-all hover:scale-105">
+               [class.cursor-pointer]="isEditMode && !isStudent"
+               [class.hover:scale-105]="!isStudent"
+               class="size-36 rounded-[2.5rem] bg-white p-1.5 shadow-2xl transition-all">
             <div class="w-full h-full rounded-[2rem] bg-emerald-50 flex items-center justify-center overflow-hidden border-2 border-white relative">
 
               <span *ngIf="!user.avatarUrl" class="text-4xl font-black text-emerald-300 select-none">{{ user.initials }}</span>
 
               <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" class="w-full h-full object-cover">
 
-              <div *ngIf="isEditMode" class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+              <div *ngIf="isEditMode && !isStudent" class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
                 <span translate="no" class="material-symbols-outlined notranslate text-white text-3xl">add_a_photo</span>
               </div>
             </div>
           </div>
-          <input type="file" id="avatarInput" class="hidden" accept="image/*" (change)="onFileSelected($event)">
+          <input *ngIf="!isStudent" type="file" id="avatarInput" class="hidden" accept="image/*" (change)="onFileSelected($event)">
         </div>
 
         <div class="flex-1 pb-2 text-center md:text-left">

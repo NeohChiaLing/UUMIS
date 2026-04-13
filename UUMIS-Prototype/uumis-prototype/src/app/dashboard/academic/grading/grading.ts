@@ -23,7 +23,6 @@ export class GradingComponent implements OnInit {
   selectedSubject: string = '';
   students: any[] = [];
 
-  // --- NEW: DYNAMIC STAT CARD VARIABLES ---
   upcomingExamsCount: number = 0;
   pendingApprovalsCount: number = 0;
   activeScalesCount: number = 0;
@@ -31,7 +30,6 @@ export class GradingComponent implements OnInit {
   constructor(private router: Router, private location: Location, private authService: AuthService) {}
 
   ngOnInit() {
-    // 1. Load Dynamic Subjects & Active Scales Count
     this.authService.getSubjects().subscribe({
       next: (res) => {
         this.allSubjects = res;
@@ -39,12 +37,10 @@ export class GradingComponent implements OnInit {
       }
     });
 
-    // 2. Load Dynamic Upcoming Exams (Quizzes) Count
     this.authService.getAssignments().subscribe({
       next: (res) => this.upcomingExamsCount = res.filter((a:any) => a.type === 'Quiz').length
     });
 
-    // 3. Load Dynamic Pending Approvals (Lesson Plans) Count
     this.authService.getLessonPlans().subscribe({
       next: (res) => this.pendingApprovalsCount = res.filter((lp:any) => lp.status === 'Pending Review').length
     });
@@ -68,11 +64,10 @@ export class GradingComponent implements OnInit {
 
     this.authService.getUsers().subscribe({
       next: (users) => {
-        // Bulletproof filtering for Exact Year Matches
         const yearStudents = users.filter((u: any) => {
           if ((u.role || '').toLowerCase() !== 'student' || !u.bio || u.bio === 'Unassigned') return false;
 
-          const parts = u.bio.split('-');
+          const parts = u.bio.split(' - ');
           const stuLevel = parts[0].trim().toLowerCase();
           const stuYear = parts.length > 1 ? parts[1].trim().toLowerCase() : stuLevel;
           const targetYear = this.selectedYear.toLowerCase();
@@ -82,20 +77,23 @@ export class GradingComponent implements OnInit {
 
         this.authService.getGrades(this.selectedYear, this.selectedSubject).subscribe({
           next: (grades) => this.mapStudentsToGrades(yearStudents, grades),
-          error: () => this.mapStudentsToGrades(yearStudents, []) // Fallback if no grades exist yet
+          error: () => this.mapStudentsToGrades(yearStudents, [])
         });
       },
       error: () => alert("Failed to fetch users. Please ensure /api/auth/users is running in backend!")
     });
   }
 
-  // Helper method to attach grades to students
   mapStudentsToGrades(yearStudents: any[], grades: any[]) {
     this.students = yearStudents.map((stu: any) => {
-      const existingGrade = grades.find(g => g.studentUsername === stu.username);
+      // THE FIX: Strictly use the database username to prevent backend crashes
+      const uniqueId = stu.username || '';
+
+      const existingGrade = grades.find(g => g.studentUsername === uniqueId && uniqueId !== '');
+
       return {
-        studentUsername: stu.username,
-        name: stu.fullName || stu.username,
+        studentUsername: uniqueId,
+        name: stu.fullName || stu.username || 'Unknown Student',
         mark: existingGrade ? existingGrade.mark : 0,
         grade: existingGrade ? existingGrade.gradeLetter : '-',
         status: existingGrade ? existingGrade.status : 'Pending',
@@ -122,7 +120,6 @@ export class GradingComponent implements OnInit {
     else student.grade = 'F';
   }
 
-  // Clean CSS logic for HTML badge colors
   getGradeClass(grade: string): string {
     if (!grade) return 'text-gray-400 bg-gray-50';
     if (grade.startsWith('A')) return 'text-green-600 bg-green-50';
@@ -150,8 +147,25 @@ export class GradingComponent implements OnInit {
   }
 
   submitAllGrades() {
-    this.students.forEach(s => s.isEditing = false);
-    const payload = this.students.map(s => ({
+    this.students.forEach(s => {
+      if (s.isEditing) {
+        this.calculateGrade(s);
+        s.status = 'Graded';
+        s.isEditing = false;
+      } else if (s.grade && s.grade !== '-') {
+        s.status = 'Graded';
+      }
+    });
+
+    // THE FIX: Filter out ghost accounts so the database doesn't crash!
+    const validStudents = this.students.filter(s => s.studentUsername && s.studentUsername.trim() !== '');
+
+    if (validStudents.length === 0) {
+      alert("No valid students to save! (Check if students are missing proper usernames)");
+      return;
+    }
+
+    const payload = validStudents.map(s => ({
       studentUsername: s.studentUsername,
       studentName: s.name,
       yearGroup: this.selectedYear,
@@ -163,7 +177,7 @@ export class GradingComponent implements OnInit {
 
     this.authService.saveGrades(payload).subscribe({
       next: () => alert('All grades have been permanently saved to the database!'),
-      error: () => alert('Failed to save grades.')
+      error: () => alert('Failed to save grades. Please check database connection.')
     });
   }
 }

@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 export class AuthService {
 
   // Pointing to your Spring Boot Backend
-  private apiUrl = 'http://localhost:8080/api';
+  private apiUrl = '/api';
 
   constructor(private http: HttpClient) { }
 
@@ -22,6 +22,16 @@ export class AuthService {
 
   register(user: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, user);
+  }
+
+  // --- NEW: SILENT SUBMISSION FOR APPLICATION FORM ---
+  submitApplication(user: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/apply`, user);
+  }
+
+  // --- NEW: TRIGGER APPROVAL EMAILS ---
+  sendApprovalEmail(payload: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/send-approval-email`, payload);
   }
 
   verify(email: string, code: string): Observable<any> {
@@ -57,6 +67,10 @@ export class AuthService {
     return this.http.get<any[]>(`${this.apiUrl}/students`);
   }
 
+// --- RUN YEAR END PROMOTION ---
+  promoteAllStudents(): Observable<any> {
+    return this.http.post(`${this.apiUrl}/students/promote-all`, {});
+  }
   // Approve a pending student
   approveStudent(id: number): Observable<any> {
     return this.http.put(`${this.apiUrl}/students/${id}/approve`, {});
@@ -332,5 +346,7 @@ export class AuthService {
   updateUserProfile(id: number, data: any) {
     return this.http.put(`${this.apiUrl}/users/${id}`, data);
   }
-
+  deleteFoodOrder(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/food/orders/${id}`);
+  }
 }

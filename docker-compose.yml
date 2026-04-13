@@ -5,7 +5,7 @@ services:
   mysql-db:
     image: mysql:8.0
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: 1234
       MYSQL_DATABASE: uumis_db
     ports:
       - "3306:3306"
@@ -32,11 +32,18 @@ services:
       # This forces Spring Boot to connect to the Docker MySQL instead of your laptop's local MySQL
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/uumis_db?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_PASSWORD: 1234
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_SQL_INIT_MODE: always
       SPRING_JPA_DEFER_DATASOURCE_INITIALIZATION: "true"
 
+      # --- ADD YOUR NEW EMAIL SETTINGS HERE ---
+      SPRING_MAIL_HOST: mail.uumis.com.my
+      SPRING_MAIL_PORT: 465
+      SPRING_MAIL_USERNAME: dbadmin@uumis.com.my
+      SPRING_MAIL_PASSWORD: #Dbadmin/222*
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: "true"
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_SSL_ENABLE: "true"
   # 3. The Angular Frontend Container
   frontend:
     build:

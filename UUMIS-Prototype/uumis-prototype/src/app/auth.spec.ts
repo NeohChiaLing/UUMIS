@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 export class AuthService {
 
   // Make sure this points to your Spring Boot Port (8080)
-  private apiUrl = 'http://localhost:8080/api';
+  private apiUrl = 'https://uumis.com.my/api';
 
   constructor(private http: HttpClient) { }
 

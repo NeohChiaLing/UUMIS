@@ -5,23 +5,30 @@
       <span translate="no" class="material-symbols-outlined notranslate text-sm">arrow_back</span> Back to Dashboard
     </div>
 
-    <div class="flex justify-between items-end">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
       <div>
         <h2 class="text-3xl font-black text-emerald-900 tracking-tighter">Student <span class="text-emerald-500">Management</span></h2>
         <p class="text-sm text-slate-500 font-bold mt-2">View and manage student admissions.</p>
       </div>
-      <div class="flex gap-4">
+
+      <div class="flex flex-wrap gap-4 items-center">
+        <select [(ngModel)]="selectedFilterYear" class="h-12 px-4 bg-white border border-emerald-100 rounded-xl text-sm font-bold text-slate-700 shadow-sm focus:ring-2 focus:ring-emerald-200 outline-none cursor-pointer">
+          <option value="All">All Years</option>
+          <option *ngFor="let y of allYears" [value]="y">{{y}}</option>
+        </select>
+
         <div class="hidden md:flex items-center bg-white rounded-xl px-4 h-12 border border-emerald-100 focus-within:ring-2 ring-emerald-200 transition-all shadow-sm">
           <span translate="no" class="material-symbols-outlined notranslate text-emerald-400">search</span>
-          <input type="text" placeholder="Search students..." class="bg-transparent border-none text-sm font-bold text-slate-700 focus:ring-0 w-64 ml-2 outline-none">
+          <input type="text" [(ngModel)]="searchQuery" placeholder="Search students..." class="bg-transparent border-none text-sm font-bold text-slate-700 focus:ring-0 w-48 ml-2 outline-none">
         </div>
-        <button (click)="addNewStudent()" class="bg-emerald-500 text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-emerald-600 shadow-lg shadow-emerald-200 transition-all flex items-center gap-2">
+
+        <button (click)="addNewStudent()" class="bg-emerald-500 text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-emerald-600 shadow-lg shadow-emerald-200 transition-all flex items-center gap-2 h-12">
           <span translate="no" class="material-symbols-outlined notranslate text-sm">add</span> Add Student
         </button>
       </div>
     </div>
 
-    <div class="bg-white rounded-[2.5rem] border border-emerald-50 shadow-sm overflow-hidden">
+    <div class="bg-white rounded-[2.5rem] border border-emerald-50 shadow-sm overflow-hidden mt-4">
       <table class="w-full text-left border-collapse">
         <thead class="bg-emerald-50/50 border-b border-emerald-100">
         <tr>
@@ -33,7 +40,12 @@
         </tr>
         </thead>
         <tbody class="divide-y divide-emerald-50">
-        <tr *ngFor="let student of students" (click)="viewStudent(student)" class="group hover:bg-emerald-50/30 transition-colors cursor-pointer">
+
+        <tr *ngIf="filteredStudents.length === 0">
+          <td colspan="5" class="p-12 text-center text-slate-400 font-bold text-sm uppercase tracking-widest">No students match your filter.</td>
+        </tr>
+
+        <tr *ngFor="let student of filteredStudents" (click)="viewStudent(student)" class="group hover:bg-emerald-50/30 transition-colors cursor-pointer">
           <td class="p-6 pl-8">
             <div class="flex items-center gap-4">
               <img *ngIf="student.avatarUrl" [src]="student.avatarUrl" class="size-12 rounded-xl object-cover shadow-sm border border-emerald-100">
@@ -54,7 +66,8 @@
             <span *ngIf="student.status === 'Active'" class="px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-wide">Active</span>
             <span *ngIf="student.status === 'Pending'" class="px-3 py-1.5 rounded-full bg-orange-100 text-orange-700 text-[10px] font-black uppercase tracking-wide">Pending</span>
           </td>
-          <td class="p-6 pr-8 text-right flex justify-end gap-2" (click)="$event.stopPropagation()">
+
+          <td class="p-6 pr-8 text-right flex justify-end items-center gap-2" (click)="$event.stopPropagation()">
 
             <button (click)="viewStudent(student)" class="size-8 rounded-full bg-white border border-slate-100 text-slate-400 hover:text-emerald-600 hover:border-emerald-200 hover:shadow-md transition-all flex items-center justify-center" title="View Profile">
               <span translate="no" class="material-symbols-outlined notranslate text-[18px]">visibility</span>
@@ -76,6 +89,10 @@
                 {{ student.profileStatus === 'REJECTED' ? 'cancel' : 'close' }}
               </span>
               {{ student.profileStatus === 'REJECTED' ? 'Rejected' : 'Reject' }}
+            </button>
+
+            <button (click)="deleteStudent(student, $event)" class="size-8 ml-1 flex items-center justify-center rounded-lg bg-rose-50 text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-sm" title="Delete Student">
+              <span translate="no" class="material-symbols-outlined notranslate text-[16px]">delete</span>
             </button>
 
           </td>
@@ -130,12 +147,20 @@
       <section id="overview" class="bg-white rounded-[2.5rem] shadow-sm border border-emerald-100 overflow-hidden relative">
         <div class="h-32 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
         <div class="px-8 pb-8 -mt-16 flex flex-col md:flex-row gap-6 items-end relative z-10">
-          <div class="size-32 rounded-[2rem] bg-white p-1.5 shadow-lg">
-            <img *ngIf="selectedStudent.avatarUrl" [src]="selectedStudent.avatarUrl" class="w-full h-full rounded-[1.5rem] object-cover">
-            <div *ngIf="!selectedStudent.avatarUrl" class="w-full h-full rounded-[1.5rem] bg-slate-100 flex items-center justify-center text-4xl font-black text-slate-400 uppercase">
-              {{ getInitials(selectedStudent.name) }}
+
+          <div class="relative group cursor-pointer" (click)="triggerFileInput()">
+            <div class="size-32 rounded-[2rem] bg-white p-1.5 shadow-lg transition-all hover:scale-105">
+              <div class="w-full h-full rounded-[1.5rem] bg-slate-100 flex items-center justify-center overflow-hidden relative">
+                <span *ngIf="!selectedStudent.avatarUrl" class="text-4xl font-black text-slate-400 uppercase">{{ getInitials(selectedStudent.name) }}</span>
+                <img *ngIf="selectedStudent.avatarUrl" [src]="selectedStudent.avatarUrl" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
+                  <span translate="no" class="material-symbols-outlined notranslate text-white text-3xl">add_a_photo</span>
+                </div>
+              </div>
             </div>
+            <input type="file" id="adminStudentAvatarInput" class="hidden" accept="image/*" (change)="onFileSelected($event)">
           </div>
+
           <div class="flex-1 w-full pb-2">
             <div *ngIf="isAddingMode" class="mb-2">
               <label class="text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1 block mb-1">Student Full Name</label>
@@ -341,6 +366,7 @@
               </div>
             </div>
           </div>
+
         </div>
       </section>
 

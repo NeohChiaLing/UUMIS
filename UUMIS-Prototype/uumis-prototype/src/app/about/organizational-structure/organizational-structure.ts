@@ -45,11 +45,11 @@ export class OrganizationalStructureComponent implements OnInit {
       badge: 'Hierarchy',
       titleStart: 'Organizational',
       titleHighlight: 'Structure',
-      chartImage: '/assets/organizational structure.png'
+      chartImage: 'assets/organizational structure.png'
     };
 
     // DB LOAD
-    this.http.get('http://localhost:8080/api/content/organizational_structure', { responseType: 'text' }).subscribe({
+    this.http.get('/api/content/organizational_structure', { responseType: 'text' }).subscribe({
       next: (data) => { this.pageData = (data && data.length > 5) ? JSON.parse(data) : defaultData; },
       error: () => { this.pageData = defaultData; }
     });
@@ -58,7 +58,7 @@ export class OrganizationalStructureComponent implements OnInit {
   // DB SAVE
   publishChanges() {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    this.http.post('http://localhost:8080/api/content/organizational_structure', JSON.stringify(this.pageData), { headers, responseType: 'text' }).subscribe({
+    this.http.post('/api/content/organizational_structure', JSON.stringify(this.pageData), { headers, responseType: 'text' }).subscribe({
       next: () => alert('Changes published successfully!'),
       error: (err) => { console.error(err); alert('Error saving to database.'); }
     });
@@ -69,5 +69,12 @@ export class OrganizationalStructureComponent implements OnInit {
   openEditModal() { this.editMode = true; this.editData = { ...this.pageData }; }
   closeEditModal() { this.editMode = false; this.editData = {}; }
   saveEdits() { this.pageData = { ...this.editData }; this.closeEditModal(); }
-  onFileSelected(event: any) { const file: File = event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (e: any) => this.editData.chartImage = e.target.result; reader.readAsDataURL(file); } }
+  onFileSelected(event: any, fieldName: string) {
+    const file: File = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => this.editData[fieldName] = e.target.result;
+      reader.readAsDataURL(file);
+    }
+  }
 }

@@ -25,28 +25,28 @@ export class WebsiteDataService {
         category: 'Admissions',
         title: '2025/2026 Intakes Open',
         desc: 'Registration is now open for the August 2025 and January 2026 academic sessions.',
-        image: '/assets/MAIN-BROCHURE.jpg',
+        image: 'assets/MAIN-BROCHURE.jpg',
         styleClass: 'text-[#30e87a] bg-[#f0fdf4]' // 保持原本的颜色样式
       },
       {
         category: 'Academic',
         title: 'Semester 1 Calendar',
         desc: 'View key dates for Semester 1 (August - December 2025).',
-        image: '/assets/calender1.jpg',
+        image: 'assets/calender1.jpg',
         styleClass: 'text-blue-500 bg-blue-50'
       },
       {
         category: 'Academic',
         title: 'Semester 2 Calendar',
         desc: 'View key dates for Semester 2 (January - June 2026).',
-        image: '/assets/calender2.jpg',
+        image: 'assets/calender2.jpg',
         styleClass: 'text-blue-500 bg-blue-50'
       },
       {
         category: 'Highlights',
         title: 'Shaping Global Leaders',
         desc: 'Discover our holistic approach to education and Cambridge syllabus.',
-        image: '/assets/UUMIS-PROMOTIONAL-BROCHURE.jpg',
+        image: 'assets/UUMIS-PROMOTIONAL-BROCHURE.jpg',
         styleClass: 'text-purple-500 bg-purple-50'
       }
     ],

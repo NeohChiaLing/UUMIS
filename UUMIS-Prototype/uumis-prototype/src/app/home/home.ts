@@ -61,17 +61,15 @@ export class HomeComponent implements OnInit {
       this.isAdmin = isEditMode && isActuallyAdmin;
     });
 
-    // FIX: Added ": any" to bypass old TypeScript strict typing!
     let defaultData: any = this.webService.getHomeData();
 
-    // Apply the new structure if the old structure is detected
     if (!defaultData.hero || !defaultData.hero.badge) {
       defaultData.hero = {
         badge: 'EST. 2014',
         titleStart: 'Shaping Future',
         titleHighlight: 'Global Leaders',
         description: 'Providing a nurturing environment where students thrive academically and develop into well-rounded individuals within the serene UUM campus.',
-        bgImage: '/assets/UUMIS.jpg'
+        bgImage: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1920&q=80'
       };
     }
     if (!defaultData.videoText) {
@@ -82,12 +80,22 @@ export class HomeComponent implements OnInit {
         desc: 'Take a journey through our state-of-the-art facilities, modern classrooms, and vibrant student life.'
       };
     }
+    // NEW: Default Editable Shortcuts
+    if (!defaultData.shortcuts) {
+      defaultData.shortcuts = [
+        { title: 'Board of Governors', subtitle: 'Meet the leadership', link: '/about/board', image: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1080&q=90' },
+        { title: 'Apply Online', subtitle: 'Start admission', link: '/admissions/application-form', image: 'https://images.unsplash.com/photo-1427504494785-3a9ca7044f45?auto=format&fit=crop&w=1080&q=90' },
+        { title: 'School Calendar', subtitle: 'View key dates', link: '/calendar', image: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1080&q=90' },
+        { title: 'Make an Inquiry', subtitle: 'Contact our staff', link: '/contact', image: 'https://images.unsplash.com/photo-1544717302-de2939b7ef71?auto=format&fit=crop&w=1080&q=90' }
+      ];
+    }
 
-    // GET FROM DATABASE
-    this.http.get('http://localhost:8080/api/content/home', { responseType: 'text' }).subscribe({
+    this.http.get('/api/content/home', { responseType: 'text' }).subscribe({
       next: (data) => {
         if (data && data.length > 5) {
           this.pageData = JSON.parse(data);
+          // Failsafe in case existing DB doesn't have shortcuts yet
+          if(!this.pageData.shortcuts) this.pageData.shortcuts = defaultData.shortcuts;
         } else {
           this.pageData = defaultData;
         }
@@ -101,12 +109,11 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  // SAVE TO DATABASE
   publishChanges() {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    this.http.post('http://localhost:8080/api/content/home', JSON.stringify(this.pageData), { headers, responseType: 'text' }).subscribe({
+    this.http.post('/api/content/home', JSON.stringify(this.pageData), { headers, responseType: 'text' }).subscribe({
       next: () => alert('Home Page changes published successfully to the database!'),
-      error: (err) => { console.error(err); alert('Error saving to database. Is Spring Boot running?'); }
+      error: (err) => { console.error(err); alert('Error saving to database.'); }
     });
   }
 
@@ -129,6 +136,7 @@ export class HomeComponent implements OnInit {
     else if (type === 'video') this.editData = { ...this.pageData.videoText, url: this.pageData.videoSection.youtubeUrl };
     else if (type === 'announcement') this.editData = { ...item };
     else if (type === 'event') this.editData = item ? { ...item } : { month: '', day: '', title: '', subtitle: '' };
+    else if (type === 'shortcut') this.editData = { ...item }; // NEW: Handle Shortcut edit
   }
 
   closeEditModal() { this.editMode = null; this.editData = {}; }
@@ -144,6 +152,10 @@ export class HomeComponent implements OnInit {
     else if (this.editMode === 'event') {
       if (this.editIndex >= 0) this.pageData.events[this.editIndex] = { ...this.editData };
       else this.pageData.events.push({ ...this.editData });
+    }
+    else if (this.editMode === 'shortcut') {
+      // NEW: Save Shortcut edit
+      this.pageData.shortcuts[this.editIndex] = { ...this.editData };
     }
     this.closeEditModal();
   }

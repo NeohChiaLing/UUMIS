@@ -1,0 +1,143 @@
+<div class="min-h-screen bg-[#f0fdf4] font-display text-slate-800 flex flex-col relative">
+
+  <div *ngIf="viewState === 'children'" class="flex-1 flex flex-col h-full animate-fade-in">
+    <header class="bg-white border-b border-emerald-100 px-8 py-8 flex items-center gap-6 sticky top-0 z-40 shadow-sm">
+      <button (click)="goBack()" class="size-11 flex items-center justify-center rounded-full bg-white border border-emerald-100 text-slate-400 hover:text-emerald-500 shadow-sm transition-all">
+        <span translate="no" class="material-symbols-outlined notranslate font-bold">arrow_back</span>
+      </button>
+      <div>
+        <h1 class="text-3xl font-black text-emerald-900 uppercase">My <span class="text-emerald-500">Children</span></h1>
+        <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">Select a child to view their courses</p>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto px-8 py-10">
+      <div *ngIf="myChildren.length === 0" class="h-64 flex flex-col items-center justify-center text-slate-400 opacity-60">
+        <span translate="no" class="material-symbols-outlined notranslate text-6xl mb-4">link_off</span>
+        <p class="text-sm font-black uppercase tracking-widest">No Children Linked</p>
+      </div>
+
+      <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div *ngFor="let child of myChildren" (click)="selectChild(child)" class="bg-white p-8 rounded-[2.5rem] border border-emerald-50 shadow-sm hover:shadow-xl hover:border-emerald-300 hover:scale-[1.02] transition-all cursor-pointer group flex flex-col items-center text-center gap-4 relative overflow-hidden">
+          <div class="size-24 rounded-full bg-emerald-50 p-1 shadow-inner group-hover:scale-105 transition-transform relative z-10">
+            <div class="w-full h-full rounded-full bg-emerald-100 flex items-center justify-center overflow-hidden border-2 border-white">
+              <img *ngIf="child.avatar" [src]="child.avatar" class="w-full h-full object-cover">
+              <span *ngIf="!child.avatar" class="text-2xl font-black text-emerald-600">{{ getInitials(child.fullName || child.username) }}</span>
+            </div>
+          </div>
+          <div class="relative z-10">
+            <h3 class="text-xl font-black text-slate-800">{{ child.fullName || child.username || 'No Name' }}</h3>
+            <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mt-1">Class: {{ child.bio || 'Unassigned' }}</p>
+          </div>
+          <button class="mt-4 w-full py-3 rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white font-black text-[10px] uppercase tracking-widest transition-all relative z-10">
+            View Courses
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div *ngIf="viewState === 'subjects'" class="flex-1 flex flex-col h-full animate-fade-in">
+    <header class="bg-white border-b border-emerald-100 px-8 py-8 flex items-center gap-6 sticky top-0 z-40 shadow-sm">
+      <button (click)="goBack()" class="size-11 flex items-center justify-center rounded-full bg-white border border-emerald-100 text-slate-400 hover:text-emerald-500 shadow-sm transition-all">
+        <span translate="no" class="material-symbols-outlined notranslate font-bold">arrow_back</span>
+      </button>
+      <div>
+        <h1 class="text-3xl font-black text-emerald-900 uppercase">
+          {{ selectedChild ? (selectedChild.fullName || 'Child').split(' ')[0] + "'s" : 'My' }} <span class="text-emerald-500">Subjects</span>
+        </h1>
+        <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">Select a subject to view tasks</p>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto px-8 py-10">
+      <div *ngIf="subjects.length === 0" class="h-64 flex flex-col items-center justify-center text-slate-400 opacity-60">
+        <span translate="no" class="material-symbols-outlined notranslate text-6xl mb-4">auto_stories</span>
+        <p class="text-sm font-black uppercase tracking-widest">No subjects found for this Level & Year.</p>
+      </div>
+
+      <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div *ngFor="let sub of subjects" (click)="selectSubject(sub)" class="bg-white p-8 rounded-[2.5rem] border border-emerald-50 shadow-sm hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer group flex flex-col items-center text-center gap-4">
+          <div class="p-5 rounded-2xl mb-2 transition-colors" [ngClass]="sub.color">
+            <span translate="no" class="material-symbols-outlined notranslate text-4xl">{{ sub.icon }}</span>
+          </div>
+          <div>
+            <h3 class="text-xl font-black text-slate-800 uppercase">{{ sub.code }}</h3>
+            <p class="text-xs font-bold text-slate-400 mt-1 uppercase tracking-wide">{{ sub.name }}</p>
+          </div>
+          <div class="mt-4 px-4 py-1.5 bg-slate-50 rounded-full text-[10px] font-black text-slate-500 uppercase tracking-widest border border-slate-100 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+            {{ sub.tasksCount }} Pending Tasks
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div *ngIf="viewState === 'assignments'" class="flex-1 flex flex-col h-full animate-fade-in">
+    <header class="bg-white border-b border-emerald-100 px-8 py-8 flex flex-col md:flex-row items-center justify-between gap-6 sticky top-0 z-40 shadow-sm">
+      <div class="flex items-center gap-5">
+        <button (click)="goBack()" class="size-11 flex items-center justify-center rounded-full bg-white border border-emerald-100 text-slate-400 hover:text-emerald-500 shadow-sm transition-all">
+          <span translate="no" class="material-symbols-outlined notranslate font-bold">arrow_back</span>
+        </button>
+        <div>
+          <h1 class="text-3xl font-black text-emerald-900 uppercase">{{ selectedSubject?.code }}</h1>
+          <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">{{ selectedSubject?.name }} Tasks</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="flex-1 overflow-y-auto px-8 py-10">
+      <div *ngIf="filteredAssignments.length === 0" class="h-64 flex flex-col items-center justify-center text-slate-400">
+        <span translate="no" class="material-symbols-outlined notranslate text-6xl opacity-30 mb-4">task_alt</span>
+        <p class="text-sm font-bold uppercase tracking-widest">No tasks found for this subject.</p>
+      </div>
+
+      <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div *ngFor="let task of filteredAssignments" (click)="openTask(task)" class="bg-white p-8 rounded-[3rem] border border-emerald-100/50 shadow-sm space-y-6 hover:shadow-xl hover:scale-[1.02] transition-all group cursor-pointer relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <span [ngClass]="task.type === 'Assignment' ? 'bg-blue-50 text-blue-600' : 'bg-pink-50 text-pink-600'" class="px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter border border-white/50 shadow-sm">{{task.type}}</span>
+            <span *ngIf="task.status === 'Submitted'" class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black uppercase"><span translate="no" class="material-symbols-outlined notranslate text-sm align-middle mr-1">check</span>Done</span>
+          </div>
+
+          <div class="space-y-1">
+            <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest">{{task.subjectCode}}</p>
+            <h4 class="text-xl font-black text-slate-800 uppercase leading-tight">{{task.title}}</h4>
+            <div class="flex items-center gap-2 pt-2">
+              <span translate="no" class="material-symbols-outlined notranslate text-slate-300 text-sm">event</span>
+              <p class="text-xs font-bold text-slate-400">Due: {{task.deadline | date:'mediumDate'}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="viewState === 'details'" class="fixed inset-0 z-[120] flex items-center justify-center bg-emerald-900/40 backdrop-blur-sm p-6 animate-fade-in">
+    <div class="bg-white w-full max-w-lg p-10 rounded-[3rem] border border-emerald-100 shadow-2xl space-y-6 relative">
+      <button (click)="goBack()" class="absolute top-6 right-6 text-slate-300 hover:text-rose-500 transition-colors">
+        <span translate="no" class="material-symbols-outlined notranslate text-2xl">close</span>
+      </button>
+
+      <div class="text-center">
+        <div class="size-20 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center mx-auto shadow-inner mb-4">
+          <span translate="no" class="material-symbols-outlined notranslate text-4xl">assignment</span>
+        </div>
+        <h3 class="text-2xl font-black text-slate-800 uppercase">View Task Details</h3>
+        <p class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-widest">Due: {{clickedTask?.deadline | date:'mediumDate'}}</p>
+      </div>
+
+      <div class="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 space-y-2 text-center">
+        <h4 class="text-lg font-black text-emerald-600 uppercase">{{clickedTask?.subjectCode}}</h4>
+        <p class="text-sm font-bold text-slate-600">{{clickedTask?.title}}</p>
+        <p class="text-[10px] font-black text-orange-500 uppercase tracking-widest mt-2 pt-2 border-t border-slate-200">Only students can submit answers.</p>
+      </div>
+
+      <button (click)="confirmDownload()" class="w-full py-4 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white font-black uppercase tracking-widest rounded-2xl transition-all flex items-center justify-center gap-3">
+        <span translate="no" class="material-symbols-outlined notranslate">download</span> Download Instructions
+      </button>
+    </div>
+  </div>
+
+</div>

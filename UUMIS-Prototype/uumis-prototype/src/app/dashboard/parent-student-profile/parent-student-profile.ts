@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService } from '../../services/auth.service'; // Added to fetch real database data
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-parent-student-profile',
@@ -12,7 +12,6 @@ import { AuthService } from '../../services/auth.service'; // Added to fetch rea
 })
 export class ParentStudentProfileComponent implements OnInit {
 
-  // Structure maintained, but dummy data emptied so it can be filled by the real database
   studentProfile: any = {
     name: 'Loading...',
     id: '',
@@ -28,42 +27,96 @@ export class ParentStudentProfileComponent implements OnInit {
     allergies: 'None',
     medicalConditions: 'None',
     father: { name: '', ic: '', phone: '', email: '', job: '' },
-    mother: { name: '', ic: '', phone: '', email: '', job: '' }
+    mother: { name: '', ic: '', phone: '', email: '', job: '' },
+    avatarUrl: null
   };
 
   currentUser: any = null;
+  activeChildId: any = null; // NEW: The specific child being viewed
 
   constructor(private location: Location, private authService: AuthService) {}
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
 
-    // Check if the logged-in parent has a child linked to their account
-    if (this.currentUser && this.currentUser.childUserId) {
+    // THE FIX: Get the specifically selected child from memory, NOT the generic one!
+    this.activeChildId = sessionStorage.getItem('parentActiveChildId');
 
-      // Fetch the REAL child's data from the database
-      this.authService.getStudentDashboardData(this.currentUser.childUserId).subscribe({
+    if (this.currentUser && this.activeChildId) {
+
+      this.authService.getStudentDashboardData(this.activeChildId).subscribe({
         next: (childData: any) => {
-          // Map the database info to your UI layout perfectly
+          if (childData.profileJson) {
+            try {
+              const savedData = JSON.parse(childData.profileJson);
+              this.studentProfile = { ...this.studentProfile, ...savedData };
+            } catch(e) {}
+          }
+
+          // Override with guaranteed database values
           this.studentProfile.name = childData.fullName || childData.username || 'No Name';
           this.studentProfile.id = childData.studentId || childData.verificationCode || '---';
           this.studentProfile.grade = childData.bio || 'Unassigned';
-          this.studentProfile.phone = childData.phone || '';
+          this.studentProfile.phone = childData.phone || this.studentProfile.phone || '';
+          this.studentProfile.avatarUrl = childData.avatar || null;
         },
         error: (err: any) => console.error('Failed to load child profile', err)
       });
     } else {
-      this.studentProfile.name = 'No Child Linked';
+      this.studentProfile.name = 'No Child Selected';
     }
   }
 
-  // Generates real initials for the Avatar image!
+  get completionPercentage(): number {
+    let totalFields = 0;
+    let filledFields = 0;
+
+    const checkValue = (val: string) => {
+      totalFields++;
+      if (val && val.trim() !== '' && val.trim() !== '---' && val.trim() !== 'Unassigned') {
+        filledFields++;
+      }
+    };
+
+    checkValue(this.studentProfile.name);
+    checkValue(this.studentProfile.id);
+    checkValue(this.studentProfile.grade);
+    checkValue(this.studentProfile.admissionDate);
+    checkValue(this.studentProfile.teacher);
+    checkValue(this.studentProfile.dob);
+    checkValue(this.studentProfile.gender);
+    checkValue(this.studentProfile.address);
+    checkValue(this.studentProfile.passport);
+    checkValue(this.studentProfile.phone);
+    checkValue(this.studentProfile.bloodGroup);
+    checkValue(this.studentProfile.allergies);
+    checkValue(this.studentProfile.medicalConditions);
+
+    if (this.studentProfile.father) {
+      checkValue(this.studentProfile.father.name);
+      checkValue(this.studentProfile.father.ic);
+      checkValue(this.studentProfile.father.phone);
+      checkValue(this.studentProfile.father.email);
+      checkValue(this.studentProfile.father.job);
+    }
+
+    if (this.studentProfile.mother) {
+      checkValue(this.studentProfile.mother.name);
+      checkValue(this.studentProfile.mother.ic);
+      checkValue(this.studentProfile.mother.phone);
+      checkValue(this.studentProfile.mother.email);
+      checkValue(this.studentProfile.mother.job);
+    }
+
+    if (totalFields === 0) return 0;
+    return Math.round((filledFields / totalFields) * 100);
+  }
+
   getInitials(name: string): string {
     if (!name || name === 'Loading...' || name === 'No Child Linked') return 'NA';
     return name.trim().slice(0, 2).toUpperCase();
   }
 
-  // Smooth Scroll function
   scrollToSection(sectionId: string) {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -75,7 +128,38 @@ export class ParentStudentProfileComponent implements OnInit {
     this.location.back();
   }
 
+  // --- THE FIX: Re-added Picture Upload Logic ---
+  triggerFileInput() {
+    document.getElementById('parentChildAvatarInput')?.click();
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        this.studentProfile.avatarUrl = e.target.result; // Update UI instantly
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
   saveUpdates() {
-    alert('Profile updates submitted to school admin for approval.');
+    if (!this.currentUser || !this.activeChildId) {
+      alert("No active child selected!");
+      return;
+    }
+
+    const payload = {
+      profileStatus: 'PENDING',
+      profileJson: JSON.stringify(this.studentProfile),
+      avatar: this.studentProfile.avatarUrl // Safely resaves the existing or new picture!
+    };
+
+    // Save to the activeChildId, NOT the outdated currentUser.childUserId!
+    this.authService.adminUpdateStudent(this.activeChildId, payload).subscribe({
+      next: () => alert('Child profile details submitted to school admin for approval.'),
+      error: () => alert('Failed to submit updates.')
+    });
   }
 }
