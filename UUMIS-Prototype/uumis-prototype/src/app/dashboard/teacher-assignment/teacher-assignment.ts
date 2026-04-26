@@ -10,7 +10,7 @@ import { AuthService } from '../../services/auth.service';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './teacher-assignment.html',
-  styleUrl: './teacher-assignment.css' // Create empty css file if needed
+  styleUrl: './teacher-assignment.css'
 })
 export class TeacherAssignmentComponent implements OnInit, OnDestroy {
 
@@ -18,17 +18,14 @@ export class TeacherAssignmentComponent implements OnInit, OnDestroy {
   selectedYear: string = '';
   selectedSubject: any = null;
 
-  // --- NEW: Locked Teacher Constraints ---
   teacherAllowedYears: string[] = [];
   teacherAllowedSubjects: string[] = [];
-  years: string[] = []; // Will only be populated with teacher's assigned years!
+  years: string[] = [];
 
-  // Data Storage
   allSubjectsFromDb: any[] = [];
   subjects: any[] = [];
   allAssignments: any = {};
 
-  // UI State Control
   isAddingMode: boolean = false;
   isEditing: boolean = false;
   showQuizStartConfirm: boolean = false;
@@ -37,14 +34,20 @@ export class TeacherAssignmentComponent implements OnInit, OnDestroy {
   isQuizActive: boolean = false;
   showResultModal: boolean = false;
 
+  showGradeModal: boolean = false;
+  gradingStudent: any = null;
+  gradingScore: string = '';
+
   currentPdfUrl: SafeResourceUrl | null = null;
   clickedTask: any = null;
   quizResult: any = null;
   countdownTimer: any = null;
   remainingTimeText: string = '00:00:00';
   userAnswers: any = {};
-
   newTask: any = {};
+
+  taskSubmissions: any[] = [];
+  isLoadingSubmissions: boolean = false;
 
   constructor(
     private router: Router,
@@ -65,29 +68,28 @@ export class TeacherAssignmentComponent implements OnInit, OnDestroy {
     if (this.countdownTimer) clearInterval(this.countdownTimer);
   }
 
-  // --- NEW: Fetch Teacher's Locked Profile ---
   loadTeacherProfile() {
     const localUser = this.authService.getCurrentUser();
     if (!localUser) return;
 
-    this.authService.getUsers().subscribe({
-      next: (users: any[]) => {
-        const myFreshProfile = users.find(u => u.id === localUser.id || (u.email && u.email === localUser.email));
+    this.authService.getTeachers().subscribe({
+      next: (teachers: any[]) => {
+        const myFreshProfile = teachers.find(t => t.username === localUser.username || t.email === localUser.email);
 
         if (myFreshProfile) {
           const bio = myFreshProfile.bio || '';
-          const classList = bio ? bio.split(',').map((s: string) => s.trim()) : [];
+          const classList = bio && bio !== 'Unassigned' ? bio.split(',').map((s: string) => s.trim()) : [];
 
           this.teacherAllowedYears = classList.map((c: string) => {
             const parts = c.includes(' - ') ? c.split(' - ') : c.split('-');
             return parts.length > 1 ? parts[1].trim() : parts[0].trim();
           }).filter((y: string) => y !== 'Unassigned' && y !== '');
 
-          this.teacherAllowedSubjects = myFreshProfile.assignedSubjects
-            ? myFreshProfile.assignedSubjects.split(',').map((s: string) => s.trim())
+          const assignedSubjRaw = myFreshProfile.assignedSubjects || myFreshProfile.assigned_subjects || '';
+          this.teacherAllowedSubjects = assignedSubjRaw
+            ? assignedSubjRaw.split(',').map((s: string) => s.trim().toLowerCase())
             : [];
 
-          // Assign strictly to the UI loop
           this.years = this.teacherAllowedYears;
         }
       }
@@ -96,9 +98,7 @@ export class TeacherAssignmentComponent implements OnInit, OnDestroy {
 
   loadSubjects() {
     this.authService.getSubjects().subscribe({
-      next: (res) => {
-        this.allSubjectsFromDb = res;
-      }
+      next: (res) => { this.allSubjectsFromDb = res; }
     });
   }
 
@@ -106,25 +106,61 @@ export class TeacherAssignmentComponent implements OnInit, OnDestroy {
     this.authService.getAssignments().subscribe({
       next: (res) => {
         this.allAssignments = {};
-        res.forEach(a => {
-          if (!this.allAssignments[a.yearGroup]) this.allAssignments[a.yearGroup] = {};
-          if (!this.allAssignments[a.yearGroup][a.subject]) this.allAssignments[a.yearGroup][a.subject] = [];
+        const now = new Date();
 
-          a.questions = a.questionsJson ? JSON.parse(a.questionsJson) : [];
-          this.allAssignments[a.yearGroup][a.subject].push(a);
+        res.forEach(a => {
+          const yG = a.yearGroup || a.year_group || '';
+          if (!this.allAssignments[yG]) this.allAssignments[yG] = {};
+          if (!this.allAssignments[yG][a.subject]) this.allAssignments[yG][a.subject] = [];
+
+          a.questions = a.questionsJson || a.questions_json ? JSON.parse(a.questionsJson || a.questions_json) : [];
+          a.startTime = a.startTime || a.start_time || '09:00';
+          a.endTime = a.endTime || a.end_time || '10:00';
+          a.quizDate = a.quizDate || a.quiz_date || '';
+          a.dueDate = a.dueDate || a.due_date || '';
+          a.fileName = a.fileName || a.file_name || '';
+          a.fileUrl = a.fileUrl || a.file_url || '';
+          a.durationText = a.durationText || a.duration_text || '';
+
+          let isReleased = false;
+          if (a.releaseMarks !== undefined && a.releaseMarks !== null) {
+            isReleased = a.releaseMarks === 1 || a.releaseMarks === true || a.releaseMarks === '1' || (a.releaseMarks.data && a.releaseMarks.data[0] === 1);
+          } else if (a.release_marks !== undefined && a.release_marks !== null) {
+            isReleased = a.release_marks === 1 || a.release_marks === true || a.release_marks === '1' || (a.release_marks.data && a.release_marks.data[0] === 1);
+          }
+          a.releaseMarks = isReleased;
+
+          if (a.type === 'Quiz' && a.quizDate && a.endTime) {
+            const quizEnd = new Date(`${a.quizDate}T${a.endTime}`);
+            a.isPastDue = now > quizEnd;
+            a.dynamicStatus = a.isPastDue ? 'Completed' : 'Active';
+          } else if (a.type === 'Assignment' && a.dueDate) {
+            const assignEnd = new Date(a.dueDate);
+            a.isPastDue = now > assignEnd;
+            a.dynamicStatus = a.isPastDue ? 'Completed' : 'Active';
+          } else {
+            a.isPastDue = false;
+            a.dynamicStatus = 'Active';
+          }
+
+          this.allAssignments[yG][a.subject].push(a);
         });
       }
     });
   }
 
-  // --- FIX: Filter subjects by Year AND Teacher's Assigned Subjects! ---
   selectYear(year: string) {
     this.selectedYear = year;
     const colors = ['bg-orange-50 text-orange-600', 'bg-blue-50 text-blue-600', 'bg-emerald-50 text-emerald-600', 'bg-purple-50 text-purple-600', 'bg-pink-50 text-pink-600', 'bg-sky-50 text-sky-600'];
 
-    const filteredSubjects = this.allSubjectsFromDb.filter(s =>
-      s.yearGroup === year && this.teacherAllowedSubjects.includes(s.name)
-    );
+    const filteredSubjects = this.allSubjectsFromDb.filter(s => {
+      const subYear = s.yearGroup || s.year_group || '';
+      const isYearMatch = subYear.trim().toLowerCase() === year.toLowerCase();
+      const subNameSafe = (s.name || '').trim().toLowerCase();
+      const isAssignedToTeacher = this.teacherAllowedSubjects.includes(subNameSafe);
+
+      return isYearMatch && isAssignedToTeacher;
+    });
 
     this.subjects = filteredSubjects.map((s: any, i: number) => ({
       code: s.code || s.name,
@@ -149,6 +185,7 @@ export class TeacherAssignmentComponent implements OnInit, OnDestroy {
 
   goBack() {
     if (this.isQuizActive) { this.closeQuizSession(); }
+    else if (this.viewState === 'submissions') { this.viewState = 'tasks'; this.clickedTask = null; }
     else if (this.viewState === 'tasks') { this.viewState = 'subjects'; this.selectedSubject = null; }
     else if (this.viewState === 'subjects') { this.viewState = 'years'; this.selectedYear = ''; }
     else { this.location.back(); }
@@ -189,6 +226,9 @@ export class TeacherAssignmentComponent implements OnInit, OnDestroy {
     this.showQuizStartConfirm = false; this.showResultModal = false; this.isQuizActive = true; this.userAnswers = {};
     let h = parseInt(this.clickedTask?.durationHours || 0); let m = parseInt(this.clickedTask?.durationMinutes || 0);
     let totalSeconds = (h * 3600) + (m * 60);
+
+    if (totalSeconds <= 0) totalSeconds = 600;
+
     this.updateTimerText(totalSeconds);
     this.countdownTimer = setInterval(() => {
       totalSeconds--;
@@ -279,6 +319,171 @@ export class TeacherAssignmentComponent implements OnInit, OnDestroy {
     this.clickedTask = task;
     if (task.type === 'Assignment') this.showAssignmentDetails = true;
     else this.showQuizStartConfirm = true;
+  }
+
+  viewSubmissions(event: Event, task: any) {
+    event.stopPropagation();
+
+    this.clickedTask = task;
+    this.viewState = 'submissions';
+    this.isLoadingSubmissions = true;
+
+    const subjectName = `${task.type}: ${task.topic}`;
+    const oldSubjectName = `TASK_${task.id}`;
+
+    // 获取当前老师点击的班级，比如 "Year 1"
+    const currentYearGroup = this.selectedYear;
+
+    this.authService.getUsers().subscribe(users => {
+      // 1. 获取本班级档案里的正常学生
+      const classStudents = users.filter(u => {
+        if ((u.role || '').toLowerCase() !== 'student') return false;
+        const yG = (u.bio || '').includes(' - ') ? (u.bio || '').split(' - ')[1]?.trim().toLowerCase() : (u.bio || '').trim().toLowerCase();
+        return yG === currentYearGroup.toLowerCase();
+      });
+
+      // 2. ⭐ 安全直连读取：同时发送 subject 和 yearGroup 给数据库，严禁跨班级读取！
+      Promise.all([
+        fetch(`/api/grades?subject=${encodeURIComponent(subjectName)}&yearGroup=${encodeURIComponent(currentYearGroup)}`).then(res => res.ok ? res.json() : []),
+        fetch(`/api/grades?subject=${encodeURIComponent(oldSubjectName)}&yearGroup=${encodeURIComponent(currentYearGroup)}`).then(res => res.ok ? res.json() : [])
+      ]).then(([newGrades, oldGrades]) => {
+        const allGrades = [...(Array.isArray(newGrades) ? newGrades : []), ...(Array.isArray(oldGrades) ? oldGrades : [])];
+
+        // 3. 安全合并：只有被数据库证实是交给这个班级 (currentYearGroup) 的学生，才允许显示！
+        const allStudentsToDisplay = [...classStudents];
+        allGrades.forEach((g: any) => {
+          const exists = allStudentsToDisplay.find(s =>
+            String(s.username).toLowerCase() === String(g.studentUsername).toLowerCase() ||
+            String(s.student_id).toLowerCase() === String(g.studentUsername).toLowerCase()
+          );
+          if (!exists && g.studentUsername) {
+            allStudentsToDisplay.push({
+              student_id: g.studentUsername,
+              username: g.studentUsername,
+              fullName: g.studentName || g.studentUsername,
+              role: 'student'
+            });
+          }
+        });
+
+        if (allStudentsToDisplay.length === 0) {
+          this.taskSubmissions = [];
+          this.isLoadingSubmissions = false;
+          return;
+        }
+
+        // 4. 匹配数据显示
+        this.taskSubmissions = allStudentsToDisplay.map(stu => {
+          const uniqueIds = [stu.student_id, stu.studentId, stu.username, stu.email, stu.fullName, stu.full_name]
+            .filter(Boolean)
+            .map(id => String(id).toLowerCase().trim());
+
+          const gradeRec = allGrades.find((g: any) => {
+            const gUname = String(g.studentUsername || g.student_username || '').toLowerCase().trim();
+            const gName = String(g.studentName || g.student_name || '').toLowerCase().trim();
+            return (gUname && uniqueIds.includes(gUname)) || (gName && uniqueIds.includes(gName));
+          });
+
+          const displayId = stu.student_id || stu.studentId || stu.username;
+
+          let statusStr = 'Pending';
+          let markStr = '-';
+          let pctStr = '-';
+
+          if (gradeRec) {
+            statusStr = 'Submitted';
+            markStr = gradeRec.mark !== null ? String(gradeRec.mark) : '-';
+            pctStr = gradeRec.gradeLetter || '-';
+          } else if (task.isPastDue) {
+            statusStr = 'Unsubmitted';
+            if (task.type === 'Quiz') {
+              const qCount = task.questions ? task.questions.length : 0;
+              markStr = `0 / ${qCount}`;
+              pctStr = '0%';
+            } else {
+              markStr = '0';
+              pctStr = '0%';
+            }
+          }
+
+          return {
+            name: stu.fullName || stu.username,
+            id: displayId,
+            status: statusStr,
+            mark: markStr,
+            percentage: pctStr,
+            submittedFileName: gradeRec ? (gradeRec.submittedFileName || gradeRec.submitted_file_name) : null,
+            submittedFileUrl: gradeRec ? (gradeRec.submittedFileUrl || gradeRec.submitted_file_url) : null
+          };
+        });
+
+        this.isLoadingSubmissions = false;
+      }).catch(err => {
+        console.error("Fetch error: ", err);
+        this.taskSubmissions = [];
+        this.isLoadingSubmissions = false;
+      });
+    });
+  }
+  openGradeModal(student: any) {
+    this.gradingStudent = student;
+    const currentMark = String(student.mark);
+    this.gradingScore = (currentMark === 'Pending Grading' || currentMark === 'File Uploaded' || currentMark === '-') ? '' : currentMark;
+    this.showGradeModal = true;
+  }
+
+  downloadStudentSubmission(student: any) {
+    if (student.submittedFileUrl) {
+      const a = document.createElement('a');
+      a.href = student.submittedFileUrl;
+      a.download = student.submittedFileName || 'Submission.pdf';
+      a.click();
+    } else {
+      alert("This student didn't upload a file.");
+    }
+  }
+
+  saveStudentGrade() {
+    if (!this.gradingScore) { alert('Please enter a score.'); return; }
+
+    const subjectName = `${this.clickedTask.type}: ${this.clickedTask.topic}`;
+    const gradePayload = [{
+      studentUsername: this.gradingStudent.id,
+      studentName: this.gradingStudent.name,
+      yearGroup: this.selectedYear,
+      subject: subjectName,
+      mark: this.gradingScore,
+      gradeLetter: '-',
+      status: 'Submitted'
+    }];
+
+    this.authService.saveGrades(gradePayload).subscribe({
+      next: () => {
+        this.gradingStudent.mark = this.gradingScore;
+        this.showGradeModal = false;
+        alert('Grade saved successfully!');
+      },
+      error: () => alert('Failed to save grade.')
+    });
+  }
+
+  toggleReleaseMarks() {
+    if (!this.clickedTask) return;
+    this.clickedTask.releaseMarks = !this.clickedTask.releaseMarks;
+
+    const payload = { ...this.clickedTask, releaseMarks: this.clickedTask.releaseMarks ? 1 : 0 };
+
+    this.authService.updateAssignment(this.clickedTask.id, payload).subscribe({
+      next: () => {
+        alert(this.clickedTask.releaseMarks ? 'Success! Marks are now published.' : 'Marks have been hidden.');
+        const targetTask = this.currentTasks.find((t:any) => t.id === this.clickedTask.id);
+        if (targetTask) targetTask.releaseMarks = this.clickedTask.releaseMarks;
+      },
+      error: () => {
+        this.clickedTask.releaseMarks = !this.clickedTask.releaseMarks;
+        alert('Failed to update release status.');
+      }
+    });
   }
 
   confirmDownload() {

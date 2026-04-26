@@ -48,7 +48,17 @@
           <div><label class="text-[11px] font-black text-gray-400 uppercase tracking-wider pl-1">Start Date <span class="text-red-500">*</span></label><input type="date" [(ngModel)]="formData.startDate" class="w-full mt-2 p-3.5 bg-gray-50/50 border border-gray-200 rounded-2xl text-sm font-bold text-[#0e1b13] outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all cursor-pointer"></div>
           <div><label class="text-[11px] font-black text-gray-400 uppercase tracking-wider pl-1">End Date <span class="text-red-500">*</span></label><input type="date" [(ngModel)]="formData.endDate" class="w-full mt-2 p-3.5 bg-gray-50/50 border border-gray-200 rounded-2xl text-sm font-bold text-[#0e1b13] outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all cursor-pointer"></div>
         </div>
-        <div><label class="text-[11px] font-black text-gray-400 uppercase tracking-wider pl-1">Upload Picture / PDF</label><div (click)="fileInput.click()" class="mt-2 w-full border-2 border-dashed border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-emerald-50/30 hover:border-emerald-300 transition-all group bg-white"><div *ngIf="!formData.fileUrl" class="flex flex-col items-center"><div class="size-14 rounded-full bg-gray-50 text-gray-300 flex items-center justify-center group-hover:text-emerald-500 group-hover:bg-emerald-100 transition-all mb-3"><span translate="no" class="material-symbols-outlined notranslate text-3xl">cloud_upload</span></div><p class="text-xs font-bold text-gray-500 group-hover:text-emerald-600">Click to upload file</p><p class="text-[10px] text-gray-400 mt-1">Supports JPG, PNG, PDF</p></div><div *ngIf="formData.fileUrl" class="flex items-center gap-4 w-full"><img *ngIf="formData.fileType === 'image'" [src]="formData.fileUrl" class="h-20 w-20 object-contain bg-gray-100 rounded-xl border border-gray-200 shadow-sm"><div *ngIf="formData.fileType === 'pdf'" class="h-20 w-20 flex items-center justify-center rounded-xl bg-red-50 border border-red-100 text-red-500"><span translate="no" class="material-symbols-outlined notranslate text-4xl">picture_as_pdf</span></div><div class="flex-1 overflow-hidden"><p class="text-sm font-bold text-emerald-900 truncate">{{ formData.fileName }}</p><p class="text-xs text-emerald-500 font-medium cursor-pointer hover:underline mt-1">Click to change</p></div><span translate="no" class="material-symbols-outlined notranslate text-emerald-500">check_circle</span></div><input #fileInput type="file" class="hidden" (change)="onFileSelected($event)" accept="image/png, image/jpeg, application/pdf"></div></div>
+        <div>
+          <label class="text-[11px] font-black text-gray-400 uppercase tracking-wider pl-1">Upload Picture / PDF</label>
+          <div (click)="fileInput.click()" class="mt-2 w-full border-2 border-dashed border-gray-200 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-emerald-50/30 hover:border-emerald-300 transition-all group bg-white">
+            <div *ngIf="!formData.fileUrl" class="flex flex-col items-center"><div class="size-14 rounded-full bg-gray-50 text-gray-300 flex items-center justify-center group-hover:text-emerald-500 group-hover:bg-emerald-100 transition-all mb-3"><span translate="no" class="material-symbols-outlined notranslate text-3xl">cloud_upload</span></div><p class="text-xs font-bold text-gray-500 group-hover:text-emerald-600">Click to upload file</p><p class="text-[10px] text-gray-400 mt-1">Supports JPG, PNG, PDF</p></div>
+            <div *ngIf="formData.fileUrl" class="flex items-center gap-4 w-full">
+              <img *ngIf="formData.fileType === 'image'" [src]="formData.safeUrl || formData.fileUrl" class="h-20 w-20 object-contain bg-gray-100 rounded-xl border border-gray-200 shadow-sm">
+              <div *ngIf="formData.fileType === 'pdf'" class="h-20 w-20 flex items-center justify-center rounded-xl bg-red-50 border border-red-100 text-red-500"><span translate="no" class="material-symbols-outlined notranslate text-4xl">picture_as_pdf</span></div>
+              <div class="flex-1 overflow-hidden"><p class="text-sm font-bold text-emerald-900 truncate">{{ formData.fileName }}</p><p class="text-xs text-emerald-500 font-medium cursor-pointer hover:underline mt-1">Click to change</p></div><span translate="no" class="material-symbols-outlined notranslate text-emerald-500">check_circle</span></div>
+            <input #fileInput type="file" class="hidden" (change)="onFileSelected($event)" accept="image/png, image/jpeg, application/pdf">
+          </div>
+        </div>
       </div>
       <div class="pt-5 border-t border-gray-100 shrink-0"><button (click)="onSubmit()" class="w-full py-4 bg-emerald-500 text-white font-black rounded-2xl shadow-lg shadow-emerald-200 hover:bg-emerald-600 hover:scale-[1.01] active:scale-[0.99] transition-all uppercase tracking-widest text-xs flex items-center justify-center gap-2"><span translate="no" class="material-symbols-outlined notranslate">{{ isEditing ? 'save' : 'add_circle' }}</span>{{ isEditing ? 'Update Discount' : 'Submit Discount' }}</button></div>
     </div>
@@ -74,7 +84,9 @@
         <div *ngFor="let item of discounts" class="bg-white rounded-[2.5rem] border border-[#e7f3ec] shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group relative">
 
           <div class="h-[450px] w-full bg-gray-100 relative overflow-hidden flex items-center justify-center">
-            <img *ngIf="item.fileType === 'image' && item.fileUrl" [src]="item.fileUrl" alt="Discount Cover" class="w-full h-full object-contain p-2 transition-transform duration-500">
+
+            <img *ngIf="item.fileType === 'image' && item.safeUrl" [src]="item.safeUrl" alt="Discount Cover" class="w-full h-full object-contain p-2 transition-transform duration-500">
+
             <div *ngIf="item.fileType === 'pdf'" class="w-full h-full flex flex-col items-center justify-center bg-red-50 text-red-400 group-hover:bg-red-100 transition-colors"><span translate="no" class="material-symbols-outlined notranslate text-8xl">picture_as_pdf</span><p class="text-sm font-bold mt-4 uppercase tracking-wider">PDF Document</p></div>
             <div *ngIf="!item.fileUrl" class="w-full h-full flex flex-col items-center justify-center bg-emerald-50/50 text-emerald-300"><span translate="no" class="material-symbols-outlined notranslate text-8xl">image</span><p class="text-sm font-bold mt-4 uppercase tracking-wider opacity-70">No Image</p></div>
 
@@ -116,6 +128,10 @@
 
                 <button (click)="openEditModal(item)" class="size-10 flex items-center justify-center rounded-full bg-gray-50 text-gray-500 hover:bg-gray-800 hover:text-white transition-all shadow-sm" title="Edit">
                   <span translate="no" class="material-symbols-outlined notranslate text-[20px]">edit</span>
+                </button>
+
+                <button (click)="deleteDiscount(item)" class="size-10 flex items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all shadow-sm" title="Delete">
+                  <span translate="no" class="material-symbols-outlined notranslate text-[20px]">delete</span>
                 </button>
               </div>
 

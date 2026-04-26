@@ -24,11 +24,17 @@
           <select [(ngModel)]="selectedRoleFilter" (change)="filterUsers()" class="w-full md:w-auto rounded-xl border-gray-200 bg-gray-50 text-xs font-bold uppercase py-3 px-4 focus:ring-[#30e87a] cursor-pointer outline-none border">
             <option value="All">All Roles</option>
             <option value="admin">Admin</option>
-            <option value="staff">Staff</option>
+            <option value="staff">General Staff</option>
+            <option value="register_manager">Register Manager</option>
+            <option value="financial_manager">Financial Manager</option>
             <option value="teacher">Teacher</option>
             <option value="parent">Parent</option>
             <option value="student">Student</option>
           </select>
+          <button (click)="openInviteModal()" class="flex items-center gap-2 bg-[#30e87a] hover:bg-[#28cf6b] text-white px-5 py-3 rounded-xl font-bold text-sm transition-all shadow-sm">
+            <span translate="no" class="material-symbols-outlined notranslate text-[18px]">person_add</span>
+            Add User
+          </button>
         </div>
       </div>
 
@@ -51,7 +57,7 @@
                 </div>
                 <div>
                   <p class="font-bold text-[#0e1b13]">{{ user.fullName || user.username || 'No Name Set' }}</p>
-                  <p class="text-[10px] text-gray-400 font-mono mt-0.5 uppercase tracking-widest">@{{ user.role || 'student' }}</p>
+                  <p class="text-[10px] text-gray-400 font-mono mt-0.5 uppercase tracking-widest">@{{ formatRole(user.role || 'student') }}</p>
                 </div>
               </div>
             </td>
@@ -70,7 +76,7 @@
             <td class="px-6 py-4 text-right">
               <div class="flex items-center justify-end gap-2">
                 <select [ngModel]="user.role || 'student'" (change)="changeRole(user, $event)" class="bg-gray-50 border border-gray-200 rounded-xl text-xs font-bold uppercase tracking-wider py-2 px-3 focus:ring-2 focus:ring-[#30e87a] outline-none cursor-pointer shadow-sm">
-                  <option *ngFor="let role of availableRoles" [value]="role">{{ role }}</option>
+                  <option *ngFor="let role of availableRoles" [value]="role.value">{{ role.label }}</option>
                 </select>
 
                 <button (click)="deleteUser(user)" class="size-9 flex items-center justify-center rounded-xl bg-white border border-gray-200 text-gray-400 hover:text-red-500 hover:bg-red-50 hover:border-red-200 transition-all shadow-sm" title="Delete User">
@@ -86,6 +92,44 @@
         </table>
       </div>
 
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showInviteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+  <div class="bg-white rounded-3xl w-full max-w-md shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+    <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+      <h2 class="text-xl font-black text-gray-800">Invite New User</h2>
+      <button (click)="closeInviteModal()" class="text-gray-400 hover:text-red-500 transition-colors">
+        <span translate="no" class="material-symbols-outlined notranslate">close</span>
+      </button>
+    </div>
+
+    <div class="p-8 flex flex-col gap-5">
+      <div>
+        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Email Address</label>
+        <input [(ngModel)]="inviteEmail" type="email" placeholder="staff@uumis.edu.my" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-[#30e87a] outline-none">
+      </div>
+      <div>
+        <label class="block text-xs font-black text-gray-400 uppercase tracking-widest mb-2">Assign Role</label>
+
+        <select [(ngModel)]="inviteRole" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm font-bold focus:ring-2 focus:ring-[#30e87a] outline-none uppercase cursor-pointer">
+          <option value="staff">General Staff</option>
+          <option value="register_manager">Register Manager</option>
+          <option value="financial_manager">Financial Manager</option>
+          <option value="teacher">Teacher</option>
+          <option value="admin">Admin</option>
+        </select>
+
+      </div>
+
+      <div class="mt-4 flex gap-3">
+        <button (click)="closeInviteModal()" class="flex-1 px-4 py-3 rounded-xl border border-gray-200 text-gray-500 font-bold hover:bg-gray-50 transition-all text-sm">Cancel</button>
+        <button (click)="submitInvite()" [disabled]="isInviting" class="flex-1 px-4 py-3 rounded-xl bg-[#30e87a] text-white font-bold hover:bg-[#28cf6b] disabled:opacity-50 transition-all text-sm flex justify-center items-center gap-2 shadow-sm">
+          <span *ngIf="isInviting" translate="no" class="material-symbols-outlined notranslate animate-spin text-[18px]">progress_activity</span>
+          {{ isInviting ? 'Sending...' : 'Send Invite' }}
+        </button>
+      </div>
     </div>
   </div>
 </div>

@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas'; // Added html2canvas
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -19,6 +21,9 @@ export class ParentGradesComponent implements OnInit {
 
   grades: any[] = [];
   isLoading: boolean = false;
+
+  isGeneratingPDF: boolean = false;
+  todayDate: string = new Date().toLocaleDateString();
 
   constructor(private location: Location, private authService: AuthService) {}
 
@@ -47,18 +52,15 @@ export class ParentGradesComponent implements OnInit {
 
   loadGrades() {
     this.isLoading = true;
+    const targetIdentifier = this.selectedChild.username || this.selectedChild.id || this.selectedChild.email || '';
 
-    // THE FIX: Strictly use username.
-    const targetUsername = this.selectedChild.username || '';
-
-    // If it's a ghost account, stop here and show empty!
-    if (!targetUsername) {
+    if (!targetIdentifier) {
       this.grades = [];
       this.isLoading = false;
       return;
     }
 
-    this.authService.getMyGrades(targetUsername).subscribe({
+    this.authService.getMyGrades(targetIdentifier).subscribe({
       next: (res: any[]) => {
         this.grades = res || [];
         this.isLoading = false;
@@ -70,12 +72,33 @@ export class ParentGradesComponent implements OnInit {
     });
   }
 
+  // Smart Calculator
+  getGradeLetter(mark: any, dbGrade: string): string {
+    if (dbGrade && String(dbGrade).trim() !== '') return dbGrade;
+    if (mark === null || mark === undefined || String(mark).trim() === '') return '-';
+
+    const num = Number(mark);
+    if (isNaN(num)) return '-';
+    if (num >= 90) return 'A+';
+    if (num >= 80) return 'A';
+    if (num >= 70) return 'B';
+    if (num >= 60) return 'C';
+    if (num >= 50) return 'D';
+    return 'F';
+  }
+
   getGradeClass(grade: string): string {
-    if (!grade) return 'text-slate-400 bg-slate-50 border border-slate-100';
-    if (grade.startsWith('A')) return 'text-emerald-600 bg-emerald-50 border border-emerald-100';
-    if (grade === 'F') return 'text-rose-600 bg-rose-50 border border-rose-100';
-    if (grade === '-') return 'text-slate-400 bg-slate-50 border border-slate-100';
-    return 'text-blue-600 bg-blue-50 border border-blue-100';
+    if (!grade || grade === '-') return 'bg-slate-100 text-slate-500';
+    if (grade.startsWith('A')) return 'bg-green-100 text-green-700';
+    if (grade === 'F') return 'bg-red-100 text-red-700';
+    return 'bg-blue-100 text-blue-700';
+  }
+
+  getGradeClassText(grade: string): string {
+    if (!grade || grade === '-') return 'text-slate-500';
+    if (grade.startsWith('A')) return 'text-emerald-600';
+    if (grade === 'F') return 'text-rose-600';
+    return 'text-blue-600';
   }
 
   goBack(): void {
@@ -86,5 +109,30 @@ export class ParentGradesComponent implements OnInit {
     } else {
       this.location.back();
     }
+  }
+
+  downloadReportCard() {
+    this.isGeneratingPDF = true;
+    setTimeout(() => {
+      const element = document.getElementById('formal-report-pdf-parent');
+      if (element) {
+        html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          const childName = this.selectedChild?.fullName || this.selectedChild?.username || 'Student';
+          pdf.save(`${childName.replace(/\s+/g, '_')}_Report_Card.pdf`);
+
+          this.isGeneratingPDF = false;
+        }).catch(err => {
+          console.error(err);
+          alert('Failed to generate PDF.');
+          this.isGeneratingPDF = false;
+        });
+      }
+    }, 200);
   }
 }

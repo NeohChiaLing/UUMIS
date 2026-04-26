@@ -60,18 +60,18 @@ export class LoginComponent {
         localStorage.setItem('user', JSON.stringify(res.user));
 
         // --- NEW ROLE-BASED ROUTING ---
-        const userRole = res.user.role ? res.user.role.toLowerCase() : 'student';
+        const userRole = res.user.role ? res.user.role.toLowerCase().trim() : 'student';
 
+        // THE FIX: Route specific managers to the Staff portal where their tools are!
         if (userRole === 'admin') {
           this.router.navigate(['/dashboard/admin']);
-        } else if (userRole === 'staff') {
+        } else if (userRole === 'staff' || userRole === 'financial_manager' || userRole === 'register_manager') {
           this.router.navigate(['/dashboard/staff']);
         } else if (userRole === 'teacher') {
           this.router.navigate(['/dashboard/teacher']);
         } else if (userRole === 'parent') {
           this.router.navigate(['/dashboard/parent']);
         } else {
-          // Default fallback is the student portal
           this.router.navigate(['/dashboard/student']);
         }
 

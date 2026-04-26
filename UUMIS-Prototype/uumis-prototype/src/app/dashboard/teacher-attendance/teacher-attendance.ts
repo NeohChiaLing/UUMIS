@@ -1,38 +1,45 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 import autoTable from 'jspdf-autotable';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-teacher-attendance',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './teacher-attendance.html',
-  styles: []
+  styleUrl: './teacher-attendance.css'
 })
 export class TeacherAttendanceComponent implements OnInit {
 
-  years: string[] = []; // MULTIPLE Years
+  years: string[] = [];
 
   selectedYear: string = '';
   selectedPeriod: string = 'Day';
   selectedDate: string = new Date().toISOString().split('T')[0];
   selectedMonth: string = new Date().toISOString().split('T')[0].slice(0,7);
-  selectedYearVal: string = '2026';
+  selectedYearVal: string = new Date().getFullYear().toString();
   searchQuery: string = '';
 
   timePeriods: string[] = ['Day', 'Month', 'Year'];
+  allStudents: any[] = [];
   students: any[] = [];
   filteredStudents: any[] = [];
 
   totalPresent: number = 0; totalAbsent: number = 0; totalLate: number = 0;
 
   isAddingStudent: boolean = false; newStudent = { name: '', id: '' };
-  showMCConfirm: boolean = false; isViewingMC: boolean = false; currentMCUrl: string = ''; clickedStudent: any = null;
+  showMCConfirm: boolean = false; isViewingMC: boolean = false; currentMCUrl: string | SafeResourceUrl = ''; clickedStudent: any = null;
 
-  constructor(private location: Location, private authService: AuthService) {}
+  isGeneratingPDF: boolean = false;
+  todayDate: string = new Date().toLocaleDateString();
+
+  constructor(private location: Location, private authService: AuthService, private sanitizer: DomSanitizer) {}
 
   ngOnInit() {
     const localUser = this.authService.getCurrentUser();
@@ -40,21 +47,28 @@ export class TeacherAttendanceComponent implements OnInit {
 
     this.authService.getUsers().subscribe({
       next: (users: any[]) => {
-        const myFreshProfile = users.find(u => u.id === localUser.id || (u.email && u.email === localUser.email));
+
+        // THE FIX: Correctly search the 'users' array instead of the undefined 'teachers' variable!
+        const myFreshProfile = users.find(u =>
+          u.id === localUser.id ||
+          (u.email && u.email === localUser.email) ||
+          (u.username && u.username === localUser.username)
+        );
 
         if (myFreshProfile) {
-          // --- NEW: Parse Multiple Classes ---
           const bio = myFreshProfile.bio || '';
           const classList = bio ? bio.split(',').map((s: string) => s.trim()) : [];
 
-          // THE FIX: Added (c: string) and (y: string) to satisfy the strict TS compiler
           this.years = classList.map((c: string) => {
             const parts = c.includes(' - ') ? c.split(' - ') : c.split('-');
             return parts.length > 1 ? parts[1].trim() : parts[0].trim();
           }).filter((y: string) => y !== 'Unassigned' && y !== '');
 
+          // Fallback just in case
+          if (this.years.length === 0) this.years = ['Year 1', 'Year 2', 'Year 3'];
+
           if (this.years.length > 0) {
-            this.selectedYear = this.years[0]; // Auto-select first class
+            this.selectedYear = this.years[0];
             this.loadData();
           }
         }
@@ -64,6 +78,10 @@ export class TeacherAttendanceComponent implements OnInit {
 
   goBack() { this.location.back(); }
 
+  get totalPresentCalc() { return this.filteredStudents.filter(s => s.status.toUpperCase() === 'PRESENT').length; }
+  get totalAbsentCalc() { return this.filteredStudents.filter(s => s.status.toUpperCase() === 'ABSENT').length; }
+  get totalLateCalc() { return this.filteredStudents.filter(s => s.status.toUpperCase() === 'LATE').length; }
+
   loadData() {
     if (!this.selectedYear) return;
 
@@ -71,44 +89,42 @@ export class TeacherAttendanceComponent implements OnInit {
     if (this.selectedPeriod === 'Month') targetDate = this.selectedMonth;
     if (this.selectedPeriod === 'Year') targetDate = this.selectedYearVal;
 
-    this.authService.getAttendance(this.selectedYear, targetDate).subscribe({
-      next: (records) => {
-        if (records && records.length > 0) { this.mapExistingRecords(records); }
-        else { this.loadClassRoster(); }
-      },
-      error: () => this.loadClassRoster()
-    });
-  }
-
-  loadClassRoster() {
     this.authService.getUsers().subscribe({
       next: (users) => {
         const classStudents = users.filter((u: any) => {
           if ((u.role || '').toLowerCase() !== 'student' || !u.bio || u.bio === 'Unassigned') return false;
-          const parts = u.bio.includes(' - ') ? u.bio.split(' - ') : u.bio.split('-');
-          const stuLevel = parts[0].trim().toLowerCase();
-          const stuYear = parts.length > 1 ? parts[1].trim().toLowerCase() : stuLevel;
-          return stuYear === this.selectedYear.toLowerCase() || stuLevel === this.selectedYear.toLowerCase();
+
+          const bioSafe = u.bio.toLowerCase();
+          const targetSafe = this.selectedYear.toLowerCase();
+
+          return bioSafe.includes(targetSafe);
         });
 
-        this.students = classStudents.map((stu: any) => ({
-          dbId: null, name: stu.fullName || stu.username || 'Unknown Student',
-          id: stu.username || stu.email || stu.id.toString(),
-          timeIn: '--:--', status: 'Absent', mcFile: null
-        }));
+        this.authService.getAttendance(this.selectedYear, targetDate).subscribe({
+          next: (attendanceRecords) => {
+            this.students = classStudents.map((stu: any) => {
+              const uniqueId = stu.student_id || stu.studentId || stu.username || stu.email || stu.id.toString();
+              const record = attendanceRecords.find(r => r.student_id === uniqueId || r.studentId === uniqueId);
 
-        this.filterStudents(); this.calculateStats();
+              return {
+                dbId: record ? record.id : null,
+                id: uniqueId,
+                name: stu.fullName || stu.username || 'Unknown Student',
+                class: this.selectedYear,
+                timeIn: record ? (record.time_in || record.timeIn || '--:--') : '--:--',
+                status: record ? String(record.status).toUpperCase() : 'ABSENT',
+                mcFile: record ? (record.mc_file || record.mcFile) : null,
+                mcUrl: record ? (record.mc_url || record.mcUrl) : null
+              };
+            });
+
+            this.allStudents = this.students;
+            this.filterStudents();
+            this.calculateStats();
+          }
+        });
       }
     });
-  }
-
-  mapExistingRecords(records: any[]) {
-    this.students = records.map(r => ({
-      dbId: r.id, name: r.studentName, id: r.studentUsername,
-      timeIn: r.timeIn || '--:--', status: r.status,
-      mcFile: r.remarks && r.remarks.includes('MC:') ? r.remarks.split('MC:')[1].trim() : null
-    }));
-    this.filterStudents(); this.calculateStats();
   }
 
   filterStudents() {
@@ -120,19 +136,18 @@ export class TeacherAttendanceComponent implements OnInit {
   }
 
   calculateStats() {
-    this.totalPresent = this.students.filter(s => s.status === 'Present').length;
-    this.totalAbsent = this.students.filter(s => s.status === 'Absent').length;
-    this.totalLate = this.students.filter(s => s.status === 'Late').length;
+    this.totalPresent = this.totalPresentCalc;
+    this.totalAbsent = this.totalAbsentCalc;
+    this.totalLate = this.totalLateCalc;
   }
 
   toggleStatus(student: any) {
-    if (student.dbId) return;
-    const statuses = ['Present', 'Absent', 'Late'];
-    let idx = statuses.indexOf(student.status);
+    const statuses = ['PRESENT', 'ABSENT', 'LATE'];
+    let idx = statuses.indexOf(student.status.toUpperCase());
     student.status = statuses[(idx + 1) % statuses.length];
 
-    if (student.status === 'Present' || student.status === 'Late') {
-      student.timeIn = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    if (student.status === 'PRESENT' || student.status === 'LATE') {
+      student.timeIn = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
     } else { student.timeIn = '--:--'; }
 
     this.calculateStats();
@@ -144,9 +159,10 @@ export class TeacherAttendanceComponent implements OnInit {
     if (!this.newStudent.name || !this.newStudent.id) { alert("Please fill in both fields"); return; }
     this.students.push({
       dbId: null, name: this.newStudent.name, id: this.newStudent.id,
-      timeIn: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      status: 'Present', mcFile: null
+      timeIn: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
+      status: 'PRESENT', mcFile: null, mcUrl: null
     });
+    this.allStudents = this.students;
     this.filterStudents(); this.calculateStats(); this.toggleAddStudent();
   }
 
@@ -156,12 +172,14 @@ export class TeacherAttendanceComponent implements OnInit {
         this.authService.deleteAttendance(student.dbId).subscribe({
           next: () => {
             this.students = this.students.filter(s => s !== student);
+            this.allStudents = this.students;
             this.filterStudents(); this.calculateStats();
             alert('Record deleted from Database.');
           }
         });
       } else {
         this.students = this.students.filter(s => s !== student);
+        this.allStudents = this.students;
         this.filterStudents(); this.calculateStats();
       }
     }
@@ -172,13 +190,16 @@ export class TeacherAttendanceComponent implements OnInit {
     if (this.selectedPeriod === 'Month') targetDate = this.selectedMonth;
     if (this.selectedPeriod === 'Year') targetDate = this.selectedYearVal;
 
-    const payload = this.students
-      .filter(s => !s.dbId)
-      .map(s => ({
-        studentUsername: s.id, studentName: s.name, yearGroup: this.selectedYear,
-        date: targetDate, status: s.status, timeIn: s.timeIn,
-        remarks: s.mcFile ? 'MC: ' + s.mcFile : ''
-      }));
+    const payload = this.students.map(s => ({
+      studentId: s.id,
+      studentName: s.name,
+      yearGroup: this.selectedYear,
+      date: targetDate,
+      status: s.status,
+      timeIn: s.timeIn,
+      mcFile: s.mcFile,
+      mcUrl: s.mcUrl
+    }));
 
     if (payload.length === 0) return;
 
@@ -189,27 +210,44 @@ export class TeacherAttendanceComponent implements OnInit {
   }
 
   exportToPDF() {
-    const doc = new jsPDF();
-    doc.setFontSize(18); doc.text(`Daily Attendance Report: ${this.selectedYear}`, 14, 20);
-    doc.setFontSize(12); doc.text(`Date: ${this.selectedDate}`, 14, 30);
-    autoTable(doc, {
-      startY: 45, head: [['Student Name', 'Username/ID', 'Status', 'Time In']],
-      body: this.students.map(s => [s.name, s.id, s.status, s.timeIn]),
-    });
-    doc.save(`Attendance_${this.selectedYear}_${this.selectedDate}.pdf`);
+    if (this.filteredStudents.length === 0) {
+      alert("Please load a class roster first.");
+      return;
+    }
+    this.isGeneratingPDF = true;
+    setTimeout(() => {
+      const element = document.getElementById('formal-teacher-attendance-pdf');
+      if (element) {
+        html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          pdf.save(`Attendance_Report_${this.selectedYear.replace(/\s+/g, '_')}_${this.selectedDate}.pdf`);
+          this.isGeneratingPDF = false;
+        }).catch(err => {
+          console.error(err);
+          alert('Failed to generate PDF.');
+          this.isGeneratingPDF = false;
+        });
+      }
+    }, 200);
   }
 
   handleMC(student: any) {
     this.clickedStudent = student;
-    if (student.mcFile) { this.currentMCUrl = student.mcFile; this.showMCConfirm = true; }
+    if (student.mcUrl) { this.currentMCUrl = student.mcUrl; this.showMCConfirm = true; }
     else {
       const input = document.createElement('input'); input.type = 'file'; input.accept = 'application/pdf, image/*';
       input.onchange = (e: any) => {
         const file = e.target.files[0];
         if (file) {
+          student.mcFile = file.name;
           const reader = new FileReader();
           reader.onload = (event: any) => {
-            student.mcFile = event.target.result; student.status = 'Absent'; this.calculateStats();
+            student.mcUrl = event.target.result; student.status = 'ABSENT'; this.calculateStats();
           };
           reader.readAsDataURL(file);
         }
@@ -221,7 +259,7 @@ export class TeacherAttendanceComponent implements OnInit {
   previewMC() { this.showMCConfirm = false; this.isViewingMC = true; }
   downloadMC() {
     if (this.currentMCUrl) {
-      const a = document.createElement('a'); a.href = this.currentMCUrl; a.download = `MC_${this.clickedStudent.name}.pdf`; a.click();
+      const a = document.createElement('a'); a.href = this.currentMCUrl as string; a.download = `MC_${this.clickedStudent.name}.pdf`; a.click();
     }
     this.showMCConfirm = false;
   }

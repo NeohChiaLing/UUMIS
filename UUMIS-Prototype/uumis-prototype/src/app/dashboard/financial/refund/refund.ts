@@ -3,7 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
 import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import html2canvas from 'html2canvas';
 
 @Component({
   selector: 'app-refund',
@@ -17,7 +17,9 @@ export class RefundComponent implements OnInit {
 
   selectedYear: string = 'Kindergarten';
   selectedStudent: any = null;
-  showExportConfirm: boolean = false;
+
+  isGeneratingPDF: boolean = false;
+  todayDate: string = new Date().toLocaleDateString();
 
   allStudents: any[] = [];
   students: any[] = [];
@@ -34,8 +36,7 @@ export class RefundComponent implements OnInit {
       next: (data: any[]) => {
         this.allStudents = data.map(user => {
           const grade = user.bio || 'Unassigned - Unassigned';
-          // FIX: Split by space-dash-space so "Pre-Kindergarten" doesn't get broken in half!
-          const parts = grade.split(' - ');
+          const parts = grade.includes(' - ') ? grade.split(' - ') : grade.split('-');
           const yearStr = parts.length > 1 ? parts[1].trim() : 'Unassigned';
 
           return {
@@ -97,35 +98,26 @@ export class RefundComponent implements OnInit {
       alert('No history records to export.');
       return;
     }
-    this.showExportConfirm = true;
-  }
 
-  confirmDownload() {
-    this.showExportConfirm = false;
-    const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text('Refund History Report', 14, 22);
-    doc.setFontSize(11);
-    doc.setTextColor(100);
-    doc.text(`Student: ${this.selectedStudent.name} (${this.selectedStudent.id})`, 14, 30);
-    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 36);
+    this.isGeneratingPDF = true;
+    setTimeout(() => {
+      const element = document.getElementById('formal-refund-pdf');
+      if (element) {
+        html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-    const tableBody = this.historyRefunds.map(item => [
-      item.date,
-      item.invoiceNo,
-      item.reason,
-      `RM ${item.amount.toFixed(2)}`,
-      item.status
-    ]);
-
-    autoTable(doc, {
-      head: [['Date', 'Invoice No', 'Reason', 'Amount', 'Status']],
-      body: tableBody,
-      startY: 44,
-      theme: 'grid',
-      headStyles: { fillColor: [48, 232, 122], textColor: [14, 27, 19] },
-    });
-
-    doc.save(`${this.selectedStudent.name}_Refund_History.pdf`);
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          pdf.save(`${this.selectedStudent.name.replace(/\s+/g, '_')}_Refund_Report.pdf`);
+          this.isGeneratingPDF = false;
+        }).catch(err => {
+          console.error(err);
+          alert('Failed to generate PDF.');
+          this.isGeneratingPDF = false;
+        });
+      }
+    }, 200);
   }
 }

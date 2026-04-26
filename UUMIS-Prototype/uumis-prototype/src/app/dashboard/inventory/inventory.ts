@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 import { LanguageService } from '../../services/language.service';
-import { AuthService } from '../../services/auth.service'; // Added to fetch DB data
+import { AuthService } from '../../services/auth.service';
 
 interface Asset {
   id: string;
@@ -37,40 +37,41 @@ export class InventoryComponent implements OnInit {
   filterOptions: string[] = ['All Categories', ...this.baseCategories, 'Others'];
   selectedFilter: string = 'All Categories';
 
-  assets: Asset[] = []; // Emptied dummy data, it will now load from DB!
+  assets: Asset[] = [];
   filteredAssets: Asset[] = [];
   searchTerm: string = '';
 
   showModal: boolean = false;
-  showExportConfirm: boolean = false;
   isEditing: boolean = false;
+  isGeneratingPDF: boolean = false;
+  todayDate: string = new Date().toLocaleDateString();
 
   formData: any = this.getEmptyForm();
 
   constructor(
     private location: Location,
-
-    private authService: AuthService // Inject AuthService
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
     this.loadInventory();
   }
 
-  // --- NEW: Load real data from DB ---
   loadInventory() {
     this.authService.getInventory().subscribe({
       next: (data) => {
-        this.assets = data;
-        this.filterAssets(); // Instantly apply any selected filters
+        this.assets = data.map((d:any) => ({
+          ...d,
+          personInCharge: d.personInCharge || d.person_in_charge || 'Unassigned',
+          picInitials: d.picInitials || d.pic_initials || 'UA'
+        }));
+        this.filterAssets();
       },
       error: (err) => console.error('Failed to load inventory', err)
     });
   }
 
-  goBack() {
-    this.location.back();
-  }
+  goBack() { this.location.back(); }
 
   get totalAssetsCount() { return this.assets.reduce((sum, item) => sum + item.quantity, 0); }
   get lowStockCount() { return this.assets.filter(item => item.quantity < 5).length; }
@@ -97,28 +98,27 @@ export class InventoryComponent implements OnInit {
       alert('No assets to export.');
       return;
     }
-    this.showExportConfirm = true;
-  }
 
-  confirmDownload() {
-    this.showExportConfirm = false;
-    const doc = new jsPDF();
-    doc.setFontSize(18);
-    const title = this.selectedFilter === 'All Categories' ? 'Inventory Report' : `${this.selectedFilter} Inventory`;
-    doc.text(title, 14, 22);
+    this.isGeneratingPDF = true;
+    setTimeout(() => {
+      const element = document.getElementById('formal-inventory-pdf');
+      if (element) {
+        html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
 
-    const tableBody = this.filteredAssets.map(item => [
-      item.name, item.category, item.quantity.toString(), item.status, `RM ${item.value}`, item.personInCharge
-    ]);
-
-    autoTable(doc, {
-      head: [['Asset Name', 'Category', 'Qty', 'Status', 'Unit Value', 'PIC']],
-      body: tableBody,
-      startY: 44,
-      theme: 'grid',
-      headStyles: { fillColor: [48, 232, 122], textColor: [14, 27, 19] },
-    });
-    doc.save('Inventory_Report.pdf');
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          pdf.save(`Inventory_Report_${this.selectedFilter.replace(/\s+/g, '_')}.pdf`);
+          this.isGeneratingPDF = false;
+        }).catch(err => {
+          console.error(err);
+          alert('Failed to generate PDF.');
+          this.isGeneratingPDF = false;
+        });
+      }
+    }, 200);
   }
 
   getEmptyForm() {
@@ -143,11 +143,8 @@ export class InventoryComponent implements OnInit {
     this.showModal = true;
   }
 
-  closeModal() {
-    this.showModal = false;
-  }
+  closeModal() { this.showModal = false; }
 
-  // --- UPDATED: Submits directly to the Database ---
   submitForm() {
     if (!this.formData.name || !this.formData.personInCharge) {
       alert('Please fill in required fields.');
@@ -171,7 +168,7 @@ export class InventoryComponent implements OnInit {
       const payload = { ...this.formData, category: finalCategory, status: status };
       this.authService.updateInventory(this.formData.id, payload).subscribe({
         next: () => {
-          this.loadInventory(); // Refresh from DB
+          this.loadInventory();
           this.closeModal();
           alert('Asset updated successfully!');
         },
@@ -179,7 +176,7 @@ export class InventoryComponent implements OnInit {
       });
     } else {
       const newAsset: Asset = {
-        id: `AS-2025-${Math.floor(Math.random() * 10000)}`, // Generates unique ID
+        id: `AS-2025-${Math.floor(Math.random() * 10000)}`,
         name: this.formData.name,
         category: finalCategory,
         quantity: this.formData.quantity,
@@ -193,7 +190,7 @@ export class InventoryComponent implements OnInit {
 
       this.authService.addInventory(newAsset).subscribe({
         next: () => {
-          this.loadInventory(); // Refresh from DB
+          this.loadInventory();
           this.closeModal();
           alert('New asset added successfully!');
         },
@@ -202,11 +199,10 @@ export class InventoryComponent implements OnInit {
     }
   }
 
-  // --- UPDATED: Deletes directly from the Database ---
   deleteAsset(id: string) {
     if(confirm('Delete this asset permanently?')) {
       this.authService.deleteInventory(id).subscribe({
-        next: () => this.loadInventory(), // Refresh from DB
+        next: () => this.loadInventory(),
         error: () => alert('Failed to delete asset.')
       });
     }

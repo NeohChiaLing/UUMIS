@@ -26,7 +26,6 @@ export class SubjectsComponent implements OnInit {
 
   categories = ['Languages', 'Core Sciences', 'Arts & Humanities', 'Humanities', 'Others'];
 
-  // --- NEW: Level & Year Data ---
   academicLevels = ['Kindergarten', 'Primary', 'Lower Secondary', 'Upper Secondary', 'KAFA'];
 
   getYearsForLevel(level: string): string[] {
@@ -40,7 +39,6 @@ export class SubjectsComponent implements OnInit {
 
   subjects: any[] = [];
 
-  // Used as fallback if DB is empty
   defaultSubjects = [
     { name: 'English & English as A Second Language', code: 'ENG-101', category: 'Languages', level: 'Primary', yearGroup: 'Year 1', active: true, isEditing: false, icon: 'translate' },
     { name: 'Mathematics', code: 'MATH-101', category: 'Core Sciences', level: 'Primary', yearGroup: 'Year 1', active: true, isEditing: false, icon: 'calculate' },
@@ -59,7 +57,12 @@ export class SubjectsComponent implements OnInit {
         if (data.length === 0) {
           this.subjects = JSON.parse(JSON.stringify(this.defaultSubjects));
         } else {
-          this.subjects = data.map(item => ({ ...item, isEditing: false }));
+          // THE FIX: Map year_group from the database directly to yearGroup in Angular!
+          this.subjects = data.map(item => ({
+            ...item,
+            yearGroup: item.year_group || item.yearGroup || '',
+            isEditing: false
+          }));
         }
       },
       error: (err) => console.error('Failed to load subjects', err)
@@ -86,7 +89,7 @@ export class SubjectsComponent implements OnInit {
 
   selectIcon(subject: any, icon: string) {
     subject.icon = icon;
-    this.showIconPickerIndex = null; // Close picker after selection
+    this.showIconPickerIndex = null;
   }
 
   deleteSubject(index: number, subject: any) {
@@ -105,14 +108,13 @@ export class SubjectsComponent implements OnInit {
   saveAll() {
     this.subjects.forEach(s => s.isEditing = false);
 
-    // Payload now includes level and yearGroup for the backend
     const payload = this.subjects.map(s => ({
       id: s.id,
       name: s.name,
       code: s.code,
       category: s.category,
-      level: s.level,           // Saved for Assignments
-      yearGroup: s.yearGroup,   // Saved for Assignments
+      level: s.level,
+      yearGroup: s.yearGroup,
       active: s.active,
       icon: s.icon
     }));

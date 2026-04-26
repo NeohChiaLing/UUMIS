@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -14,9 +15,13 @@ export class UserProfileComponent implements OnInit {
 
   user: any = {};
   isEditMode: boolean = false;
-  isStudent: boolean = false; // THE FIX: Added a flag to track if they are a student
+  isStudent: boolean = false;
 
-  constructor(private location: Location, private authService: AuthService) {}
+  constructor(
+    private location: Location,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.loadRealUser();
@@ -26,9 +31,17 @@ export class UserProfileComponent implements OnInit {
     const userStr = localStorage.getItem('user');
     if (userStr) {
       const storedUser = JSON.parse(userStr);
-
-      // THE FIX: Check if the user's role is exactly 'student'
       const rawRole = storedUser.role ? storedUser.role.toLowerCase().trim() : '';
+
+      // If a Teacher or Staff member accidentally lands here, immediately redirect them to their proper tabbed profile!
+      if (rawRole === 'teacher') {
+        this.router.navigate(['/dashboard/teacher/profile'], { replaceUrl: true });
+        return;
+      } else if (['admin', 'staff', 'financial_manager', 'register_manager'].includes(rawRole)) {
+        this.router.navigate(['/dashboard/staff/profile'], { replaceUrl: true });
+        return;
+      }
+
       this.isStudent = rawRole === 'student';
 
       this.user = {
@@ -98,7 +111,6 @@ export class UserProfileComponent implements OnInit {
   }
 
   triggerFileInput() {
-    // THE FIX: Prevent file input click if they are a student!
     if (this.isEditMode && !this.isStudent) {
       document.getElementById('avatarInput')?.click();
     }

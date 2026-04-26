@@ -306,7 +306,9 @@ export class AuthService {
   getActiveDiscounts() { return this.http.get<any[]>(`${this.apiUrl}/discounts/active`); }
   createDiscount(payload: any) { return this.http.post(`${this.apiUrl}/discounts`, payload); }
   updateDiscount(id: number, payload: any) { return this.http.put(`${this.apiUrl}/discounts/${id}`, payload); }
-
+  deleteDiscount(id: number) {
+    return this.http.delete(`${this.apiUrl}/discounts/${id}`);
+  }
   // --- WALLET APIs ---
   getWalletData(studentId: number) { return this.http.get<any>(`${this.apiUrl}/wallet/student/${studentId}`); }
   addWalletTransaction(studentId: number, payload: any) { return this.http.post<any>(`${this.apiUrl}/wallet/student/${studentId}/transaction`, payload); }
@@ -348,5 +350,9 @@ export class AuthService {
   }
   deleteFoodOrder(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/food/orders/${id}`);
+  }
+
+  inviteUser(email: string, role: string) {
+    return this.http.post(`${this.apiUrl}/users/invite`, { email, role });
   }
 }

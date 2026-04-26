@@ -1,20 +1,5 @@
 <div class="flex flex-col h-full bg-[#f8fcfa] font-display text-slate-800 overflow-hidden relative">
 
-  <div *ngIf="showExportConfirm" class="fixed inset-0 z-[110] flex items-center justify-center bg-black/30 backdrop-blur-sm p-6 animate-fade-in">
-    <div class="bg-white w-full max-w-sm p-8 rounded-[2rem] shadow-2xl text-center space-y-6">
-      <div class="size-16 rounded-full bg-red-50 text-red-500 flex items-center justify-center mx-auto">
-        <span translate="no" class="material-symbols-outlined notranslate text-3xl">picture_as_pdf</span>
-      </div>
-      <div>
-        <h4 class="text-xl font-black text-slate-900 uppercase">Confirm Export?</h4>
-      </div>
-      <div class="flex gap-3">
-        <button (click)="showExportConfirm = false" class="flex-1 py-3 bg-gray-100 text-gray-500 font-bold rounded-xl hover:bg-gray-200 transition-colors">Cancel</button>
-        <button (click)="confirmDownload()" class="flex-1 py-3 bg-red-500 text-white font-bold rounded-xl shadow-lg hover:bg-red-600 transition-colors">Yes, Download</button>
-      </div>
-    </div>
-  </div>
-
   <div *ngIf="showModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-fade-in">
     <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 flex flex-col gap-5">
       <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -74,12 +59,6 @@
         <span class="font-bold text-slate-900">Inventory</span>
       </div>
     </div>
-    <div class="flex items-center gap-3">
-      <button class="relative flex size-10 items-center justify-center rounded-full bg-white border border-slate-200 text-slate-600 hover:bg-slate-50 transition-colors">
-        <span translate="no" class="material-symbols-outlined notranslate text-[20px]">notifications</span>
-        <span class="absolute right-2 top-2 size-2 rounded-full bg-red-500 ring-2 ring-white"></span>
-      </button>
-    </div>
   </header>
 
   <div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
@@ -91,9 +70,10 @@
           <p class="text-slate-500 mt-1 font-medium text-sm">Manage school assets and supplies.</p>
         </div>
         <div class="flex gap-3">
-          <button (click)="initiateExport()" class="group inline-flex items-center justify-center gap-2 rounded-xl bg-white border border-slate-200 px-5 py-3 text-sm font-bold text-slate-600 transition-all hover:bg-red-50 hover:text-red-500 hover:border-red-100 shadow-sm">
-            <span translate="no" class="material-symbols-outlined notranslate text-[20px]">picture_as_pdf</span>
-            <span>Export PDF</span>
+          <button (click)="initiateExport()" [disabled]="isGeneratingPDF" class="group inline-flex items-center justify-center gap-2 rounded-xl bg-white border border-slate-200 px-5 py-3 text-sm font-bold text-slate-600 transition-all hover:bg-red-50 hover:text-red-500 hover:border-red-100 shadow-sm disabled:opacity-50">
+            <span *ngIf="isGeneratingPDF" translate="no" class="material-symbols-outlined notranslate text-[20px] animate-spin">progress_activity</span>
+            <span *ngIf="!isGeneratingPDF" translate="no" class="material-symbols-outlined notranslate text-[20px]">picture_as_pdf</span>
+            <span>{{ isGeneratingPDF ? 'Generating...' : 'Export PDF' }}</span>
           </button>
           <button (click)="openAddModal()" class="group inline-flex items-center justify-center gap-2 rounded-xl bg-[#30e87a] px-5 py-3 text-sm font-black text-slate-900 transition-all hover:bg-[#25d06b] active:scale-95 shadow-md shadow-green-200">
             <span translate="no" class="material-symbols-outlined notranslate text-[20px]">add</span>
@@ -165,7 +145,7 @@
             <tr *ngFor="let item of filteredAssets" class="group hover:bg-green-50/30 transition-colors">
               <td class="px-6 py-4">
                 <div class="flex items-center gap-4">
-                  <div class="flex size-11 shrink-0 items-center justify-center rounded-xl {{item.color}}"><span translate="no" class="material-symbols-outlined notranslate">{{ item.icon }}</span></div>
+                  <div class="flex size-11 shrink-0 items-center justify-center rounded-xl {{item.color}}"><span translate="no" class="material-symbols-outlined notranslate">{{ item.icon || 'inventory_2' }}</span></div>
                   <div class="flex flex-col"><span class="font-bold text-slate-800">{{ item.name }}</span><span class="text-[10px] font-mono text-slate-400 mt-0.5">ID: {{ item.id }}</span></div>
                 </div>
               </td>
@@ -202,6 +182,78 @@
           </table>
         </div>
 
+      </div>
+    </div>
+  </div>
+
+  <div id="formal-inventory-pdf" class="absolute top-0 left-[-9999px] w-[800px] bg-white text-black p-12 font-sans z-[-1]">
+    <div class="flex items-center border-b-[3px] border-emerald-800 pb-6 mb-8">
+      <div class="w-24 h-24 mr-6 flex-shrink-0 bg-white p-2 border-2 border-emerald-800 rounded-xl flex items-center justify-center">
+        <img src="assets/UUMIS-Logo.jpg" alt="UUMIS Logo" class="w-full h-full object-contain">
+      </div>
+      <div class="flex-1">
+        <h1 class="text-3xl font-black uppercase tracking-widest text-emerald-900 m-0">UUMIS International School</h1>
+        <p class="text-sm font-bold text-gray-800 mt-1">Universiti Utara Malaysia, 06010 UUM Sintok, Kedah Darul Aman.</p>
+        <p class="text-xs text-gray-600 mt-0.5">Phone: +60 4-928 4000 | Email: admin@uumis.edu.my | Portal: www.uumis.com.my</p>
+      </div>
+      <div class="text-right border-l-2 border-gray-200 pl-6 ml-4">
+        <p class="text-lg font-black text-gray-800 uppercase tracking-widest">Official Record</p>
+        <p class="text-xs text-gray-500 font-bold mt-1">Inventory Report</p>
+      </div>
+    </div>
+
+    <h2 class="text-center text-xl font-black uppercase tracking-widest bg-gray-100 py-2 mb-6 border border-gray-300">Asset & Supply Registry</h2>
+
+    <table class="w-full text-sm border-collapse mb-6">
+      <tbody>
+      <tr>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-2 w-1/4 uppercase text-[10px] tracking-widest">Category Filter</td>
+        <td class="border border-gray-300 p-2 font-bold text-base" colspan="3">{{ selectedFilter }}</td>
+      </tr>
+      <tr>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-2 w-1/4 uppercase text-[10px] tracking-widest">Date Issued</td>
+        <td class="border border-gray-300 p-2 w-1/4">{{ todayDate }}</td>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-2 w-1/4 uppercase text-[10px] tracking-widest">Total Valuation</td>
+        <td class="border border-gray-300 p-2 w-1/4 font-bold text-blue-600">RM {{ totalValue | number }}</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <table class="w-full text-sm border-collapse mb-8">
+      <thead>
+      <tr class="bg-gray-100">
+        <th class="border border-gray-300 p-2 text-[10px] uppercase tracking-widest text-left">Asset Name & ID</th>
+        <th class="border border-gray-300 p-2 text-[10px] uppercase tracking-widest text-left">Category</th>
+        <th class="border border-gray-300 p-2 text-[10px] uppercase tracking-widest text-center">Qty</th>
+        <th class="border border-gray-300 p-2 text-[10px] uppercase tracking-widest text-center">Unit Value</th>
+        <th class="border border-gray-300 p-2 text-[10px] uppercase tracking-widest text-right">Status</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let item of filteredAssets">
+        <td class="border border-gray-300 p-2">
+          <span class="font-bold">{{ item.name }}</span><br>
+          <span class="text-xs text-gray-500 font-mono">{{ item.id }}</span>
+        </td>
+        <td class="border border-gray-300 p-2 font-bold uppercase">{{ item.category }}</td>
+        <td class="border border-gray-300 p-2 text-center">{{ item.quantity }}</td>
+        <td class="border border-gray-300 p-2 text-center font-mono">RM {{ item.value }}</td>
+        <td class="border border-gray-300 p-2 text-right font-bold uppercase"
+            [ngClass]="{'text-green-600': item.status === 'In Stock', 'text-red-500': item.status !== 'In Stock'}">
+          {{ item.status }}
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <div class="flex justify-between items-end mt-12 pt-8">
+      <div class="text-center">
+        <div class="border-b border-gray-800 w-48 mb-2 mx-auto"></div>
+        <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Asset Manager Signature</p>
+      </div>
+      <div class="text-center">
+        <div class="border-b border-gray-800 w-48 mb-2 mx-auto"></div>
+        <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Administrator Approval</p>
       </div>
     </div>
   </div>

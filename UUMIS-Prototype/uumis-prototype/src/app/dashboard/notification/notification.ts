@@ -3,6 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import html2canvas from 'html2canvas'; // Added html2canvas!
 import { AuthService } from '../../services/auth.service';
 
 interface NotificationHistory {
@@ -17,13 +18,13 @@ interface NotificationHistory {
   failedCount?: number;
   totalCount?: number;
   isUrgent?: boolean;
-  // Separate variables for Dual Attachments
   docName?: string;
   docData?: string;
   docType?: string;
   imageName?: string;
   imageData?: string;
   imageType?: string;
+  selected?: boolean;
 }
 
 interface QuickTemplate {
@@ -51,6 +52,7 @@ export class NotificationComponent implements OnInit {
 
   currentView: 'compose' | 'history' = 'compose';
   showTemplateModal: boolean = false;
+  selectAll: boolean = false;
 
   formData = {
     title: '',
@@ -71,6 +73,10 @@ export class NotificationComponent implements OnInit {
   historyList: NotificationHistory[] = [];
   filteredHistory: NotificationHistory[] = [];
   searchTerm: string = '';
+
+  // Used for rendering the formal PDF
+  selectedItemForPdf: NotificationHistory | null = null;
+  isGeneratingPDF: boolean = false;
 
   templates: QuickTemplate[] = [
     { id: 1, title: 'Event Reminder', subject: 'Upcoming School Event', body: 'Dear Parents, this is a reminder about the upcoming event on [Date].', icon: 'event', colorClass: 'text-blue-500 bg-blue-100' },
@@ -99,24 +105,22 @@ export class NotificationComponent implements OnInit {
   triggerFileInput(inputId: string) { document.getElementById(inputId)?.click(); }
   saveDraft() { alert('Draft saved successfully! You can continue editing later.'); }
   applyTemplate(tpl: QuickTemplate) { this.formData.title = tpl.subject; this.formData.message = tpl.body; }
-  retryFailed(id: number) { alert(`Retrying to send message #${id}...`); }
 
-  // Only ONE onFileSelected method now! Handled via 'doc' or 'image'
   onFileSelected(event: any, fileType: 'doc' | 'image') {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = () => {
-        const base64String = (reader.result as string).split(',')[1];
+        const fullDataURI = reader.result as string;
 
         if (fileType === 'doc') {
           this.formData.docName = file.name;
           this.formData.docType = file.type;
-          this.formData.docData = base64String;
+          this.formData.docData = fullDataURI;
         } else {
           this.formData.imageName = file.name;
           this.formData.imageType = file.type;
-          this.formData.imageData = base64String;
+          this.formData.imageData = fullDataURI;
         }
       };
       reader.readAsDataURL(file);
@@ -161,10 +165,46 @@ export class NotificationComponent implements OnInit {
 
   filterHistory() {
     const term = this.searchTerm.toLowerCase();
-    // Added explicit type to prevent TS implicit any error
     this.filteredHistory = this.historyList.filter((item: NotificationHistory) =>
       item.subject.toLowerCase().includes(term) || item.preview.toLowerCase().includes(term) || item.recipient.toLowerCase().includes(term)
     );
+    this.checkSelection();
+  }
+
+  get hasSelectedItems(): boolean { return this.filteredHistory.some(i => i.selected); }
+  toggleSelectAll() { this.filteredHistory.forEach(item => item.selected = this.selectAll); }
+  checkSelection() { this.selectAll = this.filteredHistory.length > 0 && this.filteredHistory.every(item => item.selected); }
+
+  deleteSelected() {
+    const selectedIds = this.filteredHistory.filter(i => i.selected).map(i => i.id);
+    if (selectedIds.length === 0) return;
+
+    if (confirm(`Are you sure you want to permanently delete ${selectedIds.length} notifications?`)) {
+      this.historyList = this.historyList.filter(item => !selectedIds.includes(item.id));
+      this.filterHistory();
+      this.selectAll = false;
+      selectedIds.forEach(id => {
+        try { fetch(`/api/notifications/${id}`, { method: 'DELETE' }); } catch(e) {}
+      });
+    }
+  }
+
+  deleteSingleItem(item: NotificationHistory) {
+    if (confirm(`Are you sure you want to delete the message: "${item.subject}"?`)) {
+      this.historyList = this.historyList.filter(i => i.id !== item.id);
+      this.filterHistory();
+      try { fetch(`/api/notifications/${item.id}`, { method: 'DELETE' }); } catch(e) {}
+    }
+  }
+
+  // --- NEW: Download Attachment directly to computer ---
+  downloadAttachment(dataUri: string, fileName: string) {
+    const link = document.createElement('a');
+    link.href = dataUri;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
   downloadFullReport() {
@@ -172,7 +212,6 @@ export class NotificationComponent implements OnInit {
     doc.setFontSize(18); doc.text('Notification History Report', 14, 22);
     doc.setFontSize(11); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 30);
 
-    // Explicitly typing 'i'
     const tableBody = this.filteredHistory.map((i: NotificationHistory) => [i.subject, i.recipient, i.category, `${i.date} ${i.time}`, i.status]);
 
     autoTable(doc, {
@@ -183,59 +222,42 @@ export class NotificationComponent implements OnInit {
     doc.save('Notification_History.pdf');
   }
 
+  // --- REWRITTEN: Beautiful Formal PDF Generator ---
   downloadSingleItem(item: NotificationHistory) {
-    const doc = new jsPDF();
-    doc.setFontSize(22);
-    doc.setTextColor(14, 27, 19);
-    doc.text('Message Details', 14, 25);
-    doc.setLineWidth(0.5);
-    doc.line(14, 30, 196, 30);
-    doc.setFontSize(12);
-    doc.setTextColor(50);
+    this.selectedItemForPdf = item;
+    this.isGeneratingPDF = true;
 
-    let y = 45;
-    const lineHeight = 10;
+    // Give Angular a tiny moment to render the hidden HTML template
+    setTimeout(() => {
+      const element = document.getElementById('formal-notification-pdf');
+      if (element) {
+        html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = pdf.internal.pageSize.getHeight();
 
-    doc.setFont('helvetica', 'bold'); doc.text(`Subject:`, 14, y); doc.setFont('helvetica', 'normal'); doc.text(item.subject, 50, y); y += lineHeight;
-    doc.setFont('helvetica', 'bold'); doc.text(`Date Sent:`, 14, y); doc.setFont('helvetica', 'normal'); doc.text(`${item.date} at ${item.time}`, 50, y); y += lineHeight;
-    doc.setFont('helvetica', 'bold'); doc.text(`Recipient:`, 14, y); doc.setFont('helvetica', 'normal'); doc.text(item.recipient, 50, y); y += lineHeight;
-    doc.setFont('helvetica', 'bold'); doc.text(`Category:`, 14, y); doc.setFont('helvetica', 'normal'); doc.text(item.category, 50, y); y += lineHeight;
-    doc.setFont('helvetica', 'bold'); doc.text(`Status:`, 14, y); doc.setFont('helvetica', 'normal'); doc.text(item.status, 50, y); y += 15;
+          let imgWidth = pdfWidth;
+          let imgHeight = (canvas.height * pdfWidth) / canvas.width;
 
-    doc.setLineWidth(0.2); doc.line(14, y, 196, y); y += 10;
-    doc.setFont('helvetica', 'bold'); doc.text(`Message Body:`, 14, y); y += 8;
-    doc.setFont('helvetica', 'normal');
+          if (imgHeight > pdfHeight) {
+            const scaleRatio = pdfHeight / imgHeight;
+            imgWidth = imgWidth * scaleRatio;
+            imgHeight = imgHeight * scaleRatio;
+          }
 
-    const splitText = doc.splitTextToSize(item.preview, 180);
-    doc.text(splitText, 14, y);
+          pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+          pdf.save(`Notice_${item.id}_${item.subject.replace(/\s+/g, '_')}.pdf`);
 
-    y += (splitText.length * 7) + 10;
-
-    // Output Document Name if it exists
-    if (item.docName) {
-      doc.setFont('helvetica', 'bold');
-      doc.text(`Attached Document:`, 14, y);
-      doc.setFont('helvetica', 'normal');
-      doc.text(item.docName, 55, y);
-      y += 10;
-    }
-
-    // Output Image if it exists
-    if (item.imageName && item.imageData) {
-      doc.setFont('helvetica', 'bold');
-      doc.text(`Attached Image:`, 14, y);
-      doc.setFont('helvetica', 'normal');
-      doc.text(item.imageName, 50, y);
-      y += 10;
-
-      try {
-        let imgFormat = (item.imageType && item.imageType.includes('png')) ? 'PNG' : 'JPEG';
-        doc.addImage(item.imageData, imgFormat, 14, y, 100, 100);
-      } catch (e) {
-        console.error('Could not embed image into PDF', e);
+          this.isGeneratingPDF = false;
+          this.selectedItemForPdf = null;
+        }).catch(err => {
+          console.error('PDF Generation Error:', err);
+          alert('Failed to generate PDF.');
+          this.isGeneratingPDF = false;
+          this.selectedItemForPdf = null;
+        });
       }
-    }
-
-    doc.save(`Message_${item.id}.pdf`);
+    }, 200);
   }
 }

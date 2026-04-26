@@ -4,8 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 import autoTable from 'jspdf-autotable';
-import { AuthService } from '../../../services/auth.service'; // Verify path
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-attendance',
@@ -18,7 +19,7 @@ export class AttendanceComponent implements OnInit {
   years = ['Pre-Kindergarten', 'Kindergarten', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6', 'Year 7', 'Year 8', 'Year 9', 'Year 10', 'Year 11'];
   timePeriods = ['Day', 'Month', 'Year'];
 
-  selectedYear: string = 'Kindergarten';
+  selectedYear: string = 'Year 1'; // THE FIX: Changed default to Year 1 based on your screenshots
   selectedPeriod: string = 'Day';
   selectedDate: string = new Date().toISOString().split('T')[0];
   selectedMonth: string = new Date().toISOString().slice(0, 7);
@@ -28,7 +29,7 @@ export class AttendanceComponent implements OnInit {
   isAddingStudent: boolean = false;
   showMCConfirm: boolean = false;
   isViewingMC: boolean = false;
-  currentMCUrl: SafeResourceUrl | null = null;
+  currentMCUrl: SafeResourceUrl | string = '';
   clickedStudent: any = null;
 
   newStudent = { name: '', id: '' };
@@ -36,9 +37,11 @@ export class AttendanceComponent implements OnInit {
   allStudents: any[] = [];
   filteredStudents: any[] = [];
 
+  isGeneratingPDF: boolean = false;
+
   constructor(
     private router: Router,
-    private sanitizer: DomSanitizer,
+    public sanitizer: DomSanitizer,
     private location: Location,
     private authService: AuthService
   ) {}
@@ -51,46 +54,43 @@ export class AttendanceComponent implements OnInit {
     this.location.back();
   }
 
-  // --- DYNAMIC STATS ---
-  get totalPresent() { return this.filteredStudents.filter(s => s.status === 'Present').length; }
-  get totalAbsent() { return this.filteredStudents.filter(s => s.status === 'Absent').length; }
-  get totalLate() { return this.filteredStudents.filter(s => s.status === 'Late').length; }
+  get totalPresent() { return this.filteredStudents.filter(s => s.status.toUpperCase() === 'PRESENT').length; }
+  get totalAbsent() { return this.filteredStudents.filter(s => s.status.toUpperCase() === 'ABSENT').length; }
+  get totalLate() { return this.filteredStudents.filter(s => s.status.toUpperCase() === 'LATE').length; }
 
-  // --- 1. Fetch Students & DB Attendance ---
   loadData() {
-    // Get all users from Database
+    let targetDate = this.selectedDate;
+    if (this.selectedPeriod === 'Month') targetDate = this.selectedMonth;
+    if (this.selectedPeriod === 'Year') targetDate = this.selectedYearVal;
+
     this.authService.getUsers().subscribe({
       next: (users) => {
-        // Filter students by selected Year Group
         const yearStudents = users.filter((u: any) => {
           if ((u.role || '').toLowerCase() !== 'student' || !u.bio || u.bio === 'Unassigned') return false;
 
-          const parts = u.bio.split(' - ');
+          // THE FIX: Bulletproof fuzzy logic for matching class years!
+          const bioSafe = u.bio.toLowerCase();
+          const targetSafe = this.selectedYear.toLowerCase();
 
-          // FIX: Only extract the specific Year Group (the right side of the dash)
-          const stuYear = parts.length > 1 ? parts[1].trim().toLowerCase() : parts[0].trim().toLowerCase();
-          const targetYear = this.selectedYear.toLowerCase();
-
-          // FIX: Only match the exact Year Group! No more matching the broad Academic Level.
-          return stuYear === targetYear;
+          return bioSafe.includes(targetSafe);
         });
 
-        // Get Attendance Records for the specific Date
-        this.authService.getAttendance(this.selectedYear, this.selectedDate).subscribe({
+        this.authService.getAttendance(this.selectedYear, targetDate).subscribe({
           next: (attendanceRecords) => {
 
-            // Merge the DB Students with their Attendance Status
             this.allStudents = yearStudents.map((stu: any) => {
-              const record = attendanceRecords.find(r => r.studentId === stu.username);
+              const uniqueId = stu.student_id || stu.studentId || stu.username || stu.email || stu.id.toString();
+              const record = attendanceRecords.find(r => r.student_id === uniqueId || r.studentId === uniqueId);
+
               return {
                 dbId: record ? record.id : null,
-                id: stu.username,
-                name: stu.fullName || stu.username,
+                id: uniqueId,
+                name: stu.fullName || stu.username || 'Unknown Student',
                 class: this.selectedYear,
-                timeIn: record ? record.timeIn : '--:--',
-                status: record ? record.status : 'Absent', // Default if no record
-                mcFile: record ? record.mcFile : null,
-                mcUrl: record ? record.mcUrl : null
+                timeIn: record ? (record.time_in || record.timeIn || '--:--') : '--:--',
+                status: record ? String(record.status).toUpperCase() : 'ABSENT',
+                mcFile: record ? (record.mc_file || record.mcFile) : null,
+                mcUrl: record ? (record.mc_url || record.mcUrl) : null
               };
             });
 
@@ -101,7 +101,6 @@ export class AttendanceComponent implements OnInit {
     });
   }
 
-  // 2. Filter Search Box
   filterStudents() {
     this.filteredStudents = this.allStudents.filter(s => {
       const matchSearch = this.searchQuery ? (s.name.toLowerCase().includes(this.searchQuery.toLowerCase()) || s.id.toLowerCase().includes(this.searchQuery.toLowerCase())) : true;
@@ -110,29 +109,27 @@ export class AttendanceComponent implements OnInit {
   }
 
   toggleStatus(student: any) {
-    if (student.status === 'Present') {
-      student.status = 'Absent';
-      student.timeIn = '--:--';
-    } else if (student.status === 'Absent') {
-      student.status = 'Late';
-      // Auto set time to current time
-      student.timeIn = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const statuses = ['PRESENT', 'ABSENT', 'LATE'];
+    let idx = statuses.indexOf(student.status.toUpperCase());
+    student.status = statuses[(idx + 1) % statuses.length];
+
+    if (student.status === 'PRESENT' || student.status === 'LATE') {
+      student.timeIn = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
     } else {
-      student.status = 'Present';
-      student.timeIn = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      student.timeIn = '--:--';
     }
   }
 
   handleMC(student: any) {
-    if (student.mcFile) {
+    if (student.mcUrl) {
       this.clickedStudent = student;
+      this.currentMCUrl = student.mcUrl;
       this.showMCConfirm = true;
     } else {
       this.uploadMC(student);
     }
   }
 
-  // Uses FileReader to create a Base64 string for the DB
   uploadMC(student: any) {
     const input = document.createElement('input');
     input.type = 'file';
@@ -143,7 +140,8 @@ export class AttendanceComponent implements OnInit {
         student.mcFile = file.name;
         const reader = new FileReader();
         reader.onload = (event: any) => {
-          student.mcUrl = event.target.result; // This is the Base64 String
+          student.mcUrl = event.target.result;
+          student.status = 'ABSENT';
         };
         reader.readAsDataURL(file);
       }
@@ -152,18 +150,17 @@ export class AttendanceComponent implements OnInit {
   }
 
   previewMC() {
-    if (this.clickedStudent?.mcUrl) {
-      this.currentMCUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.clickedStudent.mcUrl);
+    if (this.currentMCUrl) {
       this.isViewingMC = true;
       this.showMCConfirm = false;
     }
   }
 
   downloadMC() {
-    if (this.clickedStudent?.mcUrl) {
+    if (this.currentMCUrl) {
       const a = document.createElement('a');
-      a.href = this.clickedStudent.mcUrl;
-      a.download = this.clickedStudent.mcFile;
+      a.href = this.currentMCUrl as string;
+      a.download = `MC_${this.clickedStudent.name}.pdf`;
       a.click();
       this.showMCConfirm = false;
     }
@@ -180,8 +177,8 @@ export class AttendanceComponent implements OnInit {
       id: this.newStudent.id,
       name: this.newStudent.name,
       class: this.selectedYear,
-      timeIn: '--:--',
-      status: 'Absent',
+      timeIn: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
+      status: 'PRESENT',
       mcFile: null,
       mcUrl: null
     });
@@ -199,27 +196,16 @@ export class AttendanceComponent implements OnInit {
     }
   }
 
-  exportToPDF() {
-    const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text(`Attendance Report: ${this.selectedYear}`, 14, 20);
-    doc.setFontSize(12);
-    doc.text(`Date: ${this.selectedDate}`, 14, 30);
-    autoTable(doc, {
-      startY: 40,
-      head: [['No.', 'Student Name', 'ID', 'Time In', 'Status']],
-      body: this.filteredStudents.map((s, i) => [i + 1, s.name, s.id, s.timeIn, s.status])
-    });
-    doc.save(`Attendance_${this.selectedYear}_${this.selectedDate}.pdf`);
-  }
-
-  // --- SUBMIT TO DATABASE ---
   submitChanges() {
+    let targetDate = this.selectedDate;
+    if (this.selectedPeriod === 'Month') targetDate = this.selectedMonth;
+    if (this.selectedPeriod === 'Year') targetDate = this.selectedYearVal;
+
     const payload = this.allStudents.map(s => ({
       studentId: s.id,
       studentName: s.name,
       yearGroup: this.selectedYear,
-      date: this.selectedDate,
+      date: targetDate,
       timeIn: s.timeIn,
       status: s.status,
       mcFile: s.mcFile,
@@ -229,9 +215,37 @@ export class AttendanceComponent implements OnInit {
     this.authService.saveAttendance(payload).subscribe({
       next: () => {
         alert('Attendance Records Saved to Database!');
-        this.loadData(); // Refresh to map the database ID's
+        this.loadData();
       },
       error: () => alert('Failed to save attendance.')
     });
+  }
+
+  exportToPDF() {
+    if (this.filteredStudents.length === 0) {
+      alert("Please load a class roster first.");
+      return;
+    }
+
+    this.isGeneratingPDF = true;
+    setTimeout(() => {
+      const element = document.getElementById('formal-attendance-pdf');
+      if (element) {
+        html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          pdf.save(`Attendance_Report_${this.selectedYear.replace(/\s+/g, '_')}_${this.selectedDate}.pdf`);
+          this.isGeneratingPDF = false;
+        }).catch(err => {
+          console.error(err);
+          alert('Failed to generate PDF.');
+          this.isGeneratingPDF = false;
+        });
+      }
+    }, 200);
   }
 }

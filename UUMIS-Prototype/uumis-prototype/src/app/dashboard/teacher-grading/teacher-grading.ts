@@ -3,7 +3,7 @@ import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import html2canvas from 'html2canvas';
 import { AuthService } from '../../services/auth.service';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -29,8 +29,14 @@ export class TeacherGradingComponent implements OnInit {
 
   showReportModal: boolean = false;
   selectedStudentForReport: any = null;
-  studentFullGrades: any[] = [];
+
+  // THE FIX: Split grades into main subjects and tasks
+  modalMainGrades: any[] = [];
+  modalTaskGrades: any[] = [];
   isFetchingReport: boolean = false;
+
+  isGeneratingPDF: boolean = false;
+  todayDate: string = new Date().toLocaleDateString();
 
   constructor(private router: Router, private location: Location, private authService: AuthService) {}
 
@@ -38,21 +44,22 @@ export class TeacherGradingComponent implements OnInit {
     const localUser = this.authService.getCurrentUser();
     if (!localUser) return;
 
-    this.authService.getUsers().subscribe({
-      next: (users: any[]) => {
-        const myFreshProfile = users.find(u => u.id === localUser.id || (u.email && u.email === localUser.email));
+    this.authService.getTeachers().subscribe({
+      next: (teachers: any[]) => {
+        const myFreshProfile = teachers.find(t => t.username === localUser.username || t.email === localUser.email);
 
         if (myFreshProfile) {
           const bio = myFreshProfile.bio || '';
-          const classList = bio ? bio.split(',').map((s: string) => s.trim()) : [];
+          const classList = bio && bio !== 'Unassigned' ? bio.split(',').map((s: string) => s.trim()) : [];
 
           this.years = classList.map((c: string) => {
             const parts = c.includes(' - ') ? c.split(' - ') : c.split('-');
             return parts.length > 1 ? parts[1].trim() : parts[0].trim();
           }).filter((y: string) => y !== 'Unassigned' && y !== '');
 
-          this.teacherAllowedSubjects = myFreshProfile.assignedSubjects
-            ? myFreshProfile.assignedSubjects.split(',').map((s: string) => s.trim())
+          const assignedSubjRaw = myFreshProfile.assignedSubjects || myFreshProfile.assigned_subjects || '';
+          this.teacherAllowedSubjects = assignedSubjRaw
+            ? assignedSubjRaw.split(',').map((s: string) => s.trim().toLowerCase())
             : [];
 
           this.authService.getSubjects().subscribe({
@@ -75,8 +82,10 @@ export class TeacherGradingComponent implements OnInit {
   onYearChange() {
     this.filteredSubjects = this.allSubjects
       .filter(s => {
-        const matchesYear = (s.yearGroup || '').trim().toLowerCase() === this.selectedYear.toLowerCase();
-        const isAssignedToTeacher = this.teacherAllowedSubjects.includes(s.name);
+        const subYear = s.yearGroup || s.year_group || '';
+        const matchesYear = subYear.trim().toLowerCase() === this.selectedYear.toLowerCase();
+        const subNameSafe = (s.name || '').trim().toLowerCase();
+        const isAssignedToTeacher = this.teacherAllowedSubjects.includes(subNameSafe);
         return matchesYear && isAssignedToTeacher;
       })
       .map(s => s.name);
@@ -85,15 +94,11 @@ export class TeacherGradingComponent implements OnInit {
     this.students = [];
   }
 
-  // ========================================================================
-  // THE FIX: Smart Multi-Fetch for "All Subjects"
-  // ========================================================================
   loadStudentList() {
     if (!this.selectedYear || !this.selectedSubject) return;
 
     this.authService.getUsers().subscribe({
       next: (users) => {
-        // 1. Get the students for this year
         const yearStudents = users.filter((u: any) => {
           if ((u.role || '').toLowerCase() !== 'student' || !u.bio || u.bio === 'Unassigned') return false;
 
@@ -105,7 +110,6 @@ export class TeacherGradingComponent implements OnInit {
           return stuYear === targetYear || stuLevel === targetYear;
         });
 
-        // 2. Determine which subjects to fetch
         const subjectsToFetch = this.selectedSubject === 'All Subjects'
           ? this.filteredSubjects
           : [this.selectedSubject];
@@ -115,24 +119,20 @@ export class TeacherGradingComponent implements OnInit {
           return;
         }
 
-        // 3. Create parallel API requests for EVERY subject
         const gradeRequests = subjectsToFetch.map(sub =>
           this.authService.getGrades(this.selectedYear, sub).pipe(
-            catchError(err => of([])) // Safely return empty array if a subject has no grades yet
+            catchError(err => of([]))
           )
         );
 
-        // 4. Wait for ALL requests to finish, then map them into the table!
         forkJoin(gradeRequests).subscribe({
           next: (results: any[][]) => {
             this.students = [];
 
-            // Loop through students
             yearStudents.forEach((stu: any) => {
               const uniqueId = stu.username || stu.email || stu.id.toString();
               const name = stu.fullName || stu.username || 'Unknown Student';
 
-              // Loop through subjects and create a unique row for each Student + Subject combo
               subjectsToFetch.forEach((sub, index) => {
                 const gradesForThisSubject = results[index];
                 const existingGrade = gradesForThisSubject.find(g => g.studentUsername === uniqueId);
@@ -140,16 +140,15 @@ export class TeacherGradingComponent implements OnInit {
                 this.students.push({
                   studentUsername: uniqueId,
                   name: name,
-                  subject: sub, // Attach the exact subject to the row
+                  subject: sub,
                   mark: existingGrade ? existingGrade.mark : 0,
-                  grade: existingGrade ? existingGrade.gradeLetter : '-',
+                  grade: existingGrade ? existingGrade.gradeLetter || existingGrade.grade_letter : '-',
                   status: existingGrade ? existingGrade.status : 'Pending',
                   isEditing: false
                 });
               });
             });
 
-            // Optional: Sort alphabetically by student name, then by subject
             this.students.sort((a, b) => a.name.localeCompare(b.name) || a.subject.localeCompare(b.subject));
           }
         });
@@ -187,11 +186,29 @@ export class TeacherGradingComponent implements OnInit {
     this.selectedStudentForReport = student;
     this.showReportModal = true;
     this.isFetchingReport = true;
-    this.studentFullGrades = [];
+    this.modalMainGrades = [];
+    this.modalTaskGrades = [];
 
-    this.authService.getMyGrades(student.studentUsername).subscribe({
+    this.authService.getStudentGrades(student.studentUsername).subscribe({
       next: (grades: any[]) => {
-        this.studentFullGrades = grades;
+        // THE FIX: Filter strictly to the selected Year so old kindergarten grades are hidden!
+        const yearGrades = grades.filter(g =>
+          (g.yearGroup || '').trim().toLowerCase() === this.selectedYear.trim().toLowerCase()
+        );
+
+        // THE FIX: Split Core Subjects from Assignments/Quizzes
+        this.modalMainGrades = yearGrades.filter(g =>
+          !g.subject.startsWith('TASK_') &&
+          !g.subject.startsWith('Assignment:') &&
+          !g.subject.startsWith('Quiz:')
+        );
+
+        this.modalTaskGrades = yearGrades.filter(g =>
+          g.subject.startsWith('TASK_') ||
+          g.subject.startsWith('Assignment:') ||
+          g.subject.startsWith('Quiz:')
+        );
+
         this.isFetchingReport = false;
       },
       error: () => {
@@ -204,19 +221,33 @@ export class TeacherGradingComponent implements OnInit {
   closeReportModal() {
     this.showReportModal = false;
     this.selectedStudentForReport = null;
-    this.studentFullGrades = [];
+    this.modalMainGrades = [];
+    this.modalTaskGrades = [];
   }
 
   exportToPDF() {
     if (!this.selectedYear || !this.selectedSubject || this.students.length === 0) return;
-    const doc = new jsPDF();
-    doc.setFontSize(18); doc.text(`Grading Report: ${this.selectedSubject} (${this.selectedYear})`, 14, 20);
-    doc.setFontSize(12); doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
-    autoTable(doc, {
-      startY: 40, head: [['Student Username', 'Name', 'Subject', 'Mark', 'Grade', 'Status']],
-      body: this.students.map(s => [s.studentUsername, s.name, s.subject, s.mark, s.grade, s.status]),
-    });
-    doc.save(`${this.selectedSubject}_${this.selectedYear}_Report.pdf`);
+    this.isGeneratingPDF = true;
+
+    setTimeout(() => {
+      const element = document.getElementById('formal-teacher-grading-pdf');
+      if (element) {
+        html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          pdf.save(`Class_Report_${this.selectedSubject.replace(/\s+/g, '_')}_${this.selectedYear}.pdf`);
+          this.isGeneratingPDF = false;
+        }).catch(err => {
+          console.error(err);
+          alert('Failed to generate PDF.');
+          this.isGeneratingPDF = false;
+        });
+      }
+    }, 200);
   }
 
   submitAllGrades() {
@@ -228,7 +259,6 @@ export class TeacherGradingComponent implements OnInit {
     const validStudents = this.students.filter(s => s.studentUsername && s.studentUsername.trim() !== '');
     if (validStudents.length === 0) return;
 
-    // THE FIX: Use s.subject dynamically instead of this.selectedSubject!
     const payload = validStudents.map(s => ({
       studentUsername: s.studentUsername,
       studentName: s.name,

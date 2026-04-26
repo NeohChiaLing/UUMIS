@@ -140,9 +140,12 @@
       <button (click)="scrollToSection('guardian')" class="flex items-center gap-3 p-3 rounded-2xl text-slate-500 hover:bg-emerald-50 hover:text-emerald-700 font-bold transition-all text-left w-full">
         <span translate="no" class="material-symbols-outlined notranslate text-xl">diversity_3</span> Guardians
       </button>
+      <button (click)="scrollToSection('siblings')" class="flex items-center gap-3 p-3 rounded-2xl text-slate-500 hover:bg-emerald-50 hover:text-emerald-700 font-bold transition-all text-left w-full">
+        <span translate="no" class="material-symbols-outlined notranslate text-xl">family_restroom</span> Siblings
+      </button>
     </aside>
 
-    <div class="lg:col-span-9 flex flex-col gap-8">
+    <div id="printable-profile-section" class="lg:col-span-9 flex flex-col gap-8">
 
       <section id="overview" class="bg-white rounded-[2.5rem] shadow-sm border border-emerald-100 overflow-hidden relative">
         <div class="h-32 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
@@ -273,7 +276,7 @@
         </div>
       </section>
 
-      <section id="guardian" class="bg-white rounded-[2.5rem] shadow-sm border border-sky-100 p-8 mb-24">
+      <section id="guardian" class="bg-white rounded-[2.5rem] shadow-sm border border-sky-100 p-8">
         <div class="flex items-center gap-4 mb-8 border-b border-sky-50 pb-4">
           <div class="p-3 bg-sky-100 text-sky-600 rounded-2xl"><span translate="no" class="material-symbols-outlined notranslate text-2xl">diversity_3</span></div>
           <div>
@@ -370,6 +373,34 @@
         </div>
       </section>
 
+      <section id="siblings" class="bg-white rounded-[2.5rem] shadow-sm border border-indigo-100 p-8 mb-24">
+        <div class="flex items-center gap-4 mb-8 border-b border-indigo-50 pb-4">
+          <div class="p-3 bg-indigo-100 text-indigo-600 rounded-2xl"><span translate="no" class="material-symbols-outlined notranslate text-2xl">family_restroom</span></div>
+          <div>
+            <h3 class="text-xl font-black text-slate-800">Sibling Information</h3>
+            <p class="text-xs font-bold text-slate-400">Details of siblings currently enrolled or applying.</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Sibling Name</label>
+            <input type="text" [(ngModel)]="selectedStudent.siblingName" placeholder="Enter sibling name" class="w-full bg-white border border-indigo-100 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-200 transition-all">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Sibling School / Grade / Class</label>
+            <input type="text" [(ngModel)]="selectedStudent.siblingGrade" placeholder="e.g. SMK Sintok - Form 5" class="w-full bg-white border border-indigo-100 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-200 transition-all">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Sibling Phone No.</label>
+            <input type="text" [(ngModel)]="selectedStudent.siblingPhone" placeholder="e.g. 0123456789" class="w-full bg-white border border-indigo-100 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-200 transition-all">
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Sibling Email</label>
+            <input type="text" [(ngModel)]="selectedStudent.siblingEmail" placeholder="e.g. sibling@email.com" class="w-full bg-white border border-indigo-100 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-200 transition-all">
+          </div>
+        </div>
+      </section>
+
     </div>
   </div>
 
@@ -388,6 +419,13 @@
       </div>
 
       <div class="flex gap-3 w-full md:w-auto font-black text-[11px] uppercase tracking-widest">
+        <button (click)="downloadProfilePDF()" [disabled]="isGeneratingPDF" class="flex-1 md:flex-none px-6 py-3 rounded-xl border border-slate-200 text-slate-500 bg-white hover:bg-slate-50 hover:text-blue-600 hover:border-blue-200 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-sm">
+          <span *ngIf="isGeneratingPDF" translate="no" class="material-symbols-outlined notranslate animate-spin text-[18px]">progress_activity</span>
+          <span *ngIf="!isGeneratingPDF" translate="no" class="material-symbols-outlined notranslate text-[18px]">download</span>
+          <span class="hidden md:inline">{{ isGeneratingPDF ? 'Generating...' : 'Download PDF' }}</span>
+          <span class="md:hidden">PDF</span>
+        </button>
+
         <button (click)="goBack()" [disabled]="isLoading" class="flex-1 md:flex-none px-6 py-3 rounded-xl border-2 border-slate-200 text-slate-400 hover:bg-slate-50 hover:text-slate-600 hover:border-slate-300 transition-all disabled:opacity-50">
           Cancel
         </button>
@@ -399,6 +437,129 @@
       </div>
 
     </div>
+  </div>
+
+  <div id="formal-pdf-template" class="absolute top-0 left-[-9999px] w-[800px] bg-white text-black p-12 font-sans z-[-1]">
+
+    <div class="flex items-center border-b-[3px] border-emerald-800 pb-6 mb-8">
+
+      <div class="w-24 h-24 mr-6 flex-shrink-0 bg-white p-2 border-2 border-emerald-800 rounded-xl flex items-center justify-center">
+        <img src="assets/UUMIS-Logo.jpg" alt="UUMIS Logo" class="w-full h-full object-contain">
+      </div>
+
+      <div class="flex-1">
+        <h1 class="text-3xl font-black uppercase tracking-widest text-emerald-900 m-0">UUMIS International School</h1>
+        <p class="text-sm font-bold text-gray-800 mt-1">Universiti Utara Malaysia, 06010 UUM Sintok, Kedah Darul Aman.</p>
+        <p class="text-xs text-gray-600 mt-0.5">Phone: +60 4-928 4000 | Email: admin@uumis.edu.my | Portal: www.uumis.com.my</p>
+      </div>
+      <div class="text-right border-l-2 border-gray-200 pl-6 ml-4">
+        <p class="text-lg font-black text-gray-800 uppercase tracking-widest">Official Record</p>
+        <p class="text-xs text-gray-500 font-bold mt-1">ID: {{ selectedStudent?.id || 'PENDING' }}</p>
+        <p class="text-xs text-gray-500 font-bold">Status: <span class="uppercase text-emerald-600">{{ selectedStudent?.status }}</span></p>
+      </div>
+    </div>
+
+    <h2 class="text-center text-xl font-black uppercase tracking-widest bg-gray-100 py-2 mb-6 border border-gray-300">Student Application Profile</h2>
+
+    <table class="w-full text-sm border-collapse mb-6">
+      <tbody>
+      <tr>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-2 w-1/4 uppercase text-[10px] tracking-widest">Full Name</td>
+        <td class="border border-gray-300 p-2 font-bold text-base" colspan="3">{{ selectedStudent?.name }}</td>
+      </tr>
+      <tr>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-2 w-1/4 uppercase text-[10px] tracking-widest">Class / Grade</td>
+        <td class="border border-gray-300 p-2 w-1/4">{{ selectedStudent?.grade || 'Unassigned' }}</td>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-2 w-1/4 uppercase text-[10px] tracking-widest">Gender</td>
+        <td class="border border-gray-300 p-2 w-1/4">{{ selectedStudent?.gender }}</td>
+      </tr>
+      <tr>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-2 uppercase text-[10px] tracking-widest">IC / Passport</td>
+        <td class="border border-gray-300 p-2">{{ selectedStudent?.passport }}</td>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-2 uppercase text-[10px] tracking-widest">Date of Birth</td>
+        <td class="border border-gray-300 p-2">{{ selectedStudent?.dob }}</td>
+      </tr>
+      <tr>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-2 uppercase text-[10px] tracking-widest">Email Address</td>
+        <td class="border border-gray-300 p-2">{{ selectedStudent?.email }}</td>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-2 uppercase text-[10px] tracking-widest">Phone No.</td>
+        <td class="border border-gray-300 p-2">{{ selectedStudent?.phone }}</td>
+      </tr>
+      <tr>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-2 uppercase text-[10px] tracking-widest">Home Address</td>
+        <td class="border border-gray-300 p-2" colspan="3">{{ selectedStudent?.address }}</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <h3 class="text-sm font-black uppercase tracking-widest text-emerald-800 mb-2 border-b-2 border-emerald-100 pb-1">Medical Information</h3>
+    <table class="w-full text-sm border-collapse mb-6">
+      <tbody>
+      <tr>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-2 w-1/4 uppercase text-[10px] tracking-widest">Blood Type</td>
+        <td class="border border-gray-300 p-2 w-1/4 text-red-600 font-bold">{{ selectedStudent?.bloodGroup }}</td>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-2 w-1/4 uppercase text-[10px] tracking-widest">Allergies</td>
+        <td class="border border-gray-300 p-2 w-1/4 text-red-600 font-bold">{{ selectedStudent?.allergies || 'None' }}</td>
+      </tr>
+      <tr>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-2 uppercase text-[10px] tracking-widest">Medical Conditions</td>
+        <td class="border border-gray-300 p-2" colspan="3">{{ selectedStudent?.medicalConditions || 'No existing conditions declared.' }}</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <h3 class="text-sm font-black uppercase tracking-widest text-emerald-800 mb-2 border-b-2 border-emerald-100 pb-1">Guardian & Sibling Details</h3>
+    <table class="w-full text-sm border-collapse mb-8">
+      <thead>
+      <tr class="bg-gray-100">
+        <th class="border border-gray-300 p-2 text-[10px] uppercase tracking-widest text-left w-1/6">Relation</th>
+        <th class="border border-gray-300 p-2 text-[10px] uppercase tracking-widest text-left w-1/4">Name</th>
+        <th class="border border-gray-300 p-2 text-[10px] uppercase tracking-widest text-left w-1/4">Contact Details</th>
+        <th class="border border-gray-300 p-2 text-[10px] uppercase tracking-widest text-left">Occupation / Education</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-2 text-[10px] uppercase tracking-widest">Father</td>
+        <td class="border border-gray-300 p-2">{{ selectedStudent?.father?.name || 'N/A' }}</td>
+        <td class="border border-gray-300 p-2 text-xs">
+          P: {{ selectedStudent?.father?.phone || 'null' }}<br>
+          E: {{ selectedStudent?.father?.email || 'null' }}
+        </td>
+        <td class="border border-gray-300 p-2">{{ selectedStudent?.father?.job || 'N/A' }}</td>
+      </tr>
+      <tr>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-2 text-[10px] uppercase tracking-widest">Mother</td>
+        <td class="border border-gray-300 p-2">{{ selectedStudent?.mother?.name || 'N/A' }}</td>
+        <td class="border border-gray-300 p-2 text-xs">
+          P: {{ selectedStudent?.mother?.phone || 'null' }}<br>
+          E: {{ selectedStudent?.mother?.email || 'null' }}
+        </td>
+        <td class="border border-gray-300 p-2">{{ selectedStudent?.mother?.job || 'N/A' }}</td>
+      </tr>
+      <tr>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-2 text-[10px] uppercase tracking-widest">Sibling</td>
+        <td class="border border-gray-300 p-2">{{ selectedStudent?.siblingName || 'N/A' }}</td>
+        <td class="border border-gray-300 p-2 text-xs">
+          P: {{ selectedStudent?.siblingPhone || 'null' }}<br>
+          E: {{ selectedStudent?.siblingEmail || 'null' }}
+        </td>
+        <td class="border border-gray-300 p-2">{{ selectedStudent?.siblingGrade || 'N/A' }}</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <div class="flex justify-between items-end mt-12 pt-8">
+      <div class="text-center">
+        <div class="border-b border-gray-800 w-48 mb-2 mx-auto"></div>
+        <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Parent / Guardian Signature</p>
+      </div>
+      <div class="text-center">
+        <div class="border-b border-gray-800 w-48 mb-2 mx-auto"></div>
+        <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Administrator Approval</p>
+      </div>
+    </div>
+
   </div>
 
 </div>

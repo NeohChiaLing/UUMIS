@@ -15,6 +15,11 @@ export class Navbar {
   isAboutDropdownOpen = false;
   isAdmissionsDropdownOpen = false;
 
+  // New variables for Mobile Menu
+  isMobileMenuOpen = false;
+  isMobileAboutOpen = false;
+  isMobileAdmissionsOpen = false;
+
   toggleAboutDropdown() {
     this.isAboutDropdownOpen = !this.isAboutDropdownOpen;
     this.isAdmissionsDropdownOpen = false;
@@ -28,6 +33,15 @@ export class Navbar {
   closeDropdown() {
     this.isAboutDropdownOpen = false;
     this.isAdmissionsDropdownOpen = false;
+  }
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+    // Reset sub-menus when closing the main menu
+    if (!this.isMobileMenuOpen) {
+      this.isMobileAboutOpen = false;
+      this.isMobileAdmissionsOpen = false;
+    }
   }
 
   logout() {

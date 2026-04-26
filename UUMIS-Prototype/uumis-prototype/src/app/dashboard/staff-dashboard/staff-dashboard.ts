@@ -13,10 +13,12 @@ import { AuthService } from '../../services/auth.service';
 export class StaffDashboardComponent implements OnInit {
   isFinancialOpen = false;
   userEmail: string = '';
+  userRole: string = '';
 
   // Helpers for cleaner HTML logic
   isFinanceManager: boolean = false;
   isRegisterManager: boolean = false;
+  isGeneralAdmin: boolean = false;
 
   constructor(private router: Router, private authService: AuthService) {}
 
@@ -27,11 +29,15 @@ export class StaffDashboardComponent implements OnInit {
       const parsedUser = JSON.parse(userData);
       this.userEmail = parsedUser.email || '';
 
-      // Set roles based on email
-      this.isFinanceManager = this.userEmail === 'finance@uumis.edu.my';
-      this.isRegisterManager = this.userEmail === 'register@uumis.edu.my';
+      // THE FIX: Grab the actual role from the database that we saved during login
+      this.userRole = parsedUser.role ? parsedUser.role.toLowerCase().trim() : 'staff';
 
-      console.log('Logged in as:', this.userEmail);
+      // Set dashboard permissions based on their true database role, not just their email!
+      this.isFinanceManager = this.userRole === 'financial_manager';
+      this.isRegisterManager = this.userRole === 'register_manager';
+      this.isGeneralAdmin = this.userRole === 'admin' || this.userRole === 'staff';
+
+      console.log('Logged in as:', this.userEmail, '| Role:', this.userRole);
     } else {
       console.warn('No user data found in localStorage!');
     }

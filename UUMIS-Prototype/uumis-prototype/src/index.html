@@ -2,18 +2,86 @@
 <html lang="en" class="dark">
 <head>
   <meta charset="utf-8">
-  <title>EduCore Portal</title>
+  <title>UUMIS Portal</title>
   <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <link rel="icon" type="image/jpeg" href="assets/UUMIS-Logo.jpg">
   <meta name="google" content="notranslate">
 
   <link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+  <style>
+    .bubble-float { animation: float 18s ease-in-out infinite; }
+    .bubble-float-alt { animation: float-alt 22s ease-in-out infinite; }
+    .bubble-rotate { animation: rotate-slow 40s linear infinite; }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
+      33% { transform: translateY(-60px) translateX(20px) scale(1.1); }
+      66% { transform: translateY(-20px) translateX(-20px) scale(0.95); }
+    }
+
+    @keyframes float-alt {
+      0%, 100% { transform: translateY(0px) translateX(0px) scale(1); }
+      50% { transform: translateY(-80px) translateX(-30px) scale(1.15); }
+    }
+
+    @keyframes rotate-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .glass-bubble {
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0) 100%);
+      box-shadow: inset 0 0 40px rgba(255, 255, 255, 0.3), 0 20px 60px rgba(0, 0, 0, 0.05);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+  </style>
+
+  <style>
+    /* RESPONSIVE FIX: Allow the page to scale naturally, preventing horizontal scroll if not needed */
+    html, body {
+      top: 0px !important;
+      margin-top: 0px !important;
+      padding-top: 0px !important;
+      transform: none !important;
+      width: 100% !important;
+      overflow-x: hidden !important; /* Hide horizontal scroll to prevent zooming issues on mobile */
+    }
+
+    app-root {
+      display: block;
+      width: 100% !important;
+      /* Removed the min-width: 1280px to allow mobile responsiveness */
+    }
+
+    /* 保护你自己的翻译按钮不受影响 */
+    #google_translate_element, .skiptranslate {
+      z-index: 9999999 !important;
+    }
+
+    /* 无差别隐藏所有的谷歌翻译弹出层、气泡和横幅 */
+    .goog-te-banner-frame,
+    .goog-te-balloon-frame,
+    #goog-gt-tt,
+    [class*="VIpgJd-ZVi9od-"] {
+      display: none !important;
+      visibility: hidden !important;
+      height: 0px !important;
+      width: 0px !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+      position: absolute !important;
+      top: -9999px !important;
+      z-index: -1 !important;
+    }
+  </style>
 </head>
+
 <body>
 <app-root></app-root>
 
@@ -23,22 +91,51 @@
   function googleTranslateElementInit() {
     new google.translate.TranslateElement({
       pageLanguage: 'en',
-      // THE FIX: Added 'th' right here!
       includedLanguages: 'en,ms,th',
       autoDisplay: false
     }, 'google_translate_element');
   }
 </script>
-<script type="text/javascript" src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
-<script type="text/javascript">
-  // This wipes the Google Translate memory every time you refresh (F5) or close the tab!
+<script>
   window.addEventListener('beforeunload', function() {
     var domains = [window.location.hostname, '.' + window.location.hostname, 'localhost', ''];
     domains.forEach(function(d) {
       var domainStr = d ? 'domain=' + d + ';' : '';
       document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; ' + domainStr + ' path=/;';
     });
+  });
+
+  const observer = new MutationObserver(() => {
+    const docs = [document.documentElement, document.body];
+    docs.forEach(el => {
+      ['top', 'marginTop', 'paddingTop'].forEach(prop => {
+        if (el.style[prop]) {
+          el.style.setProperty(prop.replace(/[A-Z]/g, m => '-' + m.toLowerCase()), '0px', 'important');
+        }
+      });
+      if (el.style.transform) {
+        el.style.setProperty('transform', 'none', 'important');
+      }
+    });
+
+    document.querySelectorAll('iframe').forEach(iframe => {
+      if (iframe.src.includes('translate.googleapis.com') || iframe.id.includes('goog_')) {
+        const parent = iframe.parentNode;
+        iframe.remove();
+        if (parent && parent.tagName === 'DIV' && parent.id !== 'google_translate_element' && parent !== document.body) {
+          parent.remove();
+        }
+      }
+    });
+  });
+
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['style'],
+    childList: true,
+    subtree: true
   });
 </script>
 

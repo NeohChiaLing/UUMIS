@@ -34,7 +34,6 @@
     <div class="max-w-6xl mx-auto">
 
       <div *ngIf="currentView === 'compose'" class="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in">
-
         <div class="lg:col-span-2 flex flex-col gap-6">
           <div class="bg-white rounded-[1.5rem] shadow-sm border border-[#e7f3ec] p-8">
             <div class="flex items-center gap-3 mb-8">
@@ -108,7 +107,7 @@
               </div>
 
               <div class="flex items-center justify-end gap-3 pt-6 border-t border-[#e7f3ec]">
-                <button type="button" class="px-6 py-3 rounded-xl border border-gray-200 text-gray-500 font-bold text-xs uppercase tracking-wider hover:bg-gray-50 transition-colors">Save Draft</button>
+                <button type="button" (click)="saveDraft()" class="px-6 py-3 rounded-xl border border-gray-200 text-gray-500 font-bold text-xs uppercase tracking-wider hover:bg-gray-50 transition-colors">Save Draft</button>
                 <button type="button" (click)="sendMessage()" class="bg-[#30e87a] text-[#0e1b13] hover:bg-[#25d366] px-8 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all shadow-lg shadow-green-200 flex items-center gap-2">
                   <span translate="no" class="material-symbols-outlined notranslate text-lg">send</span> Send Emails
                 </button>
@@ -164,7 +163,12 @@
               <input [(ngModel)]="searchTerm" (keyup)="filterHistory()" class="block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-gray-50 text-sm font-bold focus:ring-2 focus:ring-[#30e87a] outline-none" placeholder="Search by subject or content..." type="text"/>
             </div>
             <div class="flex gap-3">
-              <button (click)="downloadFullReport()" class="flex items-center gap-2 bg-white border border-gray-200 text-gray-500 hover:text-red-500 hover:border-red-200 px-4 py-2.5 rounded-xl transition-colors font-bold text-xs uppercase"><span translate="no" class="material-symbols-outlined notranslate text-[18px]">picture_as_pdf</span> Export History</button>
+              <button *ngIf="hasSelectedItems" (click)="deleteSelected()" class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 hover:bg-red-500 hover:text-white px-4 py-2.5 rounded-xl transition-all font-bold text-xs uppercase shadow-sm">
+                <span translate="no" class="material-symbols-outlined notranslate text-[18px]">delete</span> Delete
+              </button>
+              <button (click)="downloadFullReport()" class="flex items-center gap-2 bg-white border border-gray-200 text-gray-500 hover:text-blue-500 hover:border-blue-200 px-4 py-2.5 rounded-xl transition-colors font-bold text-xs uppercase">
+                <span translate="no" class="material-symbols-outlined notranslate text-[18px]">picture_as_pdf</span> Export
+              </button>
             </div>
           </div>
         </div>
@@ -173,17 +177,22 @@
           <table class="w-full text-left text-sm text-gray-600">
             <thead class="bg-gray-50/50 text-[10px] uppercase font-black tracking-widest text-slate-400 border-b border-[#e7f3ec]">
             <tr>
-              <th class="px-6 py-5">Message Details</th>
+              <th class="px-6 py-5 w-10">
+                <input type="checkbox" [(ngModel)]="selectAll" (change)="toggleSelectAll()" class="rounded border-gray-300 text-[#30e87a] focus:ring-[#30e87a] cursor-pointer size-4">
+              </th>
+              <th class="px-2 py-5">Message Details</th>
               <th class="px-6 py-5">Recipient</th>
               <th class="px-6 py-5">Category</th>
               <th class="px-6 py-5">Date Sent</th>
-              <th class="px-6 py-5">Status</th>
               <th class="px-6 py-5 text-right">Actions</th>
             </tr>
             </thead>
             <tbody class="divide-y divide-[#e7f3ec]">
             <tr *ngFor="let item of filteredHistory" class="group hover:bg-gray-50 transition-colors">
               <td class="px-6 py-5">
+                <input type="checkbox" [(ngModel)]="item.selected" (change)="checkSelection()" class="rounded border-gray-300 text-[#30e87a] focus:ring-[#30e87a] cursor-pointer size-4">
+              </td>
+              <td class="px-2 py-5">
                 <div class="flex items-start gap-4">
                   <div class="size-10 rounded-full flex-shrink-0 flex items-center justify-center mt-1"
                        [ngClass]="{
@@ -198,10 +207,10 @@
                       </span>
                   </div>
                   <div>
-                    <p class="font-bold text-[#0e1b13] text-sm mb-0.5">
+                    <p class="font-bold text-[#0e1b13] text-sm mb-0.5 flex items-center gap-1">
                       {{ item.subject }}
-                      <span *ngIf="item.docName" class="material-symbols-outlined text-[14px] text-blue-500 ml-1 inline-block align-middle" title="Document Attached">description</span>
-                      <span *ngIf="item.imageName" class="material-symbols-outlined text-[14px] text-green-500 ml-1 inline-block align-middle" title="Image Attached">image</span>
+                      <button *ngIf="item.docName && item.docData" (click)="downloadAttachment(item.docData, item.docName)" class="material-symbols-outlined text-[16px] text-blue-500 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 p-0.5 rounded cursor-pointer transition-colors" title="Download Document">description</button>
+                      <button *ngIf="item.imageName && item.imageData" (click)="downloadAttachment(item.imageData, item.imageName)" class="material-symbols-outlined text-[16px] text-green-500 hover:text-green-700 bg-green-50 hover:bg-green-100 p-0.5 rounded cursor-pointer transition-colors" title="Download Image">image</button>
                     </p>
                     <p class="text-gray-400 text-xs line-clamp-1 max-w-[200px]">{{ item.preview }}</p>
                   </div>
@@ -231,21 +240,14 @@
                   <span class="text-[10px] font-bold text-gray-400 mt-0.5">{{ item.time }}</span>
                 </div>
               </td>
-              <td class="px-6 py-5">
-                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wide"
-                        [ngClass]="{
-                          'bg-green-100 text-green-700': item.status === 'Delivered',
-                          'bg-yellow-100 text-yellow-700': item.status === 'Pending',
-                          'bg-red-100 text-red-700': item.status === 'Failed'
-                        }">
-                    <span class="size-1.5 rounded-full" [ngClass]="{'bg-green-600': item.status === 'Delivered', 'bg-yellow-600 animate-pulse': item.status === 'Pending', 'bg-red-600': item.status === 'Failed'}"></span>
-                    {{ item.status }}
-                  </span>
-              </td>
               <td class="px-6 py-5 text-right">
-                <div class="flex justify-end gap-2">
-                  <button (click)="downloadSingleItem(item)" class="size-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Export PDF">
-                    <span translate="no" class="material-symbols-outlined notranslate text-[18px]">picture_as_pdf</span>
+                <div class="flex justify-end gap-1">
+                  <button (click)="downloadSingleItem(item)" [disabled]="isGeneratingPDF" class="size-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-blue-500 hover:bg-blue-50 transition-colors disabled:opacity-50" title="Export Formal PDF">
+                    <span *ngIf="isGeneratingPDF && selectedItemForPdf?.id === item.id" translate="no" class="material-symbols-outlined notranslate animate-spin text-[18px]">progress_activity</span>
+                    <span *ngIf="!isGeneratingPDF || selectedItemForPdf?.id !== item.id" translate="no" class="material-symbols-outlined notranslate text-[18px]">picture_as_pdf</span>
+                  </button>
+                  <button (click)="deleteSingleItem(item)" class="size-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors" title="Delete Message">
+                    <span translate="no" class="material-symbols-outlined notranslate text-[18px]">delete</span>
                   </button>
                 </div>
               </td>
@@ -259,5 +261,79 @@
       </div>
 
     </div>
+  </div>
+
+  <div id="formal-notification-pdf" *ngIf="selectedItemForPdf" class="absolute top-0 left-[-9999px] w-[800px] bg-white text-black p-12 font-sans z-[-1]">
+
+    <div class="flex items-center border-b-[3px] border-emerald-800 pb-6 mb-8">
+      <div class="w-24 h-24 mr-6 flex-shrink-0 bg-white p-2 border-2 border-emerald-800 rounded-xl flex items-center justify-center">
+        <img src="assets/UUMIS-Logo.jpg" alt="UUMIS Logo" class="w-full h-full object-contain">
+      </div>
+      <div class="flex-1">
+        <h1 class="text-3xl font-black uppercase tracking-widest text-emerald-900 m-0">UUMIS International School</h1>
+        <p class="text-sm font-bold text-gray-800 mt-1">Universiti Utara Malaysia, 06010 UUM Sintok, Kedah Darul Aman.</p>
+        <p class="text-xs text-gray-600 mt-0.5">Phone: +60 4-928 4000 | Email: admin@uumis.edu.my | Portal: www.uumis.com.my</p>
+      </div>
+      <div class="text-right border-l-2 border-gray-200 pl-6 ml-4">
+        <p class="text-lg font-black text-gray-800 uppercase tracking-widest">Official Record</p>
+        <p class="text-xs text-gray-500 font-bold mt-1">Ref ID: NT-{{ selectedItemForPdf.id || '0000' }}</p>
+        <p class="text-xs text-gray-500 font-bold">Status: <span class="uppercase text-emerald-600">{{ selectedItemForPdf.status }}</span></p>
+      </div>
+    </div>
+
+    <h2 class="text-center text-xl font-black uppercase tracking-widest bg-gray-100 py-2 mb-6 border border-gray-300">Notification Transmission Record</h2>
+
+    <table class="w-full text-sm border-collapse mb-8">
+      <tbody>
+      <tr>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 uppercase text-[10px] tracking-widest">Subject Line</td>
+        <td class="border border-gray-300 p-3 font-bold text-base" colspan="3">{{ selectedItemForPdf.subject }}</td>
+      </tr>
+      <tr>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 uppercase text-[10px] tracking-widest">Date / Time Sent</td>
+        <td class="border border-gray-300 p-3 w-1/4">{{ selectedItemForPdf.date }} @ {{ selectedItemForPdf.time }}</td>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 uppercase text-[10px] tracking-widest">Urgency</td>
+        <td class="border border-gray-300 p-3 w-1/4 font-bold" [ngClass]="selectedItemForPdf.isUrgent ? 'text-red-600' : 'text-slate-600'">{{ selectedItemForPdf.isUrgent ? 'HIGH PRIORITY' : 'Standard' }}</td>
+      </tr>
+      <tr>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-3 uppercase text-[10px] tracking-widest">Target Audience</td>
+        <td class="border border-gray-300 p-3">{{ selectedItemForPdf.recipient }}</td>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-3 uppercase text-[10px] tracking-widest">Category</td>
+        <td class="border border-gray-300 p-3">{{ selectedItemForPdf.category || 'General' }}</td>
+      </tr>
+      <tr *ngIf="selectedItemForPdf.docName || selectedItemForPdf.imageName">
+        <td class="border border-gray-300 bg-gray-50 font-bold p-3 uppercase text-[10px] tracking-widest">Attachments Included</td>
+        <td class="border border-gray-300 p-3 text-blue-600 font-bold" colspan="3">
+          {{ selectedItemForPdf.docName ? '📄 ' + selectedItemForPdf.docName : '' }}
+          {{ selectedItemForPdf.docName && selectedItemForPdf.imageName ? ' | ' : '' }}
+          {{ selectedItemForPdf.imageName ? '🖼️ ' + selectedItemForPdf.imageName : '' }}
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <h3 class="text-sm font-black uppercase tracking-widest text-emerald-800 mb-2 border-b-2 border-emerald-100 pb-1">Message Transcript</h3>
+    <div class="border border-gray-300 p-6 bg-gray-50/50 min-h-[200px] mb-8">
+      <p class="whitespace-pre-wrap text-sm text-gray-800 leading-relaxed font-serif">{{ selectedItemForPdf.preview }}</p>
+    </div>
+
+    <div *ngIf="selectedItemForPdf.imageData" class="mb-8 page-break-inside-avoid">
+      <h3 class="text-sm font-black uppercase tracking-widest text-emerald-800 mb-2 border-b-2 border-emerald-100 pb-1">Attached Image Reference</h3>
+      <div class="border border-gray-300 p-2 text-center bg-gray-50">
+        <img [src]="selectedItemForPdf.imageData" class="max-w-[500px] max-h-[400px] object-contain mx-auto">
+      </div>
+    </div>
+
+    <div class="flex justify-between items-end mt-16 pt-8">
+      <div class="text-center">
+        <div class="border-b border-gray-800 w-48 mb-2 mx-auto"></div>
+        <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">System Administrator</p>
+      </div>
+      <div class="text-center">
+        <p class="text-xs font-bold text-gray-800 mb-2">Automated System Record</p>
+        <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Generated: {{ currentView === 'history' ? 'Today' : 'Live' }}</p>
+      </div>
+    </div>
+
   </div>
 </div>

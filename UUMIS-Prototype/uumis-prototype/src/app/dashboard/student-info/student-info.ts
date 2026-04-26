@@ -3,6 +3,8 @@ import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 @Component({
   selector: 'app-student-info',
@@ -41,14 +43,16 @@ export class StudentInfoComponent implements OnInit {
     dob: '', gender: 'Male', address: '', passport: '', phone: '',
     bloodGroup: 'O+', allergies: '', medicalConditions: '',
     father: { name: '', ic: '', phone: '', email: '', job: '' },
-    mother: { name: '', ic: '', phone: '', email: '', job: '' }
+    mother: { name: '', ic: '', phone: '', email: '', job: '' },
+    siblingName: '', siblingGrade: '', siblingPhone: '', siblingEmail: ''
   };
 
   fullProfileTemplate = {
     level: '', year: '', parentId: '', dob: '', gender: 'Male', address: '',
     passport: '', phone: '', bloodGroup: 'O+', allergies: '', profileStatus: 'PENDING',
     medicalConditions: '', father: { name: '', ic: '', phone: '', email: '', job: '' },
-    mother: { name: '', ic: '', phone: '', email: '', job: '' }
+    mother: { name: '', ic: '', phone: '', email: '', job: '' },
+    siblingName: '', siblingGrade: '', siblingPhone: '', siblingEmail: ''
   };
 
   isParentDropdownOpen: boolean = false;
@@ -169,14 +173,15 @@ export class StudentInfoComponent implements OnInit {
         this.students = data.map(user => {
           let profileData = {};
           if (user.profileJson) {
-            try { profileData = JSON.parse(user.profileJson); } catch (e) { console.warn("Failed to parse DB profile", e); }
+            try { profileData = JSON.parse(user.profileJson); } catch (e) {}
           }
 
           return {
             ...this.fullProfileTemplate,
             ...profileData,
             dbId: user.id,
-            id: user.studentId || user.verificationCode || user.username || '---',
+            // THE FIX: Safely check for student_id (snake_case from database) BEFORE falling back to username!
+            id: user.student_id || user.studentId || user.verificationCode || user.username || '---',
             name: user.fullName || user.username || 'No Name',
             grade: user.bio || 'Unassigned',
             parentId: user.parentId,
@@ -218,14 +223,10 @@ export class StudentInfoComponent implements OnInit {
     window.scrollTo(0,0);
   }
 
-  // --- THE FIX: INTELLIGENT APPROVAL ROUTING ---
   approveProfile(student: any, event: Event) {
     event.stopPropagation();
 
-    // 1. Check if this is a brand-new admission OR just an existing student updating their profile
     const isFirstTimeApproval = student.status === 'Pending';
-
-    // 2. Change the popup text so the Admin knows exactly what is happening
     const confirmMsg = isFirstTimeApproval
       ? `Approve ${student.name}'s new admission, generate their Student ID, and send welcome emails?`
       : `Approve ${student.name}'s recent profile updates? (No email will be sent)`;
@@ -235,15 +236,10 @@ export class StudentInfoComponent implements OnInit {
       student.status = 'Active';
 
       if (isFirstTimeApproval) {
-        // --- SCENARIO A: BRAND NEW STUDENT ---
-        // Call the dedicated approve endpoint to generate the Sequential ID
         this.authService.approveStudent(student.dbId).subscribe({
           next: (approveRes: any) => {
-
-            // Immediately update their Profile JSON status to match
             this.authService.adminUpdateStudent(student.dbId, { profileStatus: 'APPROVED', enabled: true }).subscribe();
 
-            // Send the Welcome Email!
             const emailPayload = {
               studentName: student.name,
               studentEmail: student.email,
@@ -253,14 +249,12 @@ export class StudentInfoComponent implements OnInit {
             this.authService.sendApprovalEmail(emailPayload).subscribe();
 
             alert(`Student ${student.name} has been officially enrolled, ID generated, and welcome emails dispatched!`);
-            this.loadStudents(); // Refresh the table so you can see their new Student ID!
+            this.loadStudents();
           },
           error: () => alert('Failed to approve student admission.')
         });
 
       } else {
-        // --- SCENARIO B: EXISTING STUDENT PROFILE UPDATE ---
-        // Just quietly update the database, no emails, no ID generation
         this.authService.adminUpdateStudent(student.dbId, {
           profileStatus: 'APPROVED',
           enabled: true
@@ -271,6 +265,7 @@ export class StudentInfoComponent implements OnInit {
       }
     }
   }
+
   rejectProfile(student: any, event: Event) {
     event.stopPropagation();
     if (student.profileStatus === 'REJECTED') return;
@@ -348,7 +343,6 @@ export class StudentInfoComponent implements OnInit {
       combinedGrade = `${this.selectedStudent.level} - ${this.selectedStudent.year}`;
     }
 
-    // --- THE FIX: Clean up the JSON to safely fit in the database! ---
     const cleanProfile = {
       dob: this.selectedStudent.dob || '',
       gender: this.selectedStudent.gender || 'Male',
@@ -358,7 +352,11 @@ export class StudentInfoComponent implements OnInit {
       allergies: this.selectedStudent.allergies || 'None',
       medicalConditions: this.selectedStudent.medicalConditions || 'None',
       father: this.selectedStudent.father || { name: '', ic: '', phone: '', email: '', job: '' },
-      mother: this.selectedStudent.mother || { name: '', ic: '', phone: '', email: '', job: '' }
+      mother: this.selectedStudent.mother || { name: '', ic: '', phone: '', email: '', job: '' },
+      siblingName: this.selectedStudent.siblingName || '',
+      siblingGrade: this.selectedStudent.siblingGrade || '',
+      siblingPhone: this.selectedStudent.siblingPhone || '',
+      siblingEmail: this.selectedStudent.siblingEmail || ''
     };
 
     const payload = {
@@ -369,7 +367,7 @@ export class StudentInfoComponent implements OnInit {
       phone: this.selectedStudent.phone,
       enabled: this.selectedStudent.status === 'Active',
       parentId: this.selectedStudent.parentId,
-      profileJson: JSON.stringify(cleanProfile), // Uses the safe, tiny JSON
+      profileJson: JSON.stringify(cleanProfile),
       avatar: this.selectedStudent.avatarUrl
     };
 
@@ -386,5 +384,42 @@ export class StudentInfoComponent implements OnInit {
         this.isLoading = false;
       }
     });
+  }
+
+  isGeneratingPDF: boolean = false;
+
+  downloadProfilePDF() {
+    this.isGeneratingPDF = true;
+    const element = document.getElementById('formal-pdf-template');
+    if (element) {
+      html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+
+        let imgWidth = pdfWidth;
+        let imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+        if (imgHeight > pdfHeight) {
+          const scaleRatio = pdfHeight / imgHeight;
+          imgWidth = imgWidth * scaleRatio;
+          imgHeight = imgHeight * scaleRatio;
+        }
+
+        const xPosition = (pdfWidth - imgWidth) / 2;
+
+        pdf.addImage(imgData, 'PNG', xPosition, 0, imgWidth, imgHeight);
+        const fileName = (this.selectedStudent?.name || 'Student').replace(/\s+/g, '_') + '_Official_Record.pdf';
+        pdf.save(fileName);
+        this.isGeneratingPDF = false;
+      }).catch(err => {
+        console.error('PDF Generation Error:', err);
+        alert('Failed to generate PDF. Please try again.');
+        this.isGeneratingPDF = false;
+      });
+    } else {
+      this.isGeneratingPDF = false;
+    }
   }
 }

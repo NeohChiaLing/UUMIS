@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl, SafeUrl } from '@angular/platform-browser';
 import { AuthService } from '../../../services/auth.service';
 
 interface DiscountItem {
@@ -12,6 +12,7 @@ interface DiscountItem {
   endDate: string;
   fileName: string | null;
   fileUrl: string | null;
+  safeUrl?: SafeUrl | SafeResourceUrl | null;
   fileType: 'image' | 'pdf' | null;
   isActive: boolean;
 }
@@ -31,7 +32,7 @@ export class DiscountComponent implements OnInit {
   formData: DiscountItem = this.getEmptyForm();
 
   showPreviewModal: boolean = false;
-  previewContent: SafeResourceUrl | string | null = null;
+  previewContent: SafeResourceUrl | SafeUrl | string | null = null;
   previewType: 'image' | 'pdf' | null = null;
   previewTitle: string = '';
 
@@ -52,7 +53,36 @@ export class DiscountComponent implements OnInit {
 
   loadDiscounts() {
     this.authService.getAllDiscounts().subscribe({
-      next: (data) => this.discounts = data,
+      next: (data: any[]) => {
+        this.discounts = data.map(item => {
+          let sUrl = null;
+
+          // Fallback to check BOTH camelCase and snake_case properties to guarantee safety
+          const fileUrl = item.fileUrl || item.file_url;
+          const fileType = item.fileType || item.file_type;
+          const startDate = item.startDate || item.start_date;
+          const endDate = item.endDate || item.end_date;
+          const fileName = item.fileName || item.file_name;
+
+          if (fileUrl) {
+            if (fileType === 'pdf') {
+              sUrl = this.sanitizer.bypassSecurityTrustResourceUrl(fileUrl);
+            } else {
+              sUrl = this.sanitizer.bypassSecurityTrustUrl(fileUrl);
+            }
+          }
+
+          return {
+            ...item,
+            fileUrl,
+            fileType,
+            startDate,
+            endDate,
+            fileName,
+            safeUrl: sUrl
+          };
+        });
+      },
       error: () => console.log('Failed to fetch discounts')
     });
   }
@@ -63,11 +93,9 @@ export class DiscountComponent implements OnInit {
     if (!item.fileUrl) { alert('No file to preview.'); return; }
     this.previewType = item.fileType;
     this.previewTitle = item.fileName || 'Preview';
-    if (item.fileType === 'pdf') {
-      this.previewContent = this.sanitizer.bypassSecurityTrustResourceUrl(item.fileUrl);
-    } else {
-      this.previewContent = item.fileUrl;
-    }
+
+    this.previewContent = item.safeUrl || item.fileUrl;
+
     this.showPreviewModal = true;
   }
 
@@ -97,7 +125,7 @@ export class DiscountComponent implements OnInit {
 
   getEmptyForm(): DiscountItem {
     const today = new Date().toISOString().split('T')[0];
-    return { title: '', description: '', startDate: today, endDate: today, fileName: null, fileUrl: null, fileType: null, isActive: true };
+    return { title: '', description: '', startDate: today, endDate: today, fileName: null, fileUrl: null, safeUrl: null, fileType: null, isActive: true };
   }
 
   openAddModal() {
@@ -134,6 +162,12 @@ export class DiscountComponent implements OnInit {
       const reader = new FileReader();
       reader.onload = (e: any) => {
         this.formData.fileUrl = e.target.result;
+
+        if (this.formData.fileType === 'pdf') {
+          this.formData.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(e.target.result);
+        } else {
+          this.formData.safeUrl = this.sanitizer.bypassSecurityTrustUrl(e.target.result);
+        }
       };
       reader.readAsDataURL(file);
     }
@@ -144,19 +178,41 @@ export class DiscountComponent implements OnInit {
       alert('Please fill in required fields (Title, Dates).'); return;
     }
 
+    const payload = { ...this.formData };
+    delete payload.safeUrl;
+
     if (this.isEditing && this.editingId) {
-      this.authService.updateDiscount(this.editingId, this.formData).subscribe({
-        next: () => { this.loadDiscounts(); this.closeModal(); }
+      this.authService.updateDiscount(this.editingId, payload).subscribe({
+        next: () => { this.loadDiscounts(); this.closeModal(); },
+        error: () => alert('Failed to update discount.')
       });
     } else {
-      this.authService.createDiscount(this.formData).subscribe({
-        next: () => { this.loadDiscounts(); this.closeModal(); }
+      this.authService.createDiscount(payload).subscribe({
+        next: () => { this.loadDiscounts(); this.closeModal(); },
+        error: () => alert('Failed to save discount.')
       });
     }
   }
 
   toggleStatus(item: DiscountItem) {
     item.isActive = !item.isActive;
-    this.authService.updateDiscount(item.id!, item).subscribe();
+
+    const payload = { ...item };
+    delete payload.safeUrl;
+
+    this.authService.updateDiscount(item.id!, payload).subscribe();
+  }
+
+  // THE FIX: New Delete Function
+  deleteDiscount(item: DiscountItem) {
+    if (confirm(`Are you sure you want to permanently delete "${item.title}"?`)) {
+      this.authService.deleteDiscount(item.id!).subscribe({
+        next: () => {
+          this.loadDiscounts();
+          alert('Discount deleted successfully.');
+        },
+        error: () => alert('Failed to delete discount. Please check connection.')
+      });
+    }
   }
 }

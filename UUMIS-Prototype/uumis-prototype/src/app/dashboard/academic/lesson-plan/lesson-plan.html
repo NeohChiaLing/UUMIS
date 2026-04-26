@@ -1,55 +1,55 @@
-<div class="min-h-screen bg-[#f0fdf4] font-display text-slate-800 flex flex-col relative">
+<div class="min-h-screen bg-[#f0fdf4] font-display text-slate-800 flex flex-col relative pb-20 md:pb-0">
 
-  <div *ngIf="isViewingPDF" class="fixed inset-0 z-[100] flex items-center justify-center bg-emerald-900/40 backdrop-blur-md p-6 lg:p-12 animate-fade-in">
-    <div class="bg-white w-full h-full rounded-[3rem] border border-emerald-100 shadow-2xl overflow-hidden flex flex-col">
-      <div class="px-10 py-6 border-b border-emerald-50 flex justify-between items-center bg-white shrink-0">
-        <div class="flex items-center gap-4">
-          <div class="size-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600"><span translate="no" class="material-symbols-outlined notranslate">description</span></div>
-          <h3 class="text-xl font-black text-emerald-900 uppercase">Document <span class="text-emerald-500">Preview</span></h3>
+  <div *ngIf="isViewingPDF" class="fixed inset-0 z-[100] flex items-center justify-center bg-emerald-900/40 backdrop-blur-md p-4 sm:p-6 lg:p-12 animate-fade-in">
+    <div class="bg-white w-full h-full rounded-[1.5rem] md:rounded-[3rem] border border-emerald-100 shadow-2xl overflow-hidden flex flex-col">
+      <div class="px-4 md:px-10 py-4 md:py-6 border-b border-emerald-50 flex justify-between items-center bg-white shrink-0">
+        <div class="flex items-center gap-2 md:gap-4">
+          <div class="size-8 md:size-10 rounded-lg md:rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600"><span translate="no" class="material-symbols-outlined notranslate text-base md:text-xl">description</span></div>
+          <h3 class="text-base md:text-xl font-black text-emerald-900 uppercase">Doc <span class="text-emerald-500">Preview</span></h3>
         </div>
-        <button (click)="closePDFViewer()" class="px-6 py-2.5 bg-rose-50 text-rose-500 rounded-xl font-black uppercase text-[10px] hover:bg-rose-500 hover:text-white transition-all flex items-center gap-2">
-          <span translate="no" class="material-symbols-outlined notranslate text-sm">close</span> Close Preview
+        <button (click)="closePDFViewer()" class="px-4 md:px-6 py-2 md:py-2.5 bg-rose-50 text-rose-500 rounded-lg md:rounded-xl font-black uppercase text-[9px] md:text-[10px] hover:bg-rose-500 hover:text-white transition-all flex items-center gap-1.5 md:gap-2">
+          <span translate="no" class="material-symbols-outlined notranslate text-sm">close</span> <span class="hidden md:inline">Close</span>
         </button>
       </div>
-      <div class="flex-1 bg-slate-100 p-4">
-        <iframe *ngIf="currentPdfUrl" [src]="currentPdfUrl" class="w-full h-full rounded-2xl border-none shadow-inner"></iframe>
+      <div class="flex-1 bg-slate-100 p-2 md:p-4">
+        <iframe *ngIf="currentPdfUrl" [src]="currentPdfUrl" class="w-full h-full rounded-xl md:rounded-2xl border-none shadow-inner"></iframe>
       </div>
     </div>
   </div>
 
-  <div *ngIf="isAddingMode" class="fixed inset-0 z-50 flex items-center justify-center bg-emerald-900/20 backdrop-blur-sm animate-fade-in">
-    <div class="bg-white w-full max-w-lg p-10 rounded-[3rem] border border-emerald-100 shadow-2xl space-y-8">
+  <div *ngIf="isAddingMode" class="fixed inset-0 z-50 flex items-center justify-center bg-emerald-900/20 backdrop-blur-sm animate-fade-in p-4 md:p-0">
+    <div class="bg-white w-full max-w-lg p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] border border-emerald-100 shadow-2xl space-y-6 md:space-y-8 max-h-[95vh] overflow-y-auto custom-scrollbar">
       <div class="flex justify-between items-center">
-        <h3 class="text-2xl font-black text-emerald-900 uppercase">Add New <span class="text-emerald-500">Plan</span></h3>
-        <button (click)="toggleAddingMode()" class="text-slate-300 hover:text-rose-500 transition-colors"><span translate="no" class="material-symbols-outlined notranslate">close</span></button>
+        <h3 class="text-xl md:text-2xl font-black text-emerald-900 uppercase">Add <span class="text-emerald-500">Plan</span></h3>
+        <button (click)="toggleAddingMode()" class="text-slate-300 hover:text-rose-500 transition-colors p-2"><span translate="no" class="material-symbols-outlined notranslate text-xl md:text-2xl">close</span></button>
       </div>
 
       <div class="space-y-4">
         <div class="space-y-1">
-          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Teacher Name</label>
-          <input [(ngModel)]="newPlanForm.teacherName" class="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 text-sm font-bold outline-none focus:ring-2 ring-emerald-100">
+          <label class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Teacher Name</label>
+          <input [(ngModel)]="newPlanForm.teacherName" class="w-full bg-slate-50 border border-slate-100 rounded-xl p-2.5 md:p-3 text-sm font-bold outline-none focus:ring-2 ring-emerald-100">
         </div>
         <div class="space-y-1">
-          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Subject Name</label>
-          <input [(ngModel)]="newPlanForm.subjectName" placeholder="e.g. Mathematics" class="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 text-sm font-bold outline-none focus:ring-2 ring-emerald-100">
+          <label class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Subject Name</label>
+          <input [(ngModel)]="newPlanForm.subjectName" placeholder="e.g. Mathematics" class="w-full bg-slate-50 border border-slate-100 rounded-xl p-2.5 md:p-3 text-sm font-bold outline-none focus:ring-2 ring-emerald-100">
         </div>
 
         <div class="space-y-1">
-          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Topic</label>
-          <input [(ngModel)]="newPlanForm.topic" placeholder="e.g. Algebra" class="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 text-sm font-bold outline-none focus:ring-2 ring-emerald-100">
+          <label class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Topic</label>
+          <input [(ngModel)]="newPlanForm.topic" placeholder="e.g. Algebra" class="w-full bg-slate-50 border border-slate-100 rounded-xl p-2.5 md:p-3 text-sm font-bold outline-none focus:ring-2 ring-emerald-100">
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="space-y-1">
-            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Level</label>
-            <select [(ngModel)]="newPlanForm.level" (change)="newPlanForm.year = ''" class="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 text-sm font-bold outline-none focus:ring-2 ring-emerald-100 cursor-pointer">
+            <label class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Level</label>
+            <select [(ngModel)]="newPlanForm.level" (change)="newPlanForm.year = ''" class="w-full bg-slate-50 border border-slate-100 rounded-xl p-2.5 md:p-3 text-sm font-bold outline-none focus:ring-2 ring-emerald-100 cursor-pointer">
               <option value="" disabled selected>Select Level...</option>
               <option *ngFor="let lvl of academicLevels" [value]="lvl">{{lvl}}</option>
             </select>
           </div>
           <div class="space-y-1" [class.opacity-50]="!newPlanForm.level">
-            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Year Group</label>
-            <select [(ngModel)]="newPlanForm.year" [disabled]="!newPlanForm.level" class="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 text-sm font-bold outline-none focus:ring-2 ring-emerald-100 cursor-pointer disabled:cursor-not-allowed">
+            <label class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Year Group</label>
+            <select [(ngModel)]="newPlanForm.year" [disabled]="!newPlanForm.level" class="w-full bg-slate-50 border border-slate-100 rounded-xl p-2.5 md:p-3 text-sm font-bold outline-none focus:ring-2 ring-emerald-100 cursor-pointer disabled:cursor-not-allowed">
               <option value="" disabled selected>Select Year...</option>
               <option *ngFor="let yr of getYearsForLevel(newPlanForm.level)" [value]="yr">{{yr}}</option>
             </select>
@@ -57,77 +57,104 @@
         </div>
 
         <div class="space-y-1 pt-2">
-          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Lesson Plan PDF</label>
-          <div (click)="fileInput.click()" class="w-full border-2 border-dashed border-emerald-200 rounded-2xl p-6 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-emerald-50 transition-all">
+          <label class="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Lesson Plan PDF</label>
+          <div (click)="fileInput.click()" class="w-full border-2 border-dashed border-emerald-200 rounded-2xl p-5 md:p-6 flex flex-col items-center justify-center gap-2 cursor-pointer hover:bg-emerald-50 transition-all bg-white shadow-inner">
             <span translate="no" class="material-symbols-outlined notranslate text-emerald-400 text-3xl">upload_file</span>
-            <span class="text-xs font-bold text-emerald-600 truncate max-w-full px-4">{{ newPlanForm.fileName || 'Click to Upload Syllabus PDF' }}</span>
+            <span class="text-[10px] md:text-xs font-bold text-emerald-600 truncate max-w-full px-4 text-center">{{ newPlanForm.fileName || 'Upload Syllabus PDF' }}</span>
             <input #fileInput type="file" class="hidden" (change)="onFileSelected($event)" accept="application/pdf">
           </div>
         </div>
       </div>
 
-      <button (click)="submitNewPlan()" class="w-full py-5 bg-emerald-500 text-white font-black uppercase tracking-widest rounded-full shadow-lg hover:scale-105 transition-all">
-        Submit to Review List
+      <button (click)="submitNewPlan()" class="w-full py-4 md:py-5 bg-emerald-500 text-white font-black uppercase tracking-widest rounded-full shadow-lg hover:scale-[1.02] transition-transform text-xs">
+        Submit to Review
       </button>
     </div>
   </div>
 
-  <header class="bg-white border-b border-emerald-100 px-8 py-8 flex flex-col gap-6 sticky top-0 z-40 shadow-sm">
+  <header class="bg-white border-b border-emerald-100 px-4 md:px-8 py-6 md:py-8 flex flex-col gap-4 md:gap-6 sticky top-0 z-40 shadow-sm">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-      <div class="flex items-center gap-5">
-        <button (click)="goBack()" class="size-11 flex items-center justify-center rounded-full bg-white border border-emerald-100 text-slate-400 hover:text-emerald-500 shadow-sm transition-all"><span translate="no" class="material-symbols-outlined notranslate font-bold">arrow_back</span></button>
-        <div>
-          <h1 class="text-3xl font-black text-emerald-900 uppercase">Lesson Plan <span class="text-emerald-500">Review</span></h1>
-          <p class="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mt-1">Syllabus Verification & Approval</p>
+      <div class="flex items-start md:items-center gap-3 md:gap-5 w-full lg:w-auto">
+        <button (click)="goBack()" class="size-10 md:size-11 shrink-0 flex items-center justify-center rounded-full bg-white border border-emerald-100 text-slate-400 hover:text-emerald-500 shadow-sm transition-all mt-1 md:mt-0"><span translate="no" class="material-symbols-outlined notranslate font-bold text-lg md:text-xl">arrow_back</span></button>
+        <div class="min-w-0">
+          <h1 class="text-xl md:text-3xl font-black text-emerald-900 uppercase tracking-tight leading-tight">Lesson Plan <span class="text-emerald-500">Review</span></h1>
+          <p class="text-slate-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] mt-0.5 md:mt-1 truncate">Syllabus Verification & Approval</p>
         </div>
       </div>
-      <button (click)="toggleAddingMode()" class="flex items-center gap-2 px-6 py-3 bg-[#f472b6] text-white rounded-xl font-black uppercase text-[10px] shadow-lg shadow-pink-100 hover:bg-[#db2777] transition-all">
-        <span class="text-lg leading-none">+</span> Add Lesson Plan
+      <button (click)="toggleAddingMode()" class="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3.5 md:py-3 bg-[#f472b6] text-white rounded-xl md:rounded-2xl font-black uppercase text-[10px] md:text-xs shadow-lg shadow-pink-100 hover:bg-[#db2777] transition-all border border-[#db2777] hover:scale-[1.02]">
+        <span class="text-base md:text-lg leading-none">+</span> Add Plan
       </button>
     </div>
   </header>
 
-  <div class="flex-1 overflow-y-auto px-8 py-10">
-    <div class="bg-white rounded-[3rem] border border-emerald-100 shadow-xl shadow-emerald-500/5 overflow-hidden">
-      <table class="w-full text-left border-collapse">
+  <div class="flex-1 overflow-y-auto px-4 md:px-8 py-6 md:py-10 w-full overflow-x-hidden">
+    <p class="text-[10px] text-slate-400 font-bold text-center mb-2 md:hidden flex items-center justify-center gap-1"><span translate="no" class="material-symbols-outlined notranslate text-[14px]">swipe</span> Swipe table left/right</p>
+
+    <div class="bg-white rounded-[1.5rem] md:rounded-[3rem] border border-emerald-100 shadow-xl shadow-emerald-500/5 overflow-x-auto w-full custom-scrollbar" style="-webkit-overflow-scrolling: touch;">
+      <table class="w-full text-left border-collapse min-w-[700px]">
         <thead>
-        <tr class="bg-emerald-50/40 border-b border-emerald-50 text-[10px] font-black text-emerald-800 uppercase tracking-widest">
-          <th class="px-8 py-5">Teacher</th>
-          <th class="px-8 py-5">Subject & Topic</th>
-          <th class="px-8 py-5">Level / Year</th>
-          <th class="px-8 py-5">Status</th>
-          <th class="px-8 py-5 text-right">Actions</th>
+        <tr class="bg-emerald-50/60 border-b border-emerald-50 text-[9px] md:text-[10px] font-black text-emerald-800 uppercase tracking-widest">
+          <th class="px-4 md:px-8 py-4 md:py-5 md:sticky md:left-0 bg-emerald-50/95 backdrop-blur z-10 shadow-[1px_0_0_#d1fae5]">Teacher</th>
+          <th class="px-4 md:px-8 py-4 md:py-5">Subject & Topic</th>
+          <th class="px-4 md:px-8 py-4 md:py-5">Level / Year</th>
+          <th class="px-4 md:px-8 py-4 md:py-5 text-center md:text-left">Status</th>
+          <th class="px-4 md:px-8 py-4 md:py-5 text-right">Actions</th>
         </tr>
         </thead>
         <tbody class="divide-y divide-emerald-50">
         <tr *ngFor="let p of lessonPlans" class="group hover:bg-emerald-50/20 transition-all">
-          <td class="px-8 py-6"><div class="flex items-center gap-3"><div class="size-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-black text-xs border border-emerald-200">{{p.avatar}}</div><div><p class="text-sm font-black text-slate-700 uppercase">{{p.teacher}}</p><p class="text-[10px] text-slate-400 font-bold">ID: {{p.id || p.teacherId}}</p></div></div></td>
-          <td class="px-8 py-6"><div class="flex items-center gap-2"><span class="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase">{{p.subject}}</span><span class="text-xs font-black text-slate-700 uppercase tracking-tight">{{p.topic}}</span></div></td>
-          <td class="px-8 py-6"><span class="text-xs font-bold text-slate-500 uppercase">{{p.grade}}</span></td>
-          <td class="px-8 py-6">
-              <span [ngClass]="{'bg-blue-50 text-blue-600 border-blue-100': p.status === 'Pending Review', 'bg-emerald-50 text-emerald-600 border-emerald-100': p.status === 'Approved', 'bg-rose-50 text-rose-500 border-rose-100': p.status === 'Needs Revision'}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black uppercase border">
-                <span class="size-1.5 rounded-full" [ngClass]="{'bg-blue-500': p.status === 'Pending Review', 'bg-emerald-500': p.status === 'Approved', 'bg-rose-500': p.status === 'Needs Revision'}"></span> {{p.status}}
+          <td class="px-4 md:px-8 py-4 md:py-6 md:sticky md:left-0 bg-white/95 backdrop-blur group-hover:bg-[#fcfdfd] shadow-[1px_0_0_#e7f3ec] z-10">
+            <div class="flex items-center gap-2 md:gap-3">
+              <div class="size-8 md:size-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-black text-[10px] md:text-xs border border-emerald-200 shrink-0 shadow-sm">{{p.avatar}}</div>
+              <div class="min-w-0">
+                <p class="text-xs md:text-sm font-black text-slate-700 uppercase truncate max-w-[120px] md:max-w-[200px]">{{p.teacher}}</p>
+                <p class="text-[9px] md:text-[10px] text-slate-400 font-bold tracking-widest uppercase mt-0.5">ID: {{p.id || p.teacherId}}</p>
+              </div>
+            </div>
+          </td>
+
+          <td class="px-4 md:px-8 py-4 md:py-6">
+            <div class="flex flex-col md:flex-row md:items-center gap-1.5 md:gap-2">
+              <span class="px-2 py-1 rounded-lg bg-emerald-50 border border-emerald-100 text-emerald-600 text-[8px] md:text-[9px] font-black uppercase w-fit shadow-sm truncate max-w-[150px]">{{p.subject}}</span>
+              <span class="text-[10px] md:text-xs font-black text-slate-700 uppercase tracking-tight line-clamp-2 md:line-clamp-1">{{p.topic}}</span>
+            </div>
+          </td>
+
+          <td class="px-4 md:px-8 py-4 md:py-6">
+            <span class="text-[10px] md:text-xs font-bold text-slate-500 uppercase tracking-wide">{{p.grade}}</span>
+          </td>
+
+          <td class="px-4 md:px-8 py-4 md:py-6 text-center md:text-left">
+              <span [ngClass]="{'bg-blue-50 text-blue-600 border-blue-200': p.status === 'Pending Review', 'bg-emerald-50 text-emerald-600 border-emerald-200': p.status === 'Approved', 'bg-rose-50 text-rose-500 border-rose-200': p.status === 'Needs Revision'}" class="inline-flex items-center justify-center md:justify-start gap-1.5 px-2.5 py-1.5 md:px-3 md:py-1 rounded-lg md:rounded-full text-[8px] md:text-[9px] font-black uppercase border shadow-sm min-w-[90px] md:min-w-0">
+                <span class="size-1.5 md:size-2 rounded-full" [ngClass]="{'bg-blue-500': p.status === 'Pending Review', 'bg-emerald-500': p.status === 'Approved', 'bg-rose-500': p.status === 'Needs Revision'}"></span> {{p.status}}
               </span>
           </td>
-          <td class="px-8 py-6 text-right">
-            <div class="flex items-center justify-end gap-2">
-              <button (click)="viewPDF(p)" class="p-2.5 bg-sky-50 text-sky-600 rounded-xl hover:bg-sky-500 hover:text-white transition-all shadow-sm" title="View PDF"><span translate="no" class="material-symbols-outlined notranslate text-[20px]">visibility</span></button>
+
+          <td class="px-4 md:px-8 py-4 md:py-6 text-right shrink-0">
+            <div class="flex items-center justify-end gap-1.5 md:gap-2 opacity-100 md:opacity-20 md:group-hover:opacity-100 transition-opacity">
+              <button (click)="viewPDF(p)" class="p-1.5 md:p-2.5 bg-white border border-sky-100 text-sky-600 rounded-lg md:rounded-xl hover:bg-sky-500 hover:text-white transition-all shadow-sm" title="View PDF"><span translate="no" class="material-symbols-outlined notranslate text-[16px] md:text-[20px]">visibility</span></button>
 
               <button (click)="approvePlan(p)"
                       [disabled]="p.status === 'Approved'"
-                      [ngClass]="p.status === 'Approved' ? 'bg-slate-100 text-slate-400 cursor-not-allowed' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white shadow-sm'"
-                      class="p-2.5 rounded-xl transition-all" title="Approve">
-                <span translate="no" class="material-symbols-outlined notranslate text-[20px]">check</span>
+                      [ngClass]="p.status === 'Approved' ? 'bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed shadow-none' : 'bg-white border-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white shadow-sm'"
+                      class="p-1.5 md:p-2.5 border rounded-lg md:rounded-xl transition-all" title="Approve">
+                <span translate="no" class="material-symbols-outlined notranslate text-[16px] md:text-[20px]">check_circle</span>
               </button>
 
-              <button (click)="rejectPlan(p)" class="p-2.5 bg-rose-50 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white transition-all shadow-sm" title="Reject"><span translate="no" class="material-symbols-outlined notranslate text-[20px]">close</span></button>
+              <button (click)="rejectPlan(p)" class="p-1.5 md:p-2.5 bg-white border border-rose-100 text-rose-500 rounded-lg md:rounded-xl hover:bg-rose-500 hover:text-white transition-all shadow-sm" title="Reject"><span translate="no" class="material-symbols-outlined notranslate text-[16px] md:text-[20px]">cancel</span></button>
 
-              <button (click)="downloadPDF(p)" class="p-2.5 bg-slate-100 text-slate-500 rounded-xl hover:bg-slate-700 hover:text-white transition-all shadow-sm" title="Download"><span translate="no" class="material-symbols-outlined notranslate text-[20px]">download</span></button>
+              <button (click)="downloadPDF(p)" class="p-1.5 md:p-2.5 bg-white border border-slate-200 text-slate-600 rounded-lg md:rounded-xl hover:bg-slate-700 hover:text-white hover:border-slate-700 transition-all shadow-sm" title="Download"><span translate="no" class="material-symbols-outlined notranslate text-[16px] md:text-[20px]">download</span></button>
             </div>
           </td>
         </tr>
         </tbody>
       </table>
+
+      <div *ngIf="lessonPlans.length === 0" class="flex flex-col items-center justify-center h-48 md:h-64 border-t border-dashed border-gray-200">
+        <span translate="no" class="material-symbols-outlined notranslate text-4xl md:text-5xl text-emerald-100 mb-3 md:mb-4">assignment_turned_in</span>
+        <p class="text-slate-400 font-black text-[10px] md:text-xs uppercase tracking-widest text-center px-4">No lesson plans found</p>
+      </div>
+
     </div>
   </div>
 </div>

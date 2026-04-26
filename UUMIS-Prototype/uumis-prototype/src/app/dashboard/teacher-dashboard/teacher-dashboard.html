@@ -156,15 +156,15 @@
                 <p class="text-xs font-black text-emerald-600 uppercase tracking-widest">No classes scheduled for today</p>
               </div>
 
-              <div *ngFor="let slot of todaySchedule; let i = index"
-                   [ngClass]="{'border-emerald-200 bg-emerald-50/50': i === 0, 'border-slate-100 bg-white hover:border-emerald-100 hover:bg-slate-50': i !== 0}"
+              <div *ngFor="let slot of todaySchedule"
+                   [ngClass]="{'border-emerald-200 bg-emerald-50/50': slot.isCurrent, 'border-slate-100 bg-white hover:border-emerald-100 hover:bg-slate-50': !slot.isCurrent, 'opacity-60': slot.isPast && !slot.isCurrent}"
                    class="flex items-center p-6 rounded-[2rem] border relative overflow-hidden group transition-colors">
 
-                <div *ngIf="i === 0" class="absolute left-0 top-0 bottom-0 w-2 bg-emerald-400"></div>
+                <div *ngIf="slot.isCurrent" class="absolute left-0 top-0 bottom-0 w-2 bg-emerald-400"></div>
 
                 <div class="flex flex-col sm:flex-row sm:items-center w-full gap-6">
                   <div class="flex flex-col min-w-[100px]">
-                    <span *ngIf="i === 0" class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Current</span>
+                    <span *ngIf="slot.isCurrent" class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">Current</span>
                     <span class="text-2xl font-black text-slate-800 tracking-tight">{{ slot.time.split('-')[0] || slot.time }}</span>
                     <span *ngIf="slot.time.includes('-')" class="text-xs font-bold text-slate-400">to {{ slot.time.split('-')[1] }}</span>
                   </div>
@@ -172,10 +172,7 @@
                     <h4 class="font-black text-slate-800 text-xl uppercase">{{ slot.subject }}</h4>
                     <p class="text-sm font-bold text-slate-500 mt-1 uppercase tracking-wide">Class: {{ slot.class || 'TBA' }}</p>
                   </div>
-                  <div class="flex flex-col items-end gap-2">
-                    <div class="text-[10px] font-black text-slate-500 bg-white px-3 py-1.5 rounded-lg border border-slate-200 uppercase tracking-wider">Room TBA</div>
-                    <button *ngIf="i === 0" class="text-[10px] bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 font-black uppercase tracking-wider shadow-md">Start Lesson</button>
-                  </div>
+
                 </div>
               </div>
             </div>

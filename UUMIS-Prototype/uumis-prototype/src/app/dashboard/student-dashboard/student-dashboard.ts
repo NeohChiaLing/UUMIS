@@ -15,9 +15,6 @@ export class StudentDashboardComponent implements OnInit {
   currentUser: any = null;
   studentName: string = 'Student';
 
-  // ==========================================================
-  // THE FIX: Added missing variables required by the HTML template
-  // ==========================================================
   studentInitials: string = 'ST';
   studentGrade: string = 'Unassigned';
   showDashboardContent: boolean = true;
@@ -25,7 +22,6 @@ export class StudentDashboardComponent implements OnInit {
   todayDate: string = '';
   todayDayName: string = '';
 
-  // Time-aware Arrays
   currentSubject: any = null;
   upcomingSubjects: any[] = [];
   completedSubjects: any[] = [];
@@ -62,7 +58,6 @@ export class StudentDashboardComponent implements OnInit {
             return;
           }
 
-          // THE FIX: Safely populate the initials and grade for the UI
           if (role === 'parent') {
             this.studentName = "My Child's Dashboard";
             this.studentInitials = "PR";
@@ -73,19 +68,18 @@ export class StudentDashboardComponent implements OnInit {
             this.studentGrade = this.currentUser.bio || 'Unassigned';
           }
 
-          let studentLevel = 'Kindergarten';
+          // THE FIX: Do NOT split the bio! Use the exact "Level - Year" string (e.g., "Primary - Year 1")
+          let exactScheduleKey = 'Kindergarten - Pre-Kindergarten';
           if (this.currentUser.bio && this.currentUser.bio !== 'Unassigned' && role !== 'parent') {
-            const parts = this.currentUser.bio.split('-');
-            if (parts.length > 0) {
-              studentLevel = parts[0].trim();
-            }
+            exactScheduleKey = this.currentUser.bio.trim();
           }
 
           const date = new Date();
           this.todayDate = date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
           this.todayDayName = date.toLocaleDateString('en-GB', { weekday: 'long' }).toUpperCase();
 
-          this.loadTodayTimetable(studentLevel);
+          // THE FIX: Pass the combined key to the database!
+          this.loadTodayTimetable(exactScheduleKey);
 
         } catch (e) {}
       } else {
@@ -109,17 +103,19 @@ export class StudentDashboardComponent implements OnInit {
     this.showFullTimetable = !this.showFullTimetable;
   }
 
-  loadTodayTimetable(level: string) {
-    this.authService.getSchedule(level).subscribe({
+  loadTodayTimetable(levelAndYearKey: string) {
+    this.authService.getSchedule(levelAndYearKey).subscribe({
       next: (res: any) => {
-        if (res && res.headers && res.gridData) {
+        if (res && res.headers) {
           const headers = JSON.parse(res.headers);
-          const rows = JSON.parse(res.gridData);
+          // THE FIX: Account for the snake_case vs camelCase mismatch!
+          const rows = JSON.parse(res.gridData || res.grid_data);
 
           this.fullHeaders = headers;
           this.fullRows = rows;
 
           let dayIndex = this.days.indexOf(this.todayDayName);
+          // Fallback to Sunday if they open it on a Friday/Saturday
           if (dayIndex === -1) {
             dayIndex = 0;
             this.todayDate += ' (Showing Sunday)';
@@ -129,7 +125,6 @@ export class StudentDashboardComponent implements OnInit {
             const todaySchedule = rows[dayIndex];
             const validSlots = [];
 
-            // Get Current Live Time
             const now = new Date();
             const currentMins = now.getHours() * 60 + now.getMinutes();
 
@@ -188,7 +183,7 @@ export class StudentDashboardComponent implements OnInit {
           }
         }
       },
-      error: (err: any) => console.log('No schedule found for level: ' + level)
+      error: (err: any) => console.log('No schedule found for key: ' + levelAndYearKey)
     });
   }
 }

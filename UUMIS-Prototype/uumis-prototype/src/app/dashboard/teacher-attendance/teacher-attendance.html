@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-[#f6f8f7] font-display text-[#0e1b13] flex flex-col relative pb-32">
+<div class="min-h-screen bg-[#f6f8f7] font-display text-[#0e1b13] flex flex-col relative pb-32 overflow-hidden">
 
   <div *ngIf="showMCConfirm" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm p-6 animate-fade-in">
     <div class="bg-white w-full max-w-sm p-8 rounded-[2rem] shadow-2xl text-center space-y-6">
@@ -49,8 +49,10 @@
       </div>
 
       <div class="flex items-center gap-3">
-        <button (click)="exportToPDF()" class="flex items-center gap-2 px-4 py-2.5 bg-white border border-[#d0e7d9] rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors shadow-sm text-[#0e1b13]">
-          <span translate="no" class="material-symbols-outlined notranslate text-[18px]">file_download</span> Export Report (PDF)
+        <button (click)="exportToPDF()" [disabled]="isGeneratingPDF" class="flex items-center gap-2 px-4 py-2.5 bg-white border border-[#d0e7d9] rounded-xl text-sm font-bold hover:bg-gray-50 transition-colors shadow-sm text-[#0e1b13] disabled:opacity-50">
+          <span *ngIf="isGeneratingPDF" translate="no" class="material-symbols-outlined notranslate text-[18px] animate-spin">progress_activity</span>
+          <span *ngIf="!isGeneratingPDF" translate="no" class="material-symbols-outlined notranslate text-[18px]">file_download</span>
+          {{ isGeneratingPDF ? 'Generating...' : 'Export Report (PDF)' }}
         </button>
         <button (click)="toggleAddStudent()" class="flex items-center gap-2 px-4 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-colors shadow-lg shadow-emerald-200">
           <span translate="no" class="material-symbols-outlined notranslate text-[18px]">add</span> Add Student
@@ -121,21 +123,20 @@
           <td class="py-5 px-6 text-sm font-mono text-gray-500">{{s.id}}</td>
 
           <td class="py-5 px-6">
-            <input [(ngModel)]="s.timeIn" [disabled]="s.dbId" class="bg-transparent border border-transparent hover:border-gray-200 rounded px-2 py-1 text-sm font-mono focus:border-emerald-500 outline-none w-24 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" [class.text-red-500]="s.status === 'Late'">
+            <input [(ngModel)]="s.timeIn" class="bg-transparent border border-transparent hover:border-gray-200 rounded px-2 py-1 text-sm font-mono focus:border-emerald-500 outline-none w-24 transition-colors" [class.text-red-500]="s.status === 'LATE'">
           </td>
 
           <td class="py-5 px-6">
-            <span [ngClass]="{'bg-green-100 text-green-700': s.status === 'Present', 'bg-pink-100 text-pink-700': s.status === 'Absent', 'bg-blue-100 text-blue-700': s.status === 'Late'}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase"><span class="size-1.5 rounded-full" [ngClass]="{'bg-green-600': s.status === 'Present', 'bg-pink-600': s.status === 'Absent', 'bg-blue-600': s.status === 'Late'}"></span> {{s.status}}</span>
+            <span [ngClass]="{'bg-green-100 text-green-700': s.status === 'PRESENT', 'bg-pink-100 text-pink-700': s.status === 'ABSENT', 'bg-blue-100 text-blue-700': s.status === 'LATE'}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase"><span class="size-1.5 rounded-full" [ngClass]="{'bg-green-600': s.status === 'PRESENT', 'bg-pink-600': s.status === 'ABSENT', 'bg-blue-600': s.status === 'LATE'}"></span> {{s.status}}</span>
           </td>
 
           <td class="py-5 px-6 text-right">
             <div class="flex items-center justify-end gap-2">
-              <button (click)="handleMC(s)" [class]="s.mcFile ? 'text-emerald-500 bg-emerald-50' : 'text-blue-400 hover:bg-blue-50'" class="p-2 rounded-xl transition-all" [title]="s.mcFile ? 'View/Download MC' : 'Upload MC'">
-                <span translate="no" class="material-symbols-outlined notranslate text-[20px]">{{ s.mcFile ? 'visibility' : 'upload_file' }}</span>
+              <button (click)="handleMC(s)" [class]="s.mcFile || s.mcUrl ? 'text-emerald-500 bg-emerald-50' : 'text-blue-400 hover:bg-blue-50'" class="p-2 rounded-xl transition-all" [title]="s.mcFile || s.mcUrl ? 'View/Download MC' : 'Upload MC'">
+                <span translate="no" class="material-symbols-outlined notranslate text-[20px]">{{ s.mcFile || s.mcUrl ? 'visibility' : 'upload_file' }}</span>
               </button>
 
-              <button *ngIf="!s.dbId" (click)="toggleStatus(s)" class="p-2 text-gray-400 hover:bg-green-50 hover:text-green-600 rounded-xl transition-all" title="Toggle Status"><span translate="no" class="material-symbols-outlined notranslate text-[20px]">swap_horiz</span></button>
-              <button *ngIf="s.dbId" disabled class="p-2 text-gray-300 cursor-not-allowed rounded-xl" title="Already Submitted"><span translate="no" class="material-symbols-outlined notranslate text-[20px]">lock</span></button>
+              <button (click)="toggleStatus(s)" class="p-2 text-gray-400 hover:bg-green-50 hover:text-green-600 rounded-xl transition-all" title="Toggle Status"><span translate="no" class="material-symbols-outlined notranslate text-[20px]">swap_horiz</span></button>
 
               <button (click)="deleteStudent(s)" class="p-2 text-gray-400 hover:bg-red-50 hover:text-red-500 rounded-xl transition-all" title="Delete Student"><span translate="no" class="material-symbols-outlined notranslate text-[20px]">delete</span></button>
             </div>
@@ -151,4 +152,80 @@
       </button>
     </div>
   </div>
+
+  <div id="formal-teacher-attendance-pdf" class="absolute top-0 left-[-9999px] w-[800px] bg-white text-black p-12 font-sans z-[-1]">
+    <div class="flex items-center border-b-[3px] border-emerald-800 pb-6 mb-8">
+      <div class="w-24 h-24 mr-6 flex-shrink-0 bg-white p-2 border-2 border-emerald-800 rounded-xl flex items-center justify-center">
+        <img src="assets/UUMIS-Logo.jpg" alt="UUMIS Logo" class="w-full h-full object-contain">
+      </div>
+      <div class="flex-1">
+        <h1 class="text-3xl font-black uppercase tracking-widest text-emerald-900 m-0">UUMIS International School</h1>
+        <p class="text-sm font-bold text-gray-800 mt-1">Universiti Utara Malaysia, 06010 UUM Sintok, Kedah Darul Aman.</p>
+        <p class="text-xs text-gray-600 mt-0.5">Phone: +60 4-928 4000 | Email: admin@uumis.edu.my | Portal: www.uumis.com.my</p>
+      </div>
+      <div class="text-right border-l-2 border-gray-200 pl-6 ml-4">
+        <p class="text-lg font-black text-gray-800 uppercase tracking-widest">Official Record</p>
+        <p class="text-xs text-gray-500 font-bold mt-1">Class Attendance Report</p>
+      </div>
+    </div>
+
+    <h2 class="text-center text-xl font-black uppercase tracking-widest bg-gray-100 py-2 mb-6 border border-gray-300">Teacher Attendance Log</h2>
+
+    <table class="w-full text-sm border-collapse mb-6">
+      <tbody>
+      <tr>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 uppercase text-[10px] tracking-widest">Class / Year</td>
+        <td class="border border-gray-300 p-3 font-bold text-base" colspan="3">{{ selectedYear }}</td>
+      </tr>
+      <tr>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 uppercase text-[10px] tracking-widest">Date</td>
+        <td class="border border-gray-300 p-3 w-1/4">{{ selectedDate }}</td>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 uppercase text-[10px] tracking-widest">Total Students</td>
+        <td class="border border-gray-300 p-3 w-1/4 font-bold text-blue-600">{{ students.length }}</td>
+      </tr>
+      <tr>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-3 uppercase text-[10px] tracking-widest">Total Present</td>
+        <td class="border border-gray-300 p-3 text-green-600 font-bold">{{ totalPresent }}</td>
+        <td class="border border-gray-300 bg-gray-50 font-bold p-3 uppercase text-[10px] tracking-widest">Total Absent / Late</td>
+        <td class="border border-gray-300 p-3 text-red-600 font-bold">{{ totalAbsent }} Absent / {{ totalLate }} Late</td>
+      </tr>
+      </tbody>
+    </table>
+
+    <table class="w-full text-sm border-collapse mb-8">
+      <thead>
+      <tr class="bg-gray-100">
+        <th class="border border-gray-300 p-2 text-[10px] uppercase tracking-widest text-left w-12">No.</th>
+        <th class="border border-gray-300 p-2 text-[10px] uppercase tracking-widest text-left">Student Name</th>
+        <th class="border border-gray-300 p-2 text-[10px] uppercase tracking-widest text-left">Student ID</th>
+        <th class="border border-gray-300 p-2 text-[10px] uppercase tracking-widest text-center">Time In</th>
+        <th class="border border-gray-300 p-2 text-[10px] uppercase tracking-widest text-right">Status</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let s of filteredStudents; let i = index">
+        <td class="border border-gray-300 bg-gray-50 font-bold p-2 text-[10px] tracking-widest">{{ i + 1 }}</td>
+        <td class="border border-gray-300 p-2 font-bold uppercase">{{ s.name }}</td>
+        <td class="border border-gray-300 p-2 text-xs text-gray-500 font-mono">{{ s.id }}</td>
+        <td class="border border-gray-300 p-2 text-center">{{ s.timeIn || '--:--' }}</td>
+        <td class="border border-gray-300 p-2 text-right font-bold uppercase"
+            [ngClass]="{'text-green-600': s.status === 'PRESENT', 'text-red-500': s.status === 'ABSENT', 'text-blue-500': s.status === 'LATE'}">
+          {{ s.status }}
+        </td>
+      </tr>
+      </tbody>
+    </table>
+
+    <div class="flex justify-between items-end mt-12 pt-8">
+      <div class="text-center">
+        <div class="border-b border-gray-800 w-48 mb-2 mx-auto"></div>
+        <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Instructor Signature</p>
+      </div>
+      <div class="text-center">
+        <div class="border-b border-gray-800 w-48 mb-2 mx-auto"></div>
+        <p class="text-[10px] font-black uppercase tracking-widest text-gray-500">Administrator Approval</p>
+      </div>
+    </div>
+  </div>
+
 </div>

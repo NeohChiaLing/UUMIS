@@ -32,6 +32,9 @@ export class FacultyStaffComponent implements OnInit {
   selectedCV: any = null;
   isLoadingCV: boolean = false;
 
+  // 👉 修复报错：添加翻译相关的变量
+  showLangModal: boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     private authService: AuthService,
@@ -176,6 +179,26 @@ export class FacultyStaffComponent implements OnInit {
       a.click();
     } else {
       alert("No file available for download.");
+    }
+  }
+
+  // 👉 修复报错：添加翻译相关的方法
+  toggleLangModal() {
+    this.showLangModal = !this.showLangModal;
+  }
+
+  switchLanguage(lang: string) {
+    this.showLangModal = false;
+    if (lang === 'en') {
+      const domains = [window.location.hostname, '.' + window.location.hostname, 'localhost', ''];
+      domains.forEach(d => { document.cookie = `googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=${d}; path=/;`; });
+      window.location.reload();
+      return;
+    }
+    const select = document.querySelector('.goog-te-combo') as HTMLSelectElement;
+    if (select) {
+      select.value = lang;
+      select.dispatchEvent(new Event('change'));
     }
   }
 }

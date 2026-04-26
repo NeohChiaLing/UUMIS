@@ -7,7 +7,7 @@
       </button>
       <div>
         <h1 class="text-3xl font-black text-emerald-900 uppercase">My <span class="text-emerald-500">Children</span></h1>
-        <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">Select a child to view their courses</p>
+        <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">Select a child to view and submit their tasks</p>
       </div>
     </header>
 
@@ -99,6 +99,7 @@
           <div class="flex justify-between items-start">
             <span [ngClass]="task.type === 'Assignment' ? 'bg-blue-50 text-blue-600' : 'bg-pink-50 text-pink-600'" class="px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-tighter border border-white/50 shadow-sm">{{task.type}}</span>
             <span *ngIf="task.status === 'Submitted'" class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-[10px] font-black uppercase"><span translate="no" class="material-symbols-outlined notranslate text-sm align-middle mr-1">check</span>Done</span>
+            <span *ngIf="task.status === 'Unsubmitted'" class="bg-rose-100 text-rose-600 px-3 py-1 rounded-full text-[10px] font-black uppercase"><span translate="no" class="material-symbols-outlined notranslate text-sm align-middle mr-1">close</span>Missed</span>
           </div>
 
           <div class="space-y-1">
@@ -114,6 +115,110 @@
     </div>
   </div>
 
+
+  <div *ngIf="viewState === 'quiz-gateway'" class="fixed inset-0 z-[120] flex items-center justify-center bg-emerald-900/40 backdrop-blur-sm p-6 animate-fade-in">
+    <div class="bg-white w-full max-w-md p-10 rounded-[3rem] border border-emerald-100 shadow-2xl space-y-6 relative text-center">
+      <button (click)="goBack()" class="absolute top-6 right-6 text-slate-300 hover:text-rose-500 transition-colors">
+        <span translate="no" class="material-symbols-outlined notranslate text-2xl">close</span>
+      </button>
+
+      <div class="size-20 rounded-full bg-pink-50 text-pink-500 flex items-center justify-center mx-auto shadow-inner mb-4">
+        <span translate="no" class="material-symbols-outlined notranslate text-4xl">timer</span>
+      </div>
+      <h3 class="text-2xl font-black text-slate-800 uppercase">Ready to Start?</h3>
+      <p class="text-sm font-bold text-slate-400 mt-2">{{clickedTask?.title}}</p>
+
+      <div class="bg-slate-50 p-4 rounded-[1.5rem] border border-slate-100 mt-4 mb-6">
+        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Time Limit</p>
+        <p class="text-xl font-black text-emerald-600">{{clickedTask?.durationText}}</p>
+        <p class="text-[9px] text-rose-500 font-bold mt-2 px-4 uppercase">The timer will not stop once you begin. If time runs out, your answers will be automatically submitted.</p>
+      </div>
+
+      <button (click)="startQuiz()" class="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-200 hover:scale-105 transition-all flex items-center justify-center gap-3">
+        <span translate="no" class="material-symbols-outlined notranslate">play_arrow</span> Start Quiz
+      </button>
+    </div>
+  </div>
+
+
+  <div *ngIf="viewState === 'quiz'" class="fixed inset-0 z-[200] bg-[#f0fdf4] flex flex-col animate-fade-in">
+    <div class="bg-white border-b border-emerald-100 px-8 py-4 flex justify-between items-center shadow-sm sticky top-0 z-10">
+      <div>
+        <h2 class="text-2xl font-black text-emerald-900 uppercase">{{clickedTask?.subjectCode}}</h2>
+        <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">{{clickedTask?.title}}</p>
+      </div>
+      <div class="flex items-center gap-4 bg-emerald-50 px-6 py-3 rounded-2xl border border-emerald-100">
+        <span translate="no" class="material-symbols-outlined notranslate text-emerald-600 animate-pulse">timer</span>
+        <span class="text-2xl font-black text-emerald-700 tabular-nums">{{remainingTimeText}}</span>
+      </div>
+    </div>
+    <div class="flex-1 overflow-y-auto p-8">
+      <div class="max-w-4xl mx-auto space-y-8">
+        <div *ngFor="let q of (clickedTask?.questions || []); let i = index" class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-emerald-50">
+          <div class="flex gap-4 mb-6">
+            <span class="size-8 bg-emerald-100 text-emerald-600 font-black rounded-lg flex items-center justify-center shrink-0">{{i+1}}</span>
+            <h3 class="text-lg font-bold text-slate-800">{{q.text}}</h3>
+          </div>
+          <div class="space-y-3 pl-12">
+            <label *ngFor="let opt of (q.options || []); let oi = index" class="flex items-center gap-4 p-4 rounded-xl border border-slate-100 hover:bg-emerald-50/50 hover:border-emerald-200 cursor-pointer transition-all group">
+              <input type="radio" [name]="'question_'+i" [value]="oi" [(ngModel)]="userAnswers[i]" class="size-5 accent-emerald-500 cursor-pointer">
+              <span class="text-slate-600 font-medium group-hover:text-emerald-800">{{opt}}</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bg-white border-t border-emerald-100 p-6 flex justify-center gap-4 sticky bottom-0 z-10">
+      <button (click)="goBack()" class="px-8 py-4 border border-slate-200 text-slate-500 font-black uppercase tracking-widest rounded-2xl hover:bg-slate-50">Cancel</button>
+      <button (click)="submitQuiz(false)" class="px-16 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-200 hover:-translate-y-1 transition-all flex items-center gap-3">
+        <span translate="no" class="material-symbols-outlined notranslate">check_circle</span> Submit Answers
+      </button>
+    </div>
+  </div>
+
+
+  <div *ngIf="viewState === 'quiz-result'" class="fixed inset-0 z-[200] bg-white flex flex-col animate-fade-in items-center justify-center p-6">
+    <div class="w-full max-w-md p-10 rounded-[3rem] border border-emerald-100 shadow-2xl text-center">
+      <div class="size-24 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto shadow-inner mb-6 border-4 border-emerald-100">
+        <span translate="no" class="material-symbols-outlined notranslate text-5xl">military_tech</span>
+      </div>
+      <h3 class="text-3xl font-black text-emerald-900 uppercase">Quiz Results</h3>
+      <p class="text-sm font-bold text-slate-500 mt-2">{{clickedTask?.title}}</p>
+
+      <div class="my-8 p-6 bg-slate-50 rounded-[2rem] border border-slate-100">
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Your Score</p>
+        <p class="text-5xl font-black text-emerald-600">{{quizResult?.score}} <span class="text-2xl text-slate-300">/ {{quizResult?.total}}</span></p>
+      </div>
+
+      <button (click)="goBack()" class="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-200 hover:scale-105 transition-all">
+        Return to Dashboard
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="viewState === 'assignment-result'" class="fixed inset-0 z-[200] bg-emerald-900/40 backdrop-blur-sm flex flex-col animate-fade-in items-center justify-center p-6">
+    <div class="bg-white w-full max-w-md p-10 rounded-[3rem] border border-emerald-100 shadow-2xl text-center relative">
+      <button (click)="goBack()" class="absolute top-6 right-6 text-slate-300 hover:text-rose-500 transition-colors">
+        <span translate="no" class="material-symbols-outlined notranslate text-2xl">close</span>
+      </button>
+      <div class="size-20 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto shadow-inner mb-4 border border-emerald-100">
+        <span translate="no" class="material-symbols-outlined notranslate text-4xl">task_alt</span>
+      </div>
+      <h3 class="text-2xl font-black text-slate-800 uppercase">Assignment Graded</h3>
+      <p class="text-sm font-bold text-slate-500 mt-2">{{clickedTask?.title}}</p>
+
+      <div class="my-6 p-6 bg-slate-50 rounded-[1.5rem] border border-slate-100">
+        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Final Score / Mark</p>
+        <p class="text-4xl font-black text-emerald-600">{{clickedTask?.scoreText}}</p>
+      </div>
+
+      <button (click)="goBack()" class="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-200 transition-all">
+        Awesome!
+      </button>
+    </div>
+  </div>
+
+
   <div *ngIf="viewState === 'details'" class="fixed inset-0 z-[120] flex items-center justify-center bg-emerald-900/40 backdrop-blur-sm p-6 animate-fade-in">
     <div class="bg-white w-full max-w-lg p-10 rounded-[3rem] border border-emerald-100 shadow-2xl space-y-6 relative">
       <button (click)="goBack()" class="absolute top-6 right-6 text-slate-300 hover:text-rose-500 transition-colors">
@@ -122,21 +227,34 @@
 
       <div class="text-center">
         <div class="size-20 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center mx-auto shadow-inner mb-4">
-          <span translate="no" class="material-symbols-outlined notranslate text-4xl">assignment</span>
+          <span translate="no" class="material-symbols-outlined notranslate text-4xl">assignment_add</span>
         </div>
-        <h3 class="text-2xl font-black text-slate-800 uppercase">View Task Details</h3>
+        <h3 class="text-2xl font-black text-slate-800 uppercase">Assignment Detail</h3>
         <p class="text-xs font-bold text-slate-400 mt-2 uppercase tracking-widest">Due: {{clickedTask?.deadline | date:'mediumDate'}}</p>
       </div>
 
-      <div class="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 space-y-2 text-center">
+      <div class="bg-slate-50 p-6 rounded-[2rem] border border-slate-100 space-y-2">
         <h4 class="text-lg font-black text-emerald-600 uppercase">{{clickedTask?.subjectCode}}</h4>
         <p class="text-sm font-bold text-slate-600">{{clickedTask?.title}}</p>
-        <p class="text-[10px] font-black text-orange-500 uppercase tracking-widest mt-2 pt-2 border-t border-slate-200">Only students can submit answers.</p>
       </div>
 
-      <button (click)="confirmDownload()" class="w-full py-4 bg-emerald-50 text-emerald-600 hover:bg-emerald-500 hover:text-white font-black uppercase tracking-widest rounded-2xl transition-all flex items-center justify-center gap-3">
-        <span translate="no" class="material-symbols-outlined notranslate">download</span> Download Instructions
-      </button>
+      <div class="space-y-3">
+        <button (click)="confirmDownload()" class="w-full py-4 bg-white border-2 border-slate-100 text-slate-500 hover:border-blue-200 hover:text-blue-500 font-black uppercase tracking-widest rounded-2xl transition-all flex items-center justify-center gap-3">
+          <span translate="no" class="material-symbols-outlined notranslate">download</span> Download Question
+        </button>
+
+        <div class="relative">
+          <input type="file" (change)="onFileSelected($event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" accept="application/pdf,.doc,.docx">
+          <div class="w-full py-4 bg-emerald-500 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-emerald-200 hover:scale-105 transition-all flex items-center justify-center gap-3">
+            <span translate="no" class="material-symbols-outlined notranslate">upload_file</span>
+            {{ selectedFileName ? selectedFileName : (clickedTask?.status === 'Submitted' ? 'Update File (Resubmit)' : 'Upload Answer File') }}
+          </div>
+        </div>
+
+        <button *ngIf="selectedFile" (click)="submitAssignment()" class="w-full py-3 bg-[#0e1b13] text-white font-black uppercase tracking-widest rounded-xl shadow-lg mt-4 hover:scale-[1.02] transition-all">
+          {{ clickedTask?.status === 'Submitted' ? 'Confirm Resubmission' : 'Confirm Submission' }}
+        </button>
+      </div>
     </div>
   </div>
 

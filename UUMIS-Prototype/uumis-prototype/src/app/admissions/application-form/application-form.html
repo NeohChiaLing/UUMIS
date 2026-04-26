@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-transparent font-display text-slate-900 relative flex flex-col overflow-x-hidden">
+<div class="min-h-screen bg-transparent font-display text-slate-900 relative flex flex-col overflow-x-hidden pb-32">
 
   <div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
     <div class="absolute -top-40 -right-40 w-[800px] h-[800px] bg-sky-200/40 rounded-full blur-[120px] bubble-float"></div>
@@ -10,12 +10,8 @@
     <div class="absolute top-1/2 right-[5%] w-24 h-24 rounded-full glass-bubble border border-white/20 bubble-float z-10" style="animation-delay: -7s;"></div>
     <div class="absolute top-[10%] left-[20%] w-16 h-16 rounded-full glass-bubble border border-white/30 bubble-float-alt z-10" style="animation-delay: -12s;"></div>
 
-    <div class="absolute top-[20%] left-[10%] opacity-[0.08] transform -rotate-12 bubble-float text-slate-800" style="animation-duration: 20s;">
-      <span translate="no" class="material-symbols-outlined notranslate text-[15rem]" style="font-variation-settings: 'wght' 100;">menu_book</span>
-    </div>
-    <div class="absolute bottom-[15%] right-[10%] opacity-[0.08] transform rotate-12 bubble-float-alt text-slate-800" style="animation-duration: 25s;">
-      <span translate="no" class="material-symbols-outlined notranslate text-[18rem]" style="font-variation-settings: 'wght' 100;">school</span>
-    </div>
+    <div class="absolute top-[20%] left-[10%] opacity-[0.08] transform -rotate-12 bubble-float text-slate-800 hidden md:block" style="animation-duration: 20s;"><span translate="no" class="material-symbols-outlined notranslate text-[15rem]" style="font-variation-settings: 'wght' 100;">menu_book</span></div>
+    <div class="absolute bottom-[15%] right-[10%] opacity-[0.08] transform rotate-12 bubble-float-alt text-slate-800 hidden md:block" style="animation-duration: 25s;"><span translate="no" class="material-symbols-outlined notranslate text-[18rem]" style="font-variation-settings: 'wght' 100;">school</span></div>
   </div>
 
   <app-navbar></app-navbar>
@@ -48,9 +44,9 @@
 
   <main class="flex-grow w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16 space-y-12 relative z-10">
 
-    <div class="fixed bottom-8 right-8 z-[90] flex flex-col items-end gap-4">
-      <button *ngIf="isAdmin" (click)="publishChanges()" class="bg-slate-900 text-white px-6 py-3 rounded-full font-black text-sm shadow-2xl hover:bg-sky-500 transition-all flex items-center gap-2 animate-fade-in-up border border-slate-700">
-        <span translate="no" class="material-symbols-outlined notranslate text-[18px]">cloud_upload</span> Publish Changes
+    <div class="fixed bottom-24 right-4 md:right-8 z-[90] flex flex-col items-end gap-4">
+      <button *ngIf="isAdmin" (click)="publishChanges()" class="bg-slate-900 text-white px-4 md:px-6 py-3 rounded-full font-black text-xs md:text-sm shadow-2xl hover:bg-sky-500 transition-all flex items-center gap-2 animate-fade-in-up border border-slate-700">
+        <span translate="no" class="material-symbols-outlined notranslate text-[18px]">cloud_upload</span> <span class="hidden md:inline">Publish Changes</span><span class="md:hidden">Save</span>
       </button>
 
       @if (showLangModal) {
@@ -60,8 +56,8 @@
         <button (click)="switchLanguage('ms')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-sky-50 hover:text-sky-500 font-bold text-sm transition-colors flex items-center gap-3"><span class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-black">MS</span> Melayu</button>
       </div>
       }
-      <button (click)="toggleLangModal()" class="size-14 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-2xl hover:scale-110 hover:bg-sky-500 transition-all cursor-pointer group border border-slate-700">
-        <span translate="no" class="material-symbols-outlined notranslate text-2xl group-hover:scale-110 transition-transform">translate</span>
+      <button (click)="toggleLangModal()" class="size-12 md:size-14 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-2xl hover:scale-110 hover:bg-sky-500 transition-all cursor-pointer group border border-slate-700">
+        <span translate="no" class="material-symbols-outlined notranslate text-xl md:text-2xl group-hover:scale-110 transition-transform">translate</span>
       </button>
     </div>
 
@@ -320,7 +316,6 @@
 
     </form>
   </main>
-  <app-footer></app-footer>
 
   <div *ngIf="editMode" class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
     <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
@@ -352,4 +347,6 @@
       </div>
     </div>
   </div>
+
+  <app-footer></app-footer>
 </div>

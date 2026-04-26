@@ -36,16 +36,24 @@ export class FoodOrderingComponent implements OnInit {
     // Load Menu
     this.authService.getFoodItems().subscribe({
       next: (items) => {
-        this.breakfastMenu = items.filter(i => i.category === 'BREAKFAST');
-        this.lunchMenu = items.filter(i => i.category === 'LUNCH');
+        this.breakfastMenu = items.filter((i: any) => i.category === 'BREAKFAST');
+        this.lunchMenu = items.filter((i: any) => i.category === 'LUNCH');
       },
-      error: (err: any) => console.error(err) // Fix: added : any
+      error: (err: any) => console.error(err)
     });
 
     // Load Orders
     this.authService.getFoodOrders().subscribe({
-      next: (orders) => this.studentOrders = orders,
-      error: (err: any) => console.error(err) // Fix: added : any
+      next: (orders: any[]) => {
+        // THE FIX: Map snake_case to camelCase
+        this.studentOrders = orders.map((o: any) => ({
+          ...o,
+          studentName: o.student_name,
+          orderDate: o.order_date,
+          totalAmount: o.total_amount
+        }));
+      },
+      error: (err: any) => console.error(err)
     });
   }
 

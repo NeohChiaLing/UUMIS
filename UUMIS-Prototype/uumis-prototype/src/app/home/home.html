@@ -1,280 +1,166 @@
-<div class="min-h-screen bg-transparent font-display text-slate-900 selection:bg-sky-500 selection:text-white relative overflow-x-hidden">
-
+<div class="min-h-screen bg-transparent font-display text-slate-900 selection:bg-sky-500 selection:text-white relative overflow-x-hidden pb-32">
   <div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
     <div class="absolute -top-40 -right-40 w-[800px] h-[800px] bg-sky-200/40 rounded-full blur-[120px] bubble-float"></div>
     <div class="absolute top-1/4 -left-48 w-[600px] h-[600px] bg-blue-400/20 rounded-full blur-[100px] bubble-float-alt" style="animation-delay: -5s;"></div>
     <div class="absolute -bottom-20 left-1/3 w-[500px] h-[500px] bg-purple-200/30 rounded-full blur-[90px] bubble-float" style="animation-delay: -10s;"></div>
-
     <div class="absolute top-[15%] right-[15%] w-32 h-32 rounded-full glass-bubble border border-white/40 bubble-float z-10" style="animation-duration: 15s;"></div>
     <div class="absolute bottom-[20%] left-[10%] w-48 h-48 rounded-full glass-bubble border border-white/30 bubble-float-alt z-10" style="animation-delay: -2s; animation-duration: 25s;"></div>
     <div class="absolute top-1/2 right-[5%] w-24 h-24 rounded-full glass-bubble border border-white/20 bubble-float z-10" style="animation-delay: -7s;"></div>
     <div class="absolute top-[10%] left-[20%] w-16 h-16 rounded-full glass-bubble border border-white/30 bubble-float-alt z-10" style="animation-delay: -12s;"></div>
-
-    <div class="absolute top-[20%] left-[10%] opacity-[0.08] transform -rotate-12 bubble-float text-slate-800" style="animation-duration: 20s;">
-      <span translate="no" class="material-symbols-outlined notranslate text-[15rem]" style="font-variation-settings: 'wght' 100;">menu_book</span>
-    </div>
-    <div class="absolute bottom-[15%] right-[10%] opacity-[0.08] transform rotate-12 bubble-float-alt text-slate-800" style="animation-duration: 25s;">
-      <span translate="no" class="material-symbols-outlined notranslate text-[18rem]" style="font-variation-settings: 'wght' 100;">school</span>
-    </div>
+    <div class="absolute top-[20%] left-[10%] opacity-[0.08] transform -rotate-12 bubble-float text-slate-800 hidden md:block" style="animation-duration: 20s;"><span translate="no" class="material-symbols-outlined notranslate text-[15rem]" style="font-variation-settings: 'wght' 100;">menu_book</span></div>
+    <div class="absolute bottom-[15%] right-[10%] opacity-[0.08] transform rotate-12 bubble-float-alt text-slate-800 hidden md:block" style="animation-duration: 25s;"><span translate="no" class="material-symbols-outlined notranslate text-[18rem]" style="font-variation-settings: 'wght' 100;">school</span></div>
   </div>
-
   <app-navbar></app-navbar>
 
-  <section class="relative w-full h-[calc(100vh-80px)] min-h-[600px] flex items-center justify-center text-center group rounded-b-[3rem] sm:rounded-b-[4rem] overflow-hidden shadow-2xl">
+  <section class="relative w-full h-auto md:h-[calc(100vh-80px)] min-h-[500px] md:min-h-[600px] flex items-center justify-center text-center group rounded-b-[2rem] sm:rounded-b-[4rem] overflow-hidden shadow-2xl py-16 md:py-0">
+    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105 z-0" [style.background-image]="'url(' + pageData.hero.bgImage + ')'"></div>
+    <div class="absolute inset-0 bg-black/40 z-0"></div>
 
-    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105 z-0"
-         [style.background-image]="'url(' + pageData.hero.bgImage + ')'">
-    </div>
-
-    <div class="absolute inset-0 bg-black/30 z-0"></div>
-
-    <button *ngIf="isAdmin" (click)="openEditModal('hero')" class="absolute top-6 right-6 z-50 bg-white hover:bg-sky-500 hover:text-white text-slate-800 rounded-full px-4 py-2 shadow-lg font-bold text-sm flex items-center gap-2 transition-all opacity-0 group-hover:opacity-100">
-      <span translate="no" class="material-symbols-outlined text-[18px] notranslate">edit</span> Edit Cover
+    <button *ngIf="isAdmin" (click)="openEditModal('hero')" class="absolute top-4 right-4 md:top-6 md:right-6 z-50 bg-white hover:bg-sky-500 hover:text-white text-slate-800 rounded-full px-4 py-2 shadow-lg font-bold text-sm flex items-center gap-2 transition-all opacity-100 md:opacity-0 group-hover:opacity-100">
+      <span translate="no" class="material-symbols-outlined text-[18px] notranslate">edit</span> <span class="hidden md:inline">Edit Cover</span>
     </button>
 
-    <div class="relative z-10 flex flex-col items-center gap-8 max-w-4xl mx-auto px-4 sm:px-6 animate-fade-in-up mt-8">
+    <div class="relative z-10 flex flex-col items-center gap-6 md:gap-8 w-full max-w-4xl mx-auto px-4 sm:px-6 animate-fade-in-up mt-4 md:mt-8">
       <div class="flex flex-col gap-4 items-center">
         <span class="inline-block px-4 py-1.5 rounded-full bg-sky-500/30 backdrop-blur-md border border-sky-400/30 text-sky-100 text-xs font-black uppercase tracking-wider w-fit shadow-lg">
           {{ pageData.hero.badge }}
         </span>
-        <h1 class="text-5xl sm:text-7xl md:text-8xl font-black leading-[1.1] tracking-tighter text-white drop-shadow-2xl">
-          {{ pageData.hero.titleStart }} <br/>
+        <h1 class="text-4xl sm:text-6xl md:text-8xl font-black leading-[1.2] md:leading-[1.1] tracking-tighter text-white drop-shadow-2xl">
+          {{ pageData.hero.titleStart }} <br class="hidden md:block"/>
           <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-300 to-sky-100 drop-shadow-lg">{{ pageData.hero.titleHighlight }}</span>
         </h1>
-        <p class="text-white text-lg sm:text-xl font-bold max-w-2xl mx-auto leading-relaxed mt-2 drop-shadow-xl">
+        <p class="text-white/90 text-base sm:text-lg md:text-xl font-bold max-w-2xl mx-auto leading-relaxed mt-2 drop-shadow-xl px-2">
           {{ pageData.hero.description }}
         </p>
       </div>
 
       <div class="w-full max-w-2xl bg-white/20 backdrop-blur-md border border-white/30 p-2 rounded-full shadow-2xl flex items-center gap-2 transition-all focus-within:border-sky-400 focus-within:ring-4 focus-within:ring-sky-400/30 mt-4">
-        <div class="pl-4 text-white">
+        <div class="pl-2 md:pl-4 text-white">
           <span translate="no" class="material-symbols-outlined notranslate drop-shadow-md">search</span>
         </div>
-        <input class="w-full bg-transparent border-none text-white placeholder-white/90 focus:ring-0 text-base outline-none font-bold drop-shadow-md" placeholder="Find schedules, documents, or staff..." type="text"/>
-        <button class="bg-sky-500 hover:bg-sky-400 text-white font-black rounded-full px-8 py-3 text-sm transition-colors shadow-lg shadow-sky-500/50">
+        <input class="w-full bg-transparent border-none text-white placeholder-white/80 focus:ring-0 text-sm md:text-base outline-none font-bold drop-shadow-md" placeholder="Find schedules, documents..." type="text"/>
+        <button class="bg-sky-500 hover:bg-sky-400 text-white font-black rounded-full px-6 md:px-8 py-2 md:py-3 text-xs md:text-sm transition-colors shadow-lg shadow-sky-500/50">
           Search
         </button>
       </div>
     </div>
   </section>
 
-  <main class="flex-grow w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-20 relative z-10">
+  <main class="flex-grow w-full max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 space-y-12 md:space-y-20 relative z-10">
 
-    <div class="fixed bottom-8 right-8 z-[90] flex flex-col items-end gap-4">
-      <button *ngIf="isAdmin" (click)="publishChanges()" class="bg-slate-900 text-white px-6 py-3 rounded-full font-black text-sm shadow-2xl hover:bg-sky-500 transition-all flex items-center gap-2 animate-fade-in-up border border-slate-700">
-        <span translate="no" class="material-symbols-outlined notranslate text-[18px]">cloud_upload</span> Publish Changes
+    <div class="fixed bottom-24 right-4 md:right-8 z-[90] flex flex-col items-end gap-4">
+      <button *ngIf="isAdmin" (click)="publishChanges()" class="bg-slate-900 text-white px-4 md:px-6 py-3 rounded-full font-black text-xs md:text-sm shadow-2xl hover:bg-sky-500 transition-all flex items-center gap-2 animate-fade-in-up border border-slate-700">
+        <span translate="no" class="material-symbols-outlined notranslate text-[18px]">cloud_upload</span> <span class="hidden md:inline">Publish Changes</span><span class="md:hidden">Save</span>
       </button>
     </div>
 
-    <section class="flex flex-col items-center justify-center w-full gap-8 relative group">
-      <button *ngIf="isAdmin" (click)="openEditModal('video')" class="absolute -top-12 right-0 z-50 bg-white hover:bg-sky-500 hover:text-white text-slate-800 rounded-full px-4 py-2 shadow-lg font-bold text-sm flex items-center gap-2 transition-all opacity-0 group-hover:opacity-100">
-        <span translate="no" class="material-symbols-outlined text-[18px] notranslate">edit</span> Edit Video Section
+    <section class="flex flex-col items-center justify-center w-full gap-6 md:gap-8 relative group">
+      <button *ngIf="isAdmin" (click)="openEditModal('video')" class="absolute -top-4 md:-top-12 right-0 z-50 bg-white hover:bg-sky-500 hover:text-white text-slate-800 rounded-full px-4 py-2 shadow-lg font-bold text-sm flex items-center gap-2 transition-all opacity-100 md:opacity-0 group-hover:opacity-100">
+        <span translate="no" class="material-symbols-outlined text-[18px] notranslate">edit</span> <span class="hidden md:inline">Edit Video</span>
       </button>
 
-      <div class="text-center max-w-3xl flex flex-col items-center gap-4">
+      <div class="text-center max-w-3xl flex flex-col items-center gap-3 md:gap-4 mt-4 md:mt-0">
         <div class="flex items-center gap-2">
           <span class="size-2 rounded-full bg-sky-500 animate-pulse"></span>
-          <span class="text-sky-600 font-black tracking-wider text-xs uppercase">{{ pageData.videoText.badge }}</span>
+          <span class="text-sky-600 font-black tracking-wider text-[10px] md:text-xs uppercase">{{ pageData.videoText.badge }}</span>
         </div>
-        <h2 class="text-4xl sm:text-5xl font-black text-slate-900 leading-tight tracking-tight">
+        <h2 class="text-3xl md:text-4xl sm:text-5xl font-black text-slate-900 leading-tight tracking-tight">
           {{ pageData.videoText.titleStart }} <span class="text-slate-400">{{ pageData.videoText.titleEnd }}</span>
         </h2>
-        <p class="text-slate-600 text-lg font-medium leading-relaxed mt-2">
+        <p class="text-slate-600 text-sm md:text-lg font-medium leading-relaxed mt-1 md:mt-2 px-2">
           {{ pageData.videoText.desc }}
         </p>
       </div>
 
-      <div class="w-full relative h-[350px] sm:h-[500px] md:h-[650px] rounded-[2.5rem] overflow-hidden shadow-2xl border-[6px] border-white/60 bg-slate-900 z-10">
-        <iframe *ngIf="safeVideoUrl"
-                class="absolute inset-0 w-full h-full"
-                [src]="safeVideoUrl"
-                title="UUMIS Corporate Video"
-                frameborder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowfullscreen>
-        </iframe>
+      <div class="w-full relative h-[250px] sm:h-[400px] md:h-[650px] rounded-[1.5rem] md:rounded-[2.5rem] overflow-hidden shadow-2xl border-[4px] md:border-[6px] border-white/60 bg-slate-900 z-10">
+        <iframe *ngIf="safeVideoUrl" class="absolute inset-0 w-full h-full" [src]="safeVideoUrl" title="UUMIS Corporate Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       </div>
     </section>
 
-    <div class="grid lg:grid-cols-12 gap-8">
-      <div class="lg:col-span-8 flex flex-col gap-6">
+    <div class="grid lg:grid-cols-12 gap-8 md:gap-12">
+      <div class="lg:col-span-8 flex flex-col gap-4 md:gap-6 w-full max-w-[100vw] overflow-hidden">
         <div class="flex items-center justify-between pl-2">
-          <h2 class="text-2xl font-black tracking-tight text-slate-900 flex items-center gap-2">
+          <h2 class="text-xl md:text-2xl font-black tracking-tight text-slate-900 flex items-center gap-2">
             <span translate="no" class="material-symbols-outlined notranslate text-sky-500">campaign</span>
             Latest Announcements
           </h2>
         </div>
 
-        <div class="flex overflow-x-auto pb-6 gap-6 snap-x custom-scrollbar">
-          <div *ngFor="let item of pageData.announcements; let i = index"
-               class="relative min-w-[300px] sm:min-w-[340px] flex flex-col bg-white/80 backdrop-blur-md rounded-[2rem] overflow-hidden border border-white snap-start hover:border-sky-500 transition-all shadow-sm hover:shadow-xl hover:-translate-y-1 group">
+        <div class="w-full overflow-x-auto pb-6 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth custom-scrollbar" style="-webkit-overflow-scrolling: touch;">
+          <div class="flex gap-4 md:gap-6 snap-x snap-mandatory w-max min-w-full">
+            <div *ngFor="let item of pageData.announcements; let i = index" class="relative w-[280px] sm:w-[320px] md:w-[340px] flex flex-col bg-white/80 backdrop-blur-md rounded-[1.5rem] md:rounded-[2rem] overflow-hidden border border-white snap-center hover:border-sky-500 transition-all shadow-md hover:shadow-xl hover:-translate-y-1 group shrink-0">
 
-            <button *ngIf="isAdmin" (click)="openEditModal('announcement', item, i)" class="absolute top-3 right-3 z-50 bg-white hover:bg-sky-100 text-sky-800 rounded-full size-8 flex items-center justify-center shadow-lg transition-all opacity-0 group-hover:opacity-100">
-              <span translate="no" class="material-symbols-outlined text-[16px] notranslate">edit</span>
-            </button>
+              <button *ngIf="isAdmin" (click)="openEditModal('announcement', item, i)" class="absolute top-3 right-3 z-50 bg-white hover:bg-sky-100 text-sky-800 rounded-full size-8 flex items-center justify-center shadow-lg transition-all opacity-100 md:opacity-0 group-hover:opacity-100">
+                <span translate="no" class="material-symbols-outlined text-[16px] notranslate">edit</span>
+              </button>
 
-            <div class="h-56 bg-cover bg-center cursor-pointer hover:opacity-90 transition-opacity relative"
-                 [style.background-image]="'url(' + item.image + ')'"
-                 (click)="openImage(item.image)">
-              <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                <span class="text-white text-xs font-bold flex items-center gap-1"><span translate="no" class="material-symbols-outlined notranslate text-sm">zoom_in</span> Click to enlarge</span>
+              <div class="h-48 md:h-56 bg-cover bg-center cursor-pointer hover:opacity-90 transition-opacity relative" [style.background-image]="'url(' + item.image + ')'" (click)="openImage(item.image)">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                  <span class="text-white text-xs font-bold flex items-center gap-1"><span translate="no" class="material-symbols-outlined notranslate text-sm">zoom_in</span> Click to enlarge</span>
+                </div>
               </div>
-            </div>
-            <div class="p-6 flex flex-col flex-1">
-              <span [class]="item.styleClass" class="px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest w-fit mb-3">
-                {{ item.category }}
-              </span>
-              <h3 class="text-xl font-bold text-slate-900 mb-2 leading-tight">{{ item.title }}</h3>
-              <p class="text-slate-500 text-sm mb-4 font-medium line-clamp-3">{{ item.desc }}</p>
+              <div class="p-5 md:p-6 flex flex-col flex-1">
+                <span [class]="item.styleClass" class="px-2.5 py-1 md:px-3 md:py-1 rounded-lg text-[9px] md:text-[10px] font-black uppercase tracking-widest w-fit mb-2 md:mb-3">
+                  {{ item.category }}
+                </span>
+                <h3 class="text-lg md:text-xl font-bold text-slate-900 mb-2 leading-tight">{{ item.title }}</h3>
+                <p class="text-slate-500 text-xs md:text-sm mb-4 font-medium line-clamp-3">{{ item.desc }}</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="lg:col-span-4 flex flex-col gap-6">
+      <div class="lg:col-span-4 flex flex-col gap-4 md:gap-6">
         <div class="flex items-center justify-between pl-2">
-          <h2 class="text-2xl font-black tracking-tight text-slate-900 flex items-center gap-2">
+          <h2 class="text-xl md:text-2xl font-black tracking-tight text-slate-900 flex items-center gap-2">
             <span translate="no" class="material-symbols-outlined notranslate text-sky-500">event</span>
             Upcoming Events
           </h2>
-          <button *ngIf="isAdmin" (click)="openEditModal('event')" class="text-xs bg-slate-900 text-white px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 hover:bg-sky-500 transition-colors shadow-md">
+          <button *ngIf="isAdmin" (click)="openEditModal('event')" class="text-[10px] md:text-xs bg-slate-900 text-white px-3 py-1.5 md:py-2 rounded-lg md:rounded-xl font-bold flex items-center gap-1 hover:bg-sky-500 transition-colors shadow-md">
             <span translate="no" class="material-symbols-outlined text-[14px] notranslate">add</span> Add
           </button>
         </div>
-        <div class="bg-white/80 backdrop-blur-md rounded-[2.5rem] border border-white p-3 flex flex-col gap-2 h-full shadow-lg">
-          <div *ngFor="let event of pageData.events; let i = index"
-               class="relative flex items-center gap-5 p-4 rounded-[2rem] hover:bg-sky-50 transition-colors group cursor-pointer border border-transparent hover:border-sky-500/20">
-            <div class="flex-shrink-0 w-20 h-20 bg-white rounded-[1.5rem] border border-slate-100 flex flex-col items-center justify-center text-center group-hover:border-sky-500 group-hover:shadow-md transition-all shadow-sm">
-              <span class="text-[10px] font-black text-sky-500 uppercase tracking-widest mb-0.5">{{ event.month }}</span>
-              <span class="text-3xl font-black text-slate-900 leading-none">{{ event.day }}</span>
+        <div class="bg-white/80 backdrop-blur-md rounded-[2rem] md:rounded-[2.5rem] border border-white p-2 md:p-3 flex flex-col gap-2 h-full shadow-lg">
+          <div *ngFor="let event of pageData.events; let i = index" class="relative flex items-center gap-4 md:gap-5 p-3 md:p-4 rounded-[1.5rem] md:rounded-[2rem] hover:bg-sky-50 transition-colors group cursor-pointer border border-transparent hover:border-sky-500/20">
+            <div class="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 bg-white rounded-xl md:rounded-[1.5rem] border border-slate-100 flex flex-col items-center justify-center text-center group-hover:border-sky-500 group-hover:shadow-md transition-all shadow-sm">
+              <span class="text-[9px] md:text-[10px] font-black text-sky-500 uppercase tracking-widest mb-0.5">{{ event.month }}</span>
+              <span class="text-2xl md:text-3xl font-black text-slate-900 leading-none">{{ event.day }}</span>
             </div>
             <div class="flex-1 min-w-0">
-              <h4 class="text-slate-900 font-bold text-lg truncate mb-1">{{ event.title }}</h4>
-              <p class="text-slate-500 text-xs font-bold uppercase tracking-wider truncate flex items-center gap-1">
+              <h4 class="text-slate-900 font-bold text-base md:text-lg truncate mb-1">{{ event.title }}</h4>
+              <p class="text-slate-500 text-[10px] md:text-xs font-bold uppercase tracking-wider truncate flex items-center gap-1">
                 <span translate="no" class="material-symbols-outlined notranslate text-[14px]">schedule</span> {{ event.subtitle }}
               </p>
             </div>
 
-            <div *ngIf="isAdmin" class="absolute right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <button (click)="openEditModal('event', event, i)" class="size-8 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center hover:bg-sky-500 hover:text-white transition-colors"><span translate="no" class="material-symbols-outlined text-[16px] notranslate">edit</span></button>
-              <button (click)="deleteEvent(i)" class="size-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"><span translate="no" class="material-symbols-outlined text-[16px] notranslate">delete</span></button>
+            <div *ngIf="isAdmin" class="absolute right-2 md:right-4 flex gap-1 md:gap-2 opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity bg-white p-1 rounded-full shadow-md md:shadow-none md:bg-transparent">
+              <button (click)="openEditModal('event', event, i)" class="size-7 md:size-8 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center hover:bg-sky-500 hover:text-white transition-colors"><span translate="no" class="material-symbols-outlined text-[14px] md:text-[16px] notranslate">edit</span></button>
+              <button (click)="deleteEvent(i)" class="size-7 md:size-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"><span translate="no" class="material-symbols-outlined text-[14px] md:text-[16px] notranslate">delete</span></button>
             </div>
           </div>
-          <div *ngIf="pageData.events.length === 0" class="p-8 text-center text-slate-400 font-bold text-sm">No upcoming events scheduled.</div>
+          <div *ngIf="pageData.events.length === 0" class="p-8 text-center text-slate-400 font-bold text-xs md:text-sm">No upcoming events scheduled.</div>
         </div>
       </div>
     </div>
 
-    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-4 pb-8">
-
-      <a *ngFor="let item of pageData.shortcuts; let i = index"
-         [routerLink]="item.link"
-         class="relative h-[340px] rounded-[2.5rem] overflow-hidden group/card cursor-pointer shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all block border-[4px] border-white/50">
-
-        <button *ngIf="isAdmin" (click)="$event.preventDefault(); $event.stopPropagation(); openEditModal('shortcut', item, i)" class="absolute top-4 right-4 z-50 bg-white hover:bg-sky-100 text-sky-800 rounded-full size-10 flex items-center justify-center shadow-lg transition-all opacity-0 group-hover/card:opacity-100">
-          <span translate="no" class="material-symbols-outlined text-[20px] notranslate">edit</span>
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 pt-4 pb-8">
+      <a *ngFor="let item of pageData.shortcuts; let i = index" [routerLink]="item.link" class="relative h-[250px] md:h-[340px] rounded-[2rem] md:rounded-[2.5rem] overflow-hidden group/card cursor-pointer shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all block border-[4px] border-white/50">
+        <button *ngIf="isAdmin" (click)="$event.preventDefault(); $event.stopPropagation(); openEditModal('shortcut', item, i)" class="absolute top-4 right-4 z-50 bg-white hover:bg-sky-100 text-sky-800 rounded-full size-8 md:size-10 flex items-center justify-center shadow-lg transition-all opacity-100 md:opacity-0 group-hover/card:opacity-100">
+          <span translate="no" class="material-symbols-outlined text-[16px] md:text-[20px] notranslate">edit</span>
         </button>
-
-        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover/card:scale-110 z-0" [style.background-image]="'url(' + item.image + ')'"></div>
+        <div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 md:group-hover/card:scale-110 z-0" [style.background-image]="'url(' + item.image + ')'"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent z-10"></div>
-        <div class="absolute bottom-0 left-0 w-full p-8 flex flex-col justify-end h-full z-20">
-          <h3 class="text-2xl font-black text-white leading-tight mb-1">{{ item.title }}</h3>
-          <p class="text-sky-300 font-bold text-sm flex items-center gap-1 opacity-0 group-hover/card:opacity-100 transition-all transform translate-y-4 group-hover/card:translate-y-0">{{ item.subtitle }} <span translate="no" class="material-symbols-outlined notranslate text-[16px]">arrow_forward</span></p>
+        <div class="absolute bottom-0 left-0 w-full p-6 md:p-8 flex flex-col justify-end h-full z-20">
+          <h3 class="text-xl md:text-2xl font-black text-white leading-tight mb-1">{{ item.title }}</h3>
+          <p class="text-sky-300 font-bold text-xs md:text-sm flex items-center gap-1 opacity-100 md:opacity-0 md:group-hover/card:opacity-100 transition-all transform md:translate-y-4 md:group-hover/card:translate-y-0">{{ item.subtitle }} <span translate="no" class="material-symbols-outlined notranslate text-[14px] md:text-[16px]">arrow_forward</span></p>
         </div>
       </a>
-
     </section>
-
   </main>
-
   <app-footer></app-footer>
 
   <div *ngIf="editMode" class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
-
-      <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-        <h2 class="text-xl font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
-          <span translate="no" class="material-symbols-outlined text-sky-500 notranslate">edit_square</span>
-          Edit {{ editMode }}
-        </h2>
-        <button (click)="closeEditModal()" class="text-slate-400 hover:text-red-500 transition-colors"><span translate="no" class="material-symbols-outlined notranslate">close</span></button>
-      </div>
-
-      <div class="p-6 flex flex-col gap-4 overflow-y-auto custom-scrollbar">
-        <ng-container *ngIf="editMode === 'hero'">
-          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Badge Text</label><input type="text" [(ngModel)]="editData.badge" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Main Title</label><input type="text" [(ngModel)]="editData.titleStart" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Title Highlight</label><input type="text" [(ngModel)]="editData.titleHighlight" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Description</label><textarea [(ngModel)]="editData.description" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></textarea></div>
-          <div>
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Background Image</label>
-            <div class="flex items-center gap-4">
-              <input type="file" #heroFileInput (change)="onFileSelected($event, 'bgImage')" accept="image/*" class="hidden">
-              <button type="button" (click)="heroFileInput.click()" class="px-4 py-2 bg-sky-100 text-sky-700 font-bold rounded-lg hover:bg-sky-200 transition-colors flex items-center gap-2">
-                <span translate="no" class="material-symbols-outlined text-[18px] notranslate">upload_file</span> Choose Image
-              </button>
-              <div *ngIf="editData.bgImage" class="h-10 w-16 rounded border border-slate-200 bg-cover bg-center" [style.background-image]="'url(' + editData.bgImage + ')'"></div>
-            </div>
-          </div>
-        </ng-container>
-
-        <ng-container *ngIf="editMode === 'video'">
-          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Badge Text</label><input type="text" [(ngModel)]="editData.badge" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Title Start</label><input type="text" [(ngModel)]="editData.titleStart" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Title End (Grey)</label><input type="text" [(ngModel)]="editData.titleEnd" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Description</label><textarea [(ngModel)]="editData.desc" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></textarea></div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">YouTube Embed URL</label><input type="text" [(ngModel)]="editData.url" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500" placeholder="https://www.youtube.com/embed/..."></div>
-        </ng-container>
-
-        <ng-container *ngIf="editMode === 'announcement'">
-          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Category</label><input type="text" [(ngModel)]="editData.category" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Title</label><input type="text" [(ngModel)]="editData.title" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Description</label><textarea [(ngModel)]="editData.desc" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></textarea></div>
-          <div>
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Announcement Image</label>
-            <div class="flex items-center gap-4">
-              <input type="file" #announcementFileInput (change)="onFileSelected($event, 'image')" accept="image/*" class="hidden">
-              <button type="button" (click)="announcementFileInput.click()" class="px-4 py-2 bg-sky-100 text-sky-700 font-bold rounded-lg hover:bg-sky-200 transition-colors flex items-center gap-2">
-                <span translate="no" class="material-symbols-outlined text-[18px] notranslate">upload_file</span> Choose Image
-              </button>
-              <div *ngIf="editData.image" class="h-10 w-16 rounded border border-slate-200 bg-cover bg-center" [style.background-image]="'url(' + editData.image + ')'"></div>
-            </div>
-          </div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Tailwind Color Class</label><input type="text" [(ngModel)]="editData.styleClass" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-mono text-sm outline-none focus:border-sky-500"></div>
-        </ng-container>
-
-        <ng-container *ngIf="editMode === 'event'">
-          <div class="grid grid-cols-2 gap-4">
-            <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Month</label><input type="text" [(ngModel)]="editData.month" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500 uppercase"></div>
-            <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Day</label><input type="text" [(ngModel)]="editData.day" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></div>
-          </div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Title</label><input type="text" [(ngModel)]="editData.title" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Description</label><input type="text" [(ngModel)]="editData.subtitle" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></div>
-        </ng-container>
-
-        <ng-container *ngIf="editMode === 'shortcut'">
-          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Title</label><input type="text" [(ngModel)]="editData.title" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Subtitle</label><input type="text" [(ngModel)]="editData.subtitle" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-medium outline-none focus:border-sky-500"></div>
-          <div>
-            <label class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1 block">Card Image</label>
-            <div class="flex items-center gap-4">
-              <input type="file" #shortcutFileInput (change)="onFileSelected($event, 'image')" accept="image/*" class="hidden">
-              <button type="button" (click)="shortcutFileInput.click()" class="px-4 py-2 bg-sky-100 text-sky-700 font-bold rounded-lg hover:bg-sky-200 transition-colors flex items-center gap-2">
-                <span translate="no" class="material-symbols-outlined text-[18px] notranslate">upload_file</span> Choose Image
-              </button>
-              <div *ngIf="editData.image" class="h-10 w-16 rounded border border-slate-200 bg-cover bg-center" [style.background-image]="'url(' + editData.image + ')'"></div>
-            </div>
-          </div>
-        </ng-container>
-      </div>
-
-      <div class="p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50 mt-auto">
-        <button (click)="closeEditModal()" class="px-6 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-slate-200 transition-colors">Cancel</button>
-        <button (click)="saveEdits()" class="px-6 py-2.5 rounded-xl font-bold bg-slate-900 text-white hover:bg-sky-500 shadow-lg transition-all flex items-center gap-2">
-          <span translate="no" class="material-symbols-outlined text-[18px] notranslate">save</span> Save Changes
-        </button>
-      </div>
-    </div>
   </div>
 
   @if (selectedImage) {

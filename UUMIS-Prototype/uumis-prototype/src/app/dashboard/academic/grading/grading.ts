@@ -3,8 +3,10 @@ import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import html2canvas from 'html2canvas';
 import { AuthService } from '../../../services/auth.service';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 
 @Component({
   selector: 'app-grading',
@@ -26,6 +28,16 @@ export class GradingComponent implements OnInit {
   upcomingExamsCount: number = 0;
   pendingApprovalsCount: number = 0;
   activeScalesCount: number = 0;
+
+  // THE FIX: Modal variables
+  showReportModal: boolean = false;
+  selectedStudentForReport: any = null;
+  modalMainGrades: any[] = [];
+  modalTaskGrades: any[] = [];
+  isFetchingReport: boolean = false;
+
+  isGeneratingPDF: boolean = false;
+  todayDate: string = new Date().toLocaleDateString();
 
   constructor(private router: Router, private location: Location, private authService: AuthService) {}
 
@@ -52,7 +64,10 @@ export class GradingComponent implements OnInit {
 
   onYearChange() {
     this.filteredSubjects = this.allSubjects
-      .filter(s => (s.yearGroup || '').trim().toLowerCase() === this.selectedYear.toLowerCase())
+      .filter(s => {
+        const subYear = s.yearGroup || s.year_group || '';
+        return subYear.trim().toLowerCase() === this.selectedYear.toLowerCase();
+      })
       .map(s => s.name);
 
     this.selectedSubject = '';
@@ -80,22 +95,20 @@ export class GradingComponent implements OnInit {
           error: () => this.mapStudentsToGrades(yearStudents, [])
         });
       },
-      error: () => alert("Failed to fetch users. Please ensure /api/auth/users is running in backend!")
+      error: () => alert("Failed to fetch users.")
     });
   }
 
   mapStudentsToGrades(yearStudents: any[], grades: any[]) {
     this.students = yearStudents.map((stu: any) => {
-      // THE FIX: Strictly use the database username to prevent backend crashes
       const uniqueId = stu.username || '';
-
       const existingGrade = grades.find(g => g.studentUsername === uniqueId && uniqueId !== '');
 
       return {
         studentUsername: uniqueId,
         name: stu.fullName || stu.username || 'Unknown Student',
         mark: existingGrade ? existingGrade.mark : 0,
-        grade: existingGrade ? existingGrade.gradeLetter : '-',
+        grade: existingGrade ? existingGrade.gradeLetter || existingGrade.grade_letter : '-',
         status: existingGrade ? existingGrade.status : 'Pending',
         isEditing: false
       };
@@ -128,22 +141,74 @@ export class GradingComponent implements OnInit {
     return 'text-blue-600 bg-blue-50';
   }
 
+  // THE FIX: Added View Full Report Logic
+  viewStudentFullReport(student: any) {
+    this.selectedStudentForReport = student;
+    this.showReportModal = true;
+    this.isFetchingReport = true;
+    this.modalMainGrades = [];
+    this.modalTaskGrades = [];
+
+    this.authService.getStudentGrades(student.studentUsername).subscribe({
+      next: (grades: any[]) => {
+        const yearGrades = grades.filter(g =>
+          (g.yearGroup || '').trim().toLowerCase() === this.selectedYear.trim().toLowerCase()
+        );
+
+        this.modalMainGrades = yearGrades.filter(g =>
+          !g.subject.startsWith('TASK_') &&
+          !g.subject.startsWith('Assignment:') &&
+          !g.subject.startsWith('Quiz:')
+        );
+
+        this.modalTaskGrades = yearGrades.filter(g =>
+          g.subject.startsWith('TASK_') ||
+          g.subject.startsWith('Assignment:') ||
+          g.subject.startsWith('Quiz:')
+        );
+
+        this.isFetchingReport = false;
+      },
+      error: () => {
+        alert("Failed to load student's full report card.");
+        this.isFetchingReport = false;
+      }
+    });
+  }
+
+  closeReportModal() {
+    this.showReportModal = false;
+    this.selectedStudentForReport = null;
+    this.modalMainGrades = [];
+    this.modalTaskGrades = [];
+  }
+
   exportToPDF() {
     if (!this.selectedYear || !this.selectedSubject || this.students.length === 0) {
       alert('Please select Year and Subject with active students first.');
       return;
     }
-    const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text(`Grading Report: ${this.selectedSubject} (${this.selectedYear})`, 14, 20);
-    doc.setFontSize(12);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
-    autoTable(doc, {
-      startY: 40,
-      head: [['Student ID / Username', 'Name', 'Mark', 'Grade', 'Status']],
-      body: this.students.map(s => [s.studentUsername, s.name, s.mark, s.grade, s.status]),
-    });
-    doc.save(`${this.selectedSubject}_${this.selectedYear}_Report.pdf`);
+    this.isGeneratingPDF = true;
+
+    setTimeout(() => {
+      const element = document.getElementById('formal-grading-pdf');
+      if (element) {
+        html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+          const imgData = canvas.toDataURL('image/png');
+          const pdf = new jsPDF('p', 'mm', 'a4');
+          const pdfWidth = pdf.internal.pageSize.getWidth();
+          const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+
+          pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+          pdf.save(`Class_Report_${this.selectedSubject.replace(/\s+/g, '_')}_${this.selectedYear}.pdf`);
+          this.isGeneratingPDF = false;
+        }).catch(err => {
+          console.error(err);
+          alert('Failed to generate PDF.');
+          this.isGeneratingPDF = false;
+        });
+      }
+    }, 200);
   }
 
   submitAllGrades() {
@@ -157,11 +222,10 @@ export class GradingComponent implements OnInit {
       }
     });
 
-    // THE FIX: Filter out ghost accounts so the database doesn't crash!
     const validStudents = this.students.filter(s => s.studentUsername && s.studentUsername.trim() !== '');
 
     if (validStudents.length === 0) {
-      alert("No valid students to save! (Check if students are missing proper usernames)");
+      alert("No valid students to save!");
       return;
     }
 

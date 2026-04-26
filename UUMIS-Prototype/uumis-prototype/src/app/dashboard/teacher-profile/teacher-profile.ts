@@ -21,11 +21,11 @@ export class TeacherProfileComponent implements OnInit {
     phone: '', email: '', linkedIn: '',
     summary: '', hardSkills: '', softSkills: '', philosophy: '',
     schedule: [
-      { day: 'Sunday', time: '', subject: '', class: '' },
-      { day: 'Monday', time: '', subject: '', class: '' },
-      { day: 'Tuesday', time: '', subject: '', class: '' },
-      { day: 'Wednesday', time: '', subject: '', class: '' },
-      { day: 'Thursday', time: '', subject: '', class: '' }
+      { day: 'Sunday', startHour: '08:00', startAmPm: 'AM', endHour: '09:00', endAmPm: 'AM', subject: '', class: '' },
+      { day: 'Monday', startHour: '08:00', startAmPm: 'AM', endHour: '09:00', endAmPm: 'AM', subject: '', class: '' },
+      { day: 'Tuesday', startHour: '08:00', startAmPm: 'AM', endHour: '09:00', endAmPm: 'AM', subject: '', class: '' },
+      { day: 'Wednesday', startHour: '08:00', startAmPm: 'AM', endHour: '09:00', endAmPm: 'AM', subject: '', class: '' },
+      { day: 'Thursday', startHour: '08:00', startAmPm: 'AM', endHour: '09:00', endAmPm: 'AM', subject: '', class: '' }
     ],
     certificates: []
   };
@@ -39,29 +39,44 @@ export class TeacherProfileComponent implements OnInit {
     this.currentUser = this.authService.getCurrentUser();
     if (!this.currentUser) return;
 
-    this.authService.getUsers().subscribe({
-      next: (users: any[]) => {
-        const myFreshProfile = users.find(u => u.id === this.currentUser.id || (u.email && u.email === this.currentUser.email));
+    this.authService.getTeachers().subscribe({
+      next: (teachers: any[]) => {
+        const myFreshProfile = teachers.find(t => t.username === this.currentUser.username || (t.email && t.email === this.currentUser.email));
 
         if (myFreshProfile) {
-          // --- NEW: Parse Multiple Classes ---
-          const classArray = myFreshProfile.bio && myFreshProfile.bio !== 'Unassigned'
-            ? myFreshProfile.bio.split(',').map((c: string) => c.trim())
+          const bio = myFreshProfile.bio || '';
+          const classList = bio && bio !== 'Unassigned'
+            ? bio.split(',').map((c: string) => c.trim())
             : [];
+
+          const assignedSubjRaw = myFreshProfile.assignedSubjects || myFreshProfile.assigned_subjects || '';
+          const schedRaw = myFreshProfile.scheduleJson || myFreshProfile.schedule_json;
+          const certsRaw = myFreshProfile.certificatesJson || myFreshProfile.certificates_json;
+
+          let parsedSchedule = this.selectedTeacher.schedule;
+          if (schedRaw) {
+            const temp = JSON.parse(schedRaw);
+            parsedSchedule = temp.map((s:any) => ({
+              day: s.day,
+              startHour: s.startHour || '08:00', startAmPm: s.startAmPm || 'AM',
+              endHour: s.endHour || '09:00', endAmPm: s.endAmPm || 'AM',
+              subject: s.subject || '', class: s.class || ''
+            }));
+          }
 
           this.selectedTeacher = {
             dbId: myFreshProfile.id,
-            name: myFreshProfile.fullName || myFreshProfile.username,
+            name: myFreshProfile.full_name || myFreshProfile.fullName || myFreshProfile.username,
             email: myFreshProfile.email || '',
             phone: myFreshProfile.phone || '',
-            assignedSubjectsArray: myFreshProfile.assignedSubjects ? myFreshProfile.assignedSubjects.split(',').map((s: string) => s.trim()) : [],
-            assignedClassesArray: classArray, // Save multi-class array
+            assignedSubjectsArray: assignedSubjRaw ? assignedSubjRaw.split(',').map((s: string) => s.trim()) : [],
+            assignedClassesArray: classList,
             summary: myFreshProfile.summary || '',
-            hardSkills: myFreshProfile.hardSkills || '',
-            softSkills: myFreshProfile.softSkills || '',
+            hardSkills: myFreshProfile.hardSkills || myFreshProfile.hard_skills || '',
+            softSkills: myFreshProfile.softSkills || myFreshProfile.soft_skills || '',
             philosophy: myFreshProfile.philosophy || '',
-            schedule: myFreshProfile.scheduleJson ? JSON.parse(myFreshProfile.scheduleJson) : this.selectedTeacher.schedule,
-            certificates: myFreshProfile.certificatesJson ? JSON.parse(myFreshProfile.certificatesJson) : []
+            schedule: parsedSchedule,
+            certificates: certsRaw ? JSON.parse(certsRaw) : []
           };
 
           this.buildGroupedSchedule();
@@ -81,7 +96,7 @@ export class TeacherProfileComponent implements OnInit {
   }
 
   addSlot(dayName: string) {
-    this.selectedTeacher.schedule.push({ day: dayName, time: '', subject: '', class: '' });
+    this.selectedTeacher.schedule.push({ day: dayName, startHour: '08:00', startAmPm: 'AM', endHour: '09:00', endAmPm: 'AM', subject: '', class: '' });
     this.buildGroupedSchedule();
   }
 
@@ -107,10 +122,21 @@ export class TeacherProfileComponent implements OnInit {
     this.openScheduleDropdownSlot = null;
   }
 
+  formatTime(slot: any, field: string) {
+    let val = slot[field];
+    if (!val) return;
+    val = val.trim();
+    if (!val.includes(':')) {
+      let num = parseInt(val, 10);
+      if (!isNaN(num)) {
+        slot[field] = `${num < 10 ? '0' + num : num}:00`;
+      }
+    }
+  }
+
   saveData() {
     if (!this.selectedTeacher.dbId) return;
 
-    // Send the array back joined as a string
     const combinedBio = this.selectedTeacher.assignedClassesArray.length > 0
       ? this.selectedTeacher.assignedClassesArray.join(', ')
       : 'Unassigned';
@@ -164,8 +190,6 @@ export class TeacherProfileComponent implements OnInit {
       a.href = cert.fileUrl;
       a.download = cert.fileName;
       a.click();
-    } else {
-      alert("No file available for download.");
     }
   }
 }

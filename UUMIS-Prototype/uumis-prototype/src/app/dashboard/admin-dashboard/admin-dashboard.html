@@ -158,7 +158,8 @@
                 </select>
               </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-48">
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-auto md:h-48">
               <div class="bg-emerald-50 rounded-[2rem] p-6 flex flex-col justify-center items-center text-center border border-emerald-100"><div class="size-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mb-3"><span translate="no" class="material-symbols-outlined notranslate">check_circle</span></div><h4 class="text-4xl font-black text-emerald-700 tracking-tighter">{{ totalPresent }}</h4><p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mt-1">Total Present</p></div>
               <div class="bg-rose-50 rounded-[2rem] p-6 flex flex-col justify-center items-center text-center border border-rose-100"><div class="size-12 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mb-3"><span translate="no" class="material-symbols-outlined notranslate">cancel</span></div><h4 class="text-4xl font-black text-rose-700 tracking-tighter">{{ totalAbsent }}</h4><p class="text-[10px] font-black text-rose-600 uppercase tracking-widest mt-1">Total Absent</p></div>
               <div class="bg-sky-50 rounded-[2rem] p-6 flex flex-col justify-center items-center text-center border border-sky-100"><div class="size-12 rounded-full bg-sky-100 text-sky-600 flex items-center justify-center mb-3"><span translate="no" class="material-symbols-outlined notranslate">analytics</span></div><h4 class="text-4xl font-black text-sky-700 tracking-tighter">{{ attRate }}%</h4><p class="text-[10px] font-black text-sky-600 uppercase tracking-widest mt-1">Overall Rate</p></div>
@@ -192,9 +193,9 @@
           </div>
         </section>
 
-        <section class="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-12">
-          <div class="lg:col-span-2 flex flex-col gap-6">
-            <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight ml-2">Quick Actions</h3>
+        <section class="max-w-4xl mx-auto w-full mb-12">
+          <div class="flex flex-col gap-6 w-full">
+            <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight text-center">Quick Actions</h3>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
               <a routerLink="/dashboard/student-info" class="flex flex-col items-center justify-center gap-4 p-8 rounded-[2rem] bg-white border border-emerald-50 hover:border-emerald-300 hover:shadow-xl transition-all group shadow-sm cursor-pointer"><div class="size-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center group-hover:bg-emerald-500 group-hover:text-white transition-all"><span translate="no" class="material-symbols-outlined text-3xl notranslate">person_add</span></div><span class="text-[10px] font-black text-slate-600 uppercase tracking-widest text-center">Add Student</span></a>
               <a routerLink="/dashboard/admin/user-roles" class="flex flex-col items-center justify-center gap-4 p-8 rounded-[2rem] bg-white border border-purple-50 hover:border-purple-300 hover:shadow-xl transition-all group shadow-sm cursor-pointer"><div class="size-14 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center group-hover:bg-purple-500 group-hover:text-white transition-all"><span translate="no" class="material-symbols-outlined text-3xl notranslate">manage_accounts</span></div><span class="text-[10px] font-black text-slate-600 uppercase tracking-widest text-center">User Roles</span></a>
@@ -215,17 +216,6 @@
               <button (click)="runYearEndPromotion()" class="shrink-0 bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest shadow-lg shadow-red-200 transition-all hover:scale-105 w-full sm:w-auto">
                 Run Promotion
               </button>
-            </div>
-          </div>
-
-          <div class="bg-white rounded-[3rem] border border-emerald-100 shadow-sm flex flex-col overflow-hidden">
-            <div class="p-8 border-b border-emerald-50 bg-emerald-50/20 flex justify-between items-center">
-              <h3 class="text-lg font-black text-slate-800 uppercase tracking-tight">Recent Activity</h3>
-            </div>
-            <div class="p-8 flex flex-col gap-8 overflow-y-auto max-h-[300px] custom-scrollbar">
-              <div class="flex gap-5"><div class="flex flex-col items-center gap-2"><div class="size-3 rounded-full bg-emerald-500 ring-4 ring-emerald-100"></div><div class="w-0.5 h-full bg-emerald-50"></div></div><div class="pb-4"><p class="text-sm font-bold text-slate-800 uppercase leading-tight">New Admission: Sarah Connor</p><p class="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-wider">Added via Student Mgmt • 2 hours ago</p></div></div>
-              <div class="flex gap-5"><div class="flex flex-col items-center gap-2"><div class="size-3 rounded-full bg-purple-500 ring-4 ring-purple-100"></div><div class="w-0.5 h-full bg-emerald-50"></div></div><div class="pb-4"><p class="text-sm font-bold text-slate-800 uppercase leading-tight">System Broadcast Sent</p><p class="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-wider">"Term 2 Exam Schedule Released" • Yesterday</p></div></div>
-              <div class="flex gap-5"><div class="flex flex-col items-center gap-2"><div class="size-3 rounded-full bg-pink-500 ring-4 ring-pink-100"></div></div><div class="pb-4"><p class="text-sm font-bold text-slate-800 uppercase leading-tight">Role Updated: J. Davidson</p><p class="text-[10px] text-slate-400 font-bold uppercase mt-1 tracking-wider">Promoted to Senior Faculty • Oct 24</p></div></div>
             </div>
           </div>
         </section>

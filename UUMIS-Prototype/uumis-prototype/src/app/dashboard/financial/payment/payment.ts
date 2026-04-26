@@ -56,7 +56,6 @@ export class PaymentComponent implements OnInit {
       next: (data: any[]) => {
         this.allStudents = data.map(user => {
           const grade = user.bio || 'Unassigned - Unassigned';
-          // FIX: Split by space-dash-space so "Pre-Kindergarten" doesn't get broken in half!
           const parts = grade.split(' - ');
           const yearStr = parts.length > 1 ? parts[1].trim() : 'Unassigned';
 
@@ -66,8 +65,8 @@ export class PaymentComponent implements OnInit {
             name: user.fullName || user.username || 'No Name',
             class: yearStr,
             year: yearStr,
-            totalPaid: user.totalPaid || 0.0,
-            due: user.outstandingDue || 0.0
+            totalPaid: Number(user.totalPaid) || 0.0,
+            due: Number(user.outstandingDue) || 0.0
           };
         });
 
@@ -88,10 +87,85 @@ export class PaymentComponent implements OnInit {
     }
   }
 
+  // 格式化数据库数据，防止前端显示空白
+  formatTxn(t: any) {
+    return {
+      id: t.id,
+      date: t.date,
+      description: t.description || t.desc || '',
+      method: t.method,
+      amount: Number(t.amount) || 0,
+      status: t.status,
+      receiptFile: t.receiptFileName || t.receipt_file_name || null,
+      fileUrl: t.receiptFileUrl || t.receipt_file_url || null,
+      invoiceNumber: 'INV-' + t.id
+    };
+  }
+
+  // 判断是否为家长上传的汇款证明
+  isPaymentProof(txn: any): boolean {
+    const desc = String(txn.description || txn.desc || '').toLowerCase();
+    return desc.includes('payment proof') || desc.includes('paid');
+  }
+
+  // ⭐ THE FIX: 终极自动修复账本逻辑！
+  recalculateBalances() {
+    let totalCharges = 0;
+    let totalPayments = 0;
+
+    // 1. 重新统计所有账单和已批准的汇款
+    this.transactions.forEach(txn => {
+      if (this.isPaymentProof(txn)) {
+        if (txn.status === 'Completed' || txn.status === 'Approved') {
+          totalPayments += Number(txn.amount);
+        }
+      } else {
+        if (txn.status !== 'Rejected' && txn.status !== 'Pending') {
+          totalCharges += Number(txn.amount);
+        }
+      }
+    });
+
+    this.selectedStudent.totalPaid = totalPayments;
+    const calculatedDue = totalCharges - totalPayments;
+    this.selectedStudent.due = calculatedDue < 0 ? 0 : calculatedDue;
+
+    // 2. 自动分配付款池，智能更新账单的 UNPAID / PARTIAL / COMPLETED 状态
+    let pool = totalPayments;
+
+    const charges = this.transactions
+      .filter(t => !this.isPaymentProof(t) && t.status !== 'Rejected')
+      .sort((a, b) => a.id - b.id); // 从最旧的账单开始抵扣
+
+    charges.forEach(charge => {
+      const amt = Number(charge.amount);
+      let newStatus = 'UNPAID';
+
+      if (pool >= amt) {
+        newStatus = 'Completed';
+        pool -= amt;
+      } else if (pool > 0) {
+        newStatus = 'PARTIAL'; // 如果不够扣整张账单，标记为部分付款！
+        pool = 0;
+      }
+
+      if (charge.status !== newStatus) {
+        charge.status = newStatus;
+        this.authService.updatePayment(charge.id, { status: newStatus }).subscribe();
+      }
+    });
+
+    this.transactions.sort((a, b) => b.id - a.id); // UI 恢复按最新时间显示
+    this.submitChanges();
+  }
+
   selectStudent(student: any) {
     this.selectedStudent = student;
     this.authService.getStudentPayments(student.dbId).subscribe({
-      next: (data) => this.transactions = data,
+      next: (data: any[]) => {
+        this.transactions = data.map(t => this.formatTxn(t));
+        this.recalculateBalances(); // 每次点击学生，自动修复对账单！
+      },
       error: () => console.log('Failed to fetch transactions.')
     });
   }
@@ -114,12 +188,14 @@ export class PaymentComponent implements OnInit {
 
   saveUpdate() {
     if (this.editMode === 'PAID') {
-      this.selectedStudent.totalPaid = this.inputVal1;
+      this.selectedStudent.totalPaid = Number(this.inputVal1);
     } else {
-      const newOutstanding = this.inputVal1 - this.inputVal2;
+      const newOutstanding = Number(this.inputVal1) - Number(this.inputVal2);
       this.selectedStudent.due = newOutstanding < 0 ? 0 : newOutstanding;
     }
+    this.submitChanges();
     this.showEditModal = false;
+    alert('Manual override applied. Note: Adding/approving future transactions will automatically recalculate and override this manual balance.');
   }
 
   openAddPayment() {
@@ -127,93 +203,6 @@ export class PaymentComponent implements OnInit {
     this.editingTxnId = null;
     this.newTxn = { date: new Date().toISOString().split('T')[0], description: '', method: 'Cash', amount: null, receiptFile: null, fileUrl: null };
     this.showAddPaymentModal = true;
-  }
-
-  submitNewPayment() {
-    if (!this.newTxn.amount) return;
-
-    const payload = {
-      ...this.newTxn,
-      status: 'UNPAID',
-      invoiceNumber: 'INV-' + Math.floor(Math.random() * 100000)
-    };
-
-    this.authService.addPayment(this.selectedStudent.dbId, payload).subscribe({
-      next: (savedTxn) => {
-        this.transactions.unshift(savedTxn);
-        this.selectedStudent.due += savedTxn.amount;
-        this.submitChanges();
-        this.showAddPaymentModal = false;
-      },
-      error: () => alert('Failed to save payment.')
-    });
-  }
-
-  changeStatus(txn: any, status: string) {
-    if (txn.status === status) return;
-    const oldStatus = txn.status;
-
-    this.authService.updatePayment(txn.id, { status: status }).subscribe({
-      next: () => {
-        txn.status = status;
-
-        if (txn.description === 'Payment Proof Uploaded' || txn.desc === 'Payment Proof Uploaded') {
-          if (status === 'Completed' && oldStatus !== 'Completed') {
-            this.selectedStudent.totalPaid += txn.amount;
-            this.selectedStudent.due -= txn.amount;
-          }
-          else if (status === 'Rejected' && oldStatus === 'Completed') {
-            this.selectedStudent.totalPaid -= txn.amount;
-            this.selectedStudent.due += txn.amount;
-          }
-        }
-
-        if (this.selectedStudent.due < 0) this.selectedStudent.due = 0;
-        if (this.selectedStudent.totalPaid < 0) this.selectedStudent.totalPaid = 0;
-
-        if (this.selectedStudent.due === 0) {
-          this.transactions.forEach(t => {
-            if (t.status === 'UNPAID') {
-              t.status = 'Completed';
-              this.authService.updatePayment(t.id, { status: 'Completed' }).subscribe();
-            }
-          });
-        }
-
-        this.submitChanges();
-      },
-      error: () => alert('Failed to update status.')
-    });
-  }
-
-  deleteTransaction(txnId: number) {
-    if (confirm('Are you sure you want to permanently delete this transaction?')) {
-      const txnToDelete = this.transactions.find(t => t.id === txnId);
-
-      this.authService.deletePayment(txnId).subscribe({
-        next: () => {
-          this.transactions = this.transactions.filter(t => t.id !== txnId);
-
-          if (txnToDelete) {
-            const isPaymentProof = (txnToDelete.desc === 'Payment Proof Uploaded' || txnToDelete.description === 'Payment Proof Uploaded');
-
-            if (isPaymentProof) {
-              if (txnToDelete.status === 'Completed') {
-                this.selectedStudent.totalPaid -= txnToDelete.amount;
-                this.selectedStudent.due += txnToDelete.amount;
-              }
-            } else {
-              this.selectedStudent.due -= txnToDelete.amount;
-            }
-
-            if (this.selectedStudent.totalPaid < 0) this.selectedStudent.totalPaid = 0;
-            if (this.selectedStudent.due < 0) this.selectedStudent.due = 0;
-            this.submitChanges();
-          }
-        },
-        error: () => alert('Failed to delete payment.')
-      });
-    }
   }
 
   onReceiptSelected(event: any) {
@@ -228,6 +217,55 @@ export class PaymentComponent implements OnInit {
     }
   }
 
+  submitNewPayment() {
+    if (!this.newTxn.amount) return;
+
+    const payload = {
+      studentName: this.selectedStudent.name,
+      date: this.newTxn.date,
+      description: this.newTxn.description,
+      method: this.newTxn.method,
+      amount: Number(this.newTxn.amount),
+      receiptFileName: this.newTxn.receiptFile,
+      receiptFileUrl: this.newTxn.fileUrl,
+      status: 'UNPAID'
+    };
+
+    this.authService.addPayment(this.selectedStudent.dbId, payload).subscribe({
+      next: (res: any) => {
+        const newLocalTxn = this.formatTxn({ ...payload, id: res.id });
+        this.transactions.unshift(newLocalTxn);
+        this.recalculateBalances(); // 自动修复对账单
+        this.showAddPaymentModal = false;
+      },
+      error: () => alert('Failed to save payment.')
+    });
+  }
+
+  changeStatus(txn: any, status: string) {
+    if (txn.status === status) return;
+
+    this.authService.updatePayment(txn.id, { status: status }).subscribe({
+      next: () => {
+        txn.status = status;
+        this.recalculateBalances(); // 无论你是 Approve 还是 Reject，全部自动重算账单
+      },
+      error: () => alert('Failed to update status.')
+    });
+  }
+
+  deleteTransaction(txnId: number) {
+    if (confirm('Are you sure you want to permanently delete this transaction?')) {
+      this.authService.deletePayment(txnId).subscribe({
+        next: () => {
+          this.transactions = this.transactions.filter(t => t.id !== txnId);
+          this.recalculateBalances(); // 删掉一条记录？没关系，剩下的记录重新算！
+        },
+        error: () => alert('Failed to delete payment.')
+      });
+    }
+  }
+
   uploadReceipt(txn: any) {
     const input = document.createElement('input');
     input.type = 'file'; input.accept = '.pdf,.jpg,.png';
@@ -236,11 +274,11 @@ export class PaymentComponent implements OnInit {
       if (file) {
         const reader = new FileReader();
         reader.onload = (ev: any) => {
-          const payload = { receiptFile: file.name, fileUrl: ev.target.result };
+          const payload = { receiptFileName: file.name, receiptFileUrl: ev.target.result };
           this.authService.updatePayment(txn.id, payload).subscribe({
             next: () => {
               txn.receiptFile = file.name;
-              txn.receiptUrl = ev.target.result;
+              txn.fileUrl = ev.target.result;
               alert('Receipt securely uploaded!');
             }
           });
@@ -252,18 +290,18 @@ export class PaymentComponent implements OnInit {
   }
 
   askDownload(txn: any) {
-    if (!txn.receiptUrl && !txn.fileUrl) { alert('No file uploaded for this transaction.'); return; }
+    if (!txn.fileUrl && !txn.receiptUrl && !txn.receiptFile) { alert('No file uploaded for this transaction.'); return; }
     this.selectedTransaction = txn;
     this.showDownloadConfirm = true;
   }
 
   confirmDownload() {
     if (this.selectedTransaction) {
-      const url = this.selectedTransaction.receiptUrl || this.selectedTransaction.fileUrl;
+      const url = this.selectedTransaction.fileUrl || this.selectedTransaction.receiptUrl;
       if(url){
         const a = document.createElement('a');
         a.href = url;
-        a.download = this.selectedTransaction.receiptFile || 'receipt.jpg';
+        a.download = this.selectedTransaction.receiptFile || 'receipt.pdf';
         a.click();
       }
     }
@@ -273,13 +311,13 @@ export class PaymentComponent implements OnInit {
   submitChanges() {
     if (!this.selectedStudent) return;
     const payload = {
-      totalPaid: this.selectedStudent.totalPaid,
-      outstandingDue: this.selectedStudent.due
+      totalPaid: Number(this.selectedStudent.totalPaid),
+      outstandingDue: Number(this.selectedStudent.due)
     };
 
     this.authService.adminUpdateStudent(this.selectedStudent.dbId, payload).subscribe({
-      next: () => console.log('Balances synchronized.'),
-      error: () => alert('Failed to update balances.')
+      next: () => console.log('Balances synchronized with server.'),
+      error: () => alert('Failed to synchronize balances.')
     });
   }
 

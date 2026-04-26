@@ -20,6 +20,7 @@ import { TeacherProfileComponent } from './dashboard/teacher-profile/teacher-pro
 import { TeacherAttendanceComponent } from './dashboard/teacher-attendance/teacher-attendance';
 import { TeacherAssignmentComponent } from './dashboard/teacher-assignment/teacher-assignment';
 import { StaffProfileComponent } from './dashboard/staff-profile/staff-profile';
+
 // Admin Dashboards
 import { AdminDashboardComponent } from './dashboard/admin-dashboard/admin-dashboard';
 import { AdminProfileComponent } from './dashboard/admin-profile/admin-profile';
@@ -56,13 +57,12 @@ import { StudentGradesComponent } from './dashboard/student-grades/student-grade
 import { StudentAttendanceComponent } from './dashboard/student-attendance/student-attendance';
 import { StudentFoodComponent } from './dashboard/student-food/student-food';
 import { StudentAssignmentComponent } from './dashboard/student-assignment/student-assignment';
-// --- NEW IMPORT: The dedicated Student Profile we just built ---
 import { StudentProfileComponent } from './dashboard/student-profile/student-profile';
 
 // Parent Specific
 import { ParentStudentProfileComponent } from './dashboard/parent-student-profile/parent-student-profile';
 
-// *** NEW: Parent Financial Components (Corrected Paths based on your logs) ***
+// Parent Financial Components
 import { PaymentComponent as ParentPaymentComponent } from './dashboard/parent-financial/payment/payment';
 import { RefundComponent as ParentRefundComponent } from './dashboard/parent-financial/refund/refund';
 import { WalletComponent as ParentWalletComponent } from './dashboard/parent-financial/wallet/wallet';
@@ -70,7 +70,6 @@ import { DiscountComponent as ParentDiscountComponent } from './dashboard/parent
 import { UserProfileComponent } from './user-profile/user-profile';
 import { WebsiteManagementComponent } from './dashboard/admin/website-management/website-management';
 import { UserRolesComponent } from './dashboard/admin/user-roles/user-roles';
-
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -86,10 +85,12 @@ export const routes: Routes = [
   { path: 'admissions/fees', component: FeesComponent },
   { path: 'calendar', component: CalendarComponent },
   { path: 'contact', component: ContactComponent },
+  { path: 'about/faculty-staff', component: FacultyStaffComponent },
 
   // --- ADMIN ROUTES ---
   { path: 'dashboard/admin', component: AdminDashboardComponent, title: 'Admin Portal' },
-  { path: 'dashboard/student-info', component: StudentInfoComponent },
+  { path: 'dashboard/student-info', component: StudentInfoComponent }, // Fallback alias
+  { path: 'dashboard/admin/students', component: StudentInfoComponent, title: 'Manage Students' }, // The actual route staff uses
   { path: 'dashboard/teacher-info', component: TeacherInfoComponent },
   { path: 'dashboard/academic/subjects', component: SubjectsComponent },
   { path: 'dashboard/academic/student-schedule', component: StudentScheduleComponent },
@@ -102,6 +103,10 @@ export const routes: Routes = [
   { path: 'dashboard/admin/notification', component: NotificationComponent, title: 'Admin - Notifications' },
   { path: 'dashboard/admin/settings', component: SettingsComponent, title: 'Admin - Settings' },
   { path: 'dashboard/admin/profile', component: AdminProfileComponent, title: 'Admin Profile' },
+  { path: 'dashboard/admin/website', component: WebsiteManagementComponent, title: 'Website Editor' },
+  { path: 'dashboard/admin/user-roles', component: UserRolesComponent },
+
+  // Shared Settings Routes
   { path: 'dashboard/staff/settings', component: SettingsComponent, title: 'Staff - Settings' },
   { path: 'dashboard/teacher/settings', component: SettingsComponent, title: 'Teacher - Settings' },
   { path: 'dashboard/student/settings', component: SettingsComponent, title: 'Student - Settings' },
@@ -111,10 +116,14 @@ export const routes: Routes = [
   {
     path: 'dashboard/financial',
     children: [
-      { path: '', redirectTo: 'payment', pathMatch: 'full' },
+      // THE FIX: Allow dashboard/financial to load the Staff Dashboard so it isn't an empty screen!
+      { path: '', component: StaffDashboardComponent, title: 'Financial Manager Portal' },
       { path: 'payment', component: PaymentComponent, title: 'Financial - Payment' },
+      { path: 'payments', redirectTo: 'payment', pathMatch: 'full' }, // Alias for the buttons
       { path: 'refund', component: RefundComponent, title: 'Financial - Refund' },
+      { path: 'refunds', redirectTo: 'refund', pathMatch: 'full' }, // Alias for the buttons
       { path: 'discount', component: DiscountComponent, title: 'Financial - Discount' },
+      { path: 'discounts', redirectTo: 'discount', pathMatch: 'full' }, // Alias for the buttons
       { path: 'wallet', component: WalletComponent, title: 'Financial - Wallet' }
     ]
   },
@@ -123,15 +132,6 @@ export const routes: Routes = [
   { path: 'dashboard/staff', component: StaffDashboardComponent, title: 'Staff Portal' },
   { path: 'dashboard/staff/student-info', component: StudentInfoComponent, title: 'Staff - Student Info' },
   { path: 'dashboard/staff/profile', component: StaffProfileComponent, title: 'Staff Profile' },
-  {
-    path: 'dashboard/staff/financial',
-    children: [
-      { path: 'payment', component: PaymentComponent, title: 'Staff - Payment' },
-      { path: 'refund', component: RefundComponent, title: 'Staff - Refund' },
-      { path: 'discount', component: DiscountComponent, title: 'Staff - Discount' },
-      { path: 'wallet', component: WalletComponent, title: 'Staff - Wallet' }
-    ]
-  },
 
   // --- TEACHER ROUTES ---
   { path: 'dashboard/teacher', component: TeacherDashboardComponent, title: 'Teacher Portal' },
@@ -148,17 +148,22 @@ export const routes: Routes = [
 
   // --- STUDENT ROUTES ---
   { path: 'dashboard/student', component: StudentDashboardComponent, title: 'Student Portal' },
-  // --- THE FIX: Pointing My Profile directly to the new StudentProfileComponent! ---
   { path: 'dashboard/student/profile', component: StudentProfileComponent, title: 'My Profile' },
   { path: 'dashboard/student/assignments', component: StudentAssignmentComponent, title: 'My Courses' },
   { path: 'dashboard/student/grades', component: StudentGradesComponent, title: 'My Grades' },
-  { path: 'dashboard/parent/attendance', component: ParentAttendanceComponent, title: 'Child Attendance' },
+  { path: 'dashboard/student/attendance', component: StudentAttendanceComponent, title: 'My Attendance' },
   { path: 'dashboard/student/food', component: StudentFoodComponent, title: 'Food Menu' },
 
   // --- PARENT ROUTES ---
   { path: 'dashboard/parent', component: ParentDashboardComponent, title: 'Parent Portal' },
+  { path: 'dashboard/parent/profile', component: ParentStudentProfileComponent, title: 'Child Profile' },
+  { path: 'dashboard/parent/courses', component: ParentCoursesComponent, title: 'Child Courses' },
+  { path: 'dashboard/parent/grades', component: ParentGradesComponent, title: 'Child Grades' },
+  { path: 'dashboard/parent/attendance', component: ParentAttendanceComponent, title: 'Child Attendance' },
+  { path: 'dashboard/parent/food', component: ParentFoodComponent, title: 'Food Ordering' },
+  { path: 'dashboard/parent/children-list', component: ParentChildrenListComponent, title: 'My Children' },
 
-  // *** PARENT FINANCIAL SUB-ROUTES ***
+  // Parent Financial Sub-Routes
   {
     path: 'dashboard/parent/financial',
     children: [
@@ -170,17 +175,6 @@ export const routes: Routes = [
     ]
   },
 
-  { path: 'dashboard/parent/profile', component: ParentStudentProfileComponent, title: 'Child Profile' },
-  { path: 'dashboard/parent/courses', component: ParentCoursesComponent, title: 'Child Courses' },
-  { path: 'dashboard/parent/grades', component: ParentGradesComponent, title: 'Child Grades' },
-  { path: 'dashboard/parent/attendance', component: StudentAttendanceComponent, title: 'Child Attendance' },
-  { path: 'dashboard/parent/food', component: ParentFoodComponent, title: 'Food Ordering' },
-
-  // 示例
-  // 修复：路径必须包含 'dashboard/' 以匹配按钮的 routerLink
-  { path: 'dashboard/user-profile', component: UserProfileComponent, title: 'My Profile' },
-  { path: 'dashboard/admin/website', component: WebsiteManagementComponent, title: 'Website Editor' },
-  { path: 'dashboard/admin/user-roles', component: UserRolesComponent },
-  { path: 'dashboard/parent/children-list', component: ParentChildrenListComponent, title: 'My Children' },
-  { path: 'about/faculty-staff', component: FacultyStaffComponent }
+  // The Generic User Profile (The one you requested for Staff)
+  { path: 'dashboard/user-profile', component: UserProfileComponent, title: 'My Profile' }
 ];

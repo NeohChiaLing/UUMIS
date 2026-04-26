@@ -28,22 +28,24 @@ export class ParentStudentProfileComponent implements OnInit {
     medicalConditions: 'None',
     father: { name: '', ic: '', phone: '', email: '', job: '' },
     mother: { name: '', ic: '', phone: '', email: '', job: '' },
+    // ⭐ THE FIX: Added Sibling fields to data structure
+    siblingName: '',
+    siblingGrade: '',
+    siblingPhone: '',
+    siblingEmail: '',
     avatarUrl: null
   };
 
   currentUser: any = null;
-  activeChildId: any = null; // NEW: The specific child being viewed
+  activeChildId: any = null;
 
   constructor(private location: Location, private authService: AuthService) {}
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
-
-    // THE FIX: Get the specifically selected child from memory, NOT the generic one!
     this.activeChildId = sessionStorage.getItem('parentActiveChildId');
 
     if (this.currentUser && this.activeChildId) {
-
       this.authService.getStudentDashboardData(this.activeChildId).subscribe({
         next: (childData: any) => {
           if (childData.profileJson) {
@@ -128,7 +130,6 @@ export class ParentStudentProfileComponent implements OnInit {
     this.location.back();
   }
 
-  // --- THE FIX: Re-added Picture Upload Logic ---
   triggerFileInput() {
     document.getElementById('parentChildAvatarInput')?.click();
   }
@@ -138,7 +139,7 @@ export class ParentStudentProfileComponent implements OnInit {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.studentProfile.avatarUrl = e.target.result; // Update UI instantly
+        this.studentProfile.avatarUrl = e.target.result;
       };
       reader.readAsDataURL(file);
     }
@@ -153,10 +154,9 @@ export class ParentStudentProfileComponent implements OnInit {
     const payload = {
       profileStatus: 'PENDING',
       profileJson: JSON.stringify(this.studentProfile),
-      avatar: this.studentProfile.avatarUrl // Safely resaves the existing or new picture!
+      avatar: this.studentProfile.avatarUrl
     };
 
-    // Save to the activeChildId, NOT the outdated currentUser.childUserId!
     this.authService.adminUpdateStudent(this.activeChildId, payload).subscribe({
       next: () => alert('Child profile details submitted to school admin for approval.'),
       error: () => alert('Failed to submit updates.')

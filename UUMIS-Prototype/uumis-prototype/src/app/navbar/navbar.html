@@ -1,84 +1,103 @@
 <div class="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md border-b border-slate-200">
-  <div class="max-w-[1280px] mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-20">
+  <div class="px-4 sm:px-6 lg:px-8 w-full max-w-[1280px] mx-auto h-20">
+    <div class="flex items-center justify-between h-full">
 
-      <div class="flex items-center gap-3 cursor-pointer" routerLink="/home">
-        <div class="size-12 flex items-center justify-center rounded-xl bg-white border border-slate-200 p-1 shadow-sm">
+      <div class="flex items-center gap-3 cursor-pointer shrink-0" routerLink="/home">
+        <div class="size-10 md:size-12 flex items-center justify-center rounded-xl bg-white border border-slate-200 p-1 shadow-sm">
           <img src="assets/UUMIS-Logo.jpg" alt="UUMIS Logo" class="w-full h-full object-contain">
         </div>
-        <h2 class="text-2xl font-black tracking-tighter text-slate-900 uppercase">UUMIS</h2>
+        <h2 class="text-xl md:text-2xl font-black tracking-tighter text-slate-900 uppercase">UUMIS</h2>
       </div>
 
-      <div class="hidden lg:flex items-center gap-8 h-full">
+      <div class="hidden lg:flex items-center gap-8 h-full shrink-0">
         <a class="text-sm font-bold text-slate-500 hover:text-sky-500 transition-colors cursor-pointer" routerLink="/home">Home</a>
 
         <div class="relative h-full flex items-center" (mouseleave)="closeDropdown()">
-          <button (click)="toggleAboutDropdown()"
-                  class="flex items-center gap-1 text-sm font-bold text-slate-500 hover:text-sky-500 transition-colors focus:outline-none cursor-pointer h-full">
+          <button (click)="toggleAboutDropdown()" class="flex items-center gap-1 text-sm font-bold text-slate-500 hover:text-sky-500 transition-colors focus:outline-none cursor-pointer h-full">
             About Us
             <span translate="no" class="material-symbols-outlined notranslate text-sm">expand_more</span>
           </button>
-
-          @if (isAboutDropdownOpen) {
-          <div class="absolute top-full -left-4 pt-4 w-64 animate-fade-in z-50">
+          <div *ngIf="isAboutDropdownOpen" class="absolute top-full -left-4 pt-4 w-64 animate-fade-in z-50">
             <div class="bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden">
               <div class="flex flex-col p-2">
-                <a routerLink="/about/mission" (click)="closeDropdown()" class="px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-50 hover:text-sky-500 transition-all cursor-pointer font-bold">
-                  Mission, Vision & Objective
-                </a>
-                <a routerLink="/about/board" (click)="closeDropdown()" class="px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-50 hover:text-sky-500 transition-all cursor-pointer font-bold">
-                  Board of Governors
-                </a>
-                <a routerLink="/about/structure" (click)="closeDropdown()" class="px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-50 hover:text-sky-500 transition-all cursor-pointer font-bold">
-                  Organizational Structure
-                </a>
-                <a routerLink="/about/faculty-staff" (click)="closeDropdown()" class="px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-50 hover:text-sky-500 transition-all cursor-pointer font-bold">
-                  Faculty & Staff
-                </a>
+                <a routerLink="/about/mission" (click)="closeDropdown()" class="px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-50 hover:text-sky-500 transition-all cursor-pointer font-bold">Mission, Vision & Objective</a>
+                <a routerLink="/about/board" (click)="closeDropdown()" class="px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-50 hover:text-sky-500 transition-all cursor-pointer font-bold">Board of Governors</a>
+                <a routerLink="/about/structure" (click)="closeDropdown()" class="px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-50 hover:text-sky-500 transition-all cursor-pointer font-bold">Organizational Structure</a>
+                <a routerLink="/about/faculty-staff" (click)="closeDropdown()" class="px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-50 hover:text-sky-500 transition-all cursor-pointer font-bold">Faculty & Staff</a>
               </div>
             </div>
           </div>
-          }
         </div>
 
         <div class="relative h-full flex items-center" (mouseleave)="closeDropdown()">
-          <button (click)="toggleAdmissionsDropdown()"
-                  class="flex items-center gap-1 text-sm font-bold text-slate-500 hover:text-sky-500 transition-colors focus:outline-none cursor-pointer h-full">
+          <button (click)="toggleAdmissionsDropdown()" class="flex items-center gap-1 text-sm font-bold text-slate-500 hover:text-sky-500 transition-colors focus:outline-none cursor-pointer h-full">
             Admissions
             <span translate="no" class="material-symbols-outlined notranslate text-sm">expand_more</span>
           </button>
-
-          @if (isAdmissionsDropdownOpen) {
-          <div class="absolute top-full -left-4 pt-4 w-64 animate-fade-in z-50">
+          <div *ngIf="isAdmissionsDropdownOpen" class="absolute top-full -left-4 pt-4 w-64 animate-fade-in z-50">
             <div class="bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden">
               <div class="flex flex-col p-2">
-                <a routerLink="/admissions/how-to-apply" (click)="closeDropdown()" class="px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-50 hover:text-sky-500 transition-all cursor-pointer font-bold">
-                  How to Apply
-                </a>
-                <a routerLink="/admissions/application-form" (click)="closeDropdown()" class="px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-50 hover:text-sky-500 transition-all cursor-pointer font-bold">
-                  Online Application
-                </a>
-                <a routerLink="/admissions/fees" (click)="closeDropdown()" class="px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-50 hover:text-sky-500 transition-all cursor-pointer font-bold flex items-center gap-2">
-                  <span translate="no" class="material-symbols-outlined notranslate text-lg">payments</span>
-                  Fees
-                </a>
+                <a routerLink="/admissions/how-to-apply" (click)="closeDropdown()" class="px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-50 hover:text-sky-500 transition-all cursor-pointer font-bold">How to Apply</a>
+                <a routerLink="/admissions/application-form" (click)="closeDropdown()" class="px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-50 hover:text-sky-500 transition-all cursor-pointer font-bold">Online Application</a>
+                <a routerLink="/admissions/fees" (click)="closeDropdown()" class="px-4 py-3 rounded-xl text-sm text-slate-600 hover:bg-slate-50 hover:text-sky-500 transition-all cursor-pointer font-bold flex items-center gap-2"><span translate="no" class="material-symbols-outlined notranslate text-lg">payments</span>Fees</a>
               </div>
             </div>
           </div>
-          }
         </div>
 
         <a routerLink="/calendar" class="text-sm font-bold text-slate-500 hover:text-sky-500 transition-colors cursor-pointer">Calendar</a>
-
         <a routerLink="/contact" class="text-sm font-bold text-slate-500 hover:text-sky-500 transition-colors cursor-pointer">Contact</a>
       </div>
 
-      <div>
-        <a routerLink="/login" class="flex items-center justify-center rounded-xl h-10 px-6 bg-sky-500 hover:bg-sky-400 transition-all text-white text-sm font-black tracking-wide shadow-lg shadow-sky-500/30 cursor-pointer decoration-0 hover:scale-105 active:scale-95">
+      <div class="hidden lg:block shrink-0 pl-4">
+        <a routerLink="/login" class="flex items-center justify-center rounded-xl h-10 px-6 bg-sky-500 hover:bg-sky-400 transition-all text-white text-sm font-black tracking-wide shadow-lg shadow-sky-500/30 cursor-pointer hover:scale-105 active:scale-95">
           <span class="mr-2">Login/Portal</span>
           <span translate="no" class="material-symbols-outlined notranslate text-[18px]">login</span>
         </a>
       </div>
+
+      <div class="lg:hidden flex items-center">
+        <button (click)="toggleMobileMenu()" class="p-2 text-slate-500 hover:text-sky-500 focus:outline-none transition-colors">
+          <span translate="no" class="material-symbols-outlined notranslate text-3xl">{{ isMobileMenuOpen ? 'close' : 'menu' }}</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <div *ngIf="isMobileMenuOpen" class="lg:hidden bg-white border-t border-slate-100 shadow-xl overflow-hidden animate-fade-in">
+    <div class="flex flex-col p-4 space-y-2">
+      <a routerLink="/home" (click)="toggleMobileMenu()" class="p-4 rounded-xl text-slate-700 font-bold hover:bg-sky-50 hover:text-sky-600">Home</a>
+
+      <div class="rounded-xl border border-slate-100 bg-slate-50/50 overflow-hidden">
+        <button (click)="isMobileAboutOpen = !isMobileAboutOpen" class="w-full p-4 flex justify-between items-center text-slate-700 font-bold hover:bg-sky-50 hover:text-sky-600">
+          About Us <span translate="no" class="material-symbols-outlined notranslate">{{ isMobileAboutOpen ? 'expand_less' : 'expand_more' }}</span>
+        </button>
+        <div *ngIf="isMobileAboutOpen" class="flex flex-col bg-white px-4 py-2 border-t border-slate-100">
+          <a routerLink="/about/mission" (click)="toggleMobileMenu()" class="py-3 text-sm text-slate-600 font-medium hover:text-sky-500 border-b border-slate-50 last:border-none">Mission & Vision</a>
+          <a routerLink="/about/board" (click)="toggleMobileMenu()" class="py-3 text-sm text-slate-600 font-medium hover:text-sky-500 border-b border-slate-50 last:border-none">Board of Governors</a>
+          <a routerLink="/about/structure" (click)="toggleMobileMenu()" class="py-3 text-sm text-slate-600 font-medium hover:text-sky-500 border-b border-slate-50 last:border-none">Organizational Structure</a>
+          <a routerLink="/about/faculty-staff" (click)="toggleMobileMenu()" class="py-3 text-sm text-slate-600 font-medium hover:text-sky-500 border-b border-slate-50 last:border-none">Faculty & Staff</a>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-slate-100 bg-slate-50/50 overflow-hidden">
+        <button (click)="isMobileAdmissionsOpen = !isMobileAdmissionsOpen" class="w-full p-4 flex justify-between items-center text-slate-700 font-bold hover:bg-sky-50 hover:text-sky-600">
+          Admissions <span translate="no" class="material-symbols-outlined notranslate">{{ isMobileAdmissionsOpen ? 'expand_less' : 'expand_more' }}</span>
+        </button>
+        <div *ngIf="isMobileAdmissionsOpen" class="flex flex-col bg-white px-4 py-2 border-t border-slate-100">
+          <a routerLink="/admissions/how-to-apply" (click)="toggleMobileMenu()" class="py-3 text-sm text-slate-600 font-medium hover:text-sky-500 border-b border-slate-50 last:border-none">How to Apply</a>
+          <a routerLink="/admissions/application-form" (click)="toggleMobileMenu()" class="py-3 text-sm text-slate-600 font-medium hover:text-sky-500 border-b border-slate-50 last:border-none">Online Application</a>
+          <a routerLink="/admissions/fees" (click)="toggleMobileMenu()" class="py-3 text-sm text-slate-600 font-medium hover:text-sky-500 border-b border-slate-50 last:border-none">Fees</a>
+        </div>
+      </div>
+
+      <a routerLink="/calendar" (click)="toggleMobileMenu()" class="p-4 rounded-xl text-slate-700 font-bold hover:bg-sky-50 hover:text-sky-600">Calendar</a>
+      <a routerLink="/contact" (click)="toggleMobileMenu()" class="p-4 rounded-xl text-slate-700 font-bold hover:bg-sky-50 hover:text-sky-600">Contact</a>
+
+      <a routerLink="/login" (click)="toggleMobileMenu()" class="mt-4 flex items-center justify-center rounded-xl p-4 bg-sky-500 hover:bg-sky-600 text-white font-black tracking-wide shadow-md">
+        Login / Portal <span translate="no" class="material-symbols-outlined notranslate ml-2">login</span>
+      </a>
     </div>
   </div>
 </div>

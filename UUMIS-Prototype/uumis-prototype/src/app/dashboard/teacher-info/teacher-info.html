@@ -222,27 +222,47 @@
           <table class="w-full text-left text-sm overflow-visible table-fixed">
             <thead *ngIf="group.slots.length > 0" class="text-slate-400 border-b border-slate-100 uppercase text-[9px] font-black">
             <tr>
-              <th class="pb-4 px-4 w-1/4">Time Slot</th>
-              <th class="pb-4 px-4 w-1/2">Subject</th>
-              <th class="pb-4 px-4 w-1/4">Class / Grade</th>
+              <th class="pb-4 px-4 w-[340px]">Time Slot</th>
+              <th class="pb-4 px-4 w-[40%]">Subject</th>
+              <th class="pb-4 px-4 w-[30%]">Class / Grade</th>
               <th *ngIf="isEditMode" class="pb-4 px-4 w-16 text-right">Delete</th>
             </tr>
             </thead>
             <tbody class="divide-y divide-slate-50">
 
             <tr *ngIf="group.slots.length === 0">
-              <td class="py-8 text-center text-[10px] font-bold text-slate-300 uppercase tracking-widest">No classes scheduled for {{group.day}}.</td>
+              <td class="py-8 text-center text-[10px] font-bold text-slate-300 uppercase tracking-widest" colspan="4">No classes scheduled for {{group.day}}.</td>
             </tr>
 
             <tr *ngFor="let slot of group.slots" class="hover:bg-emerald-50/20 transition-colors group/row">
-              <td class="py-4 px-4">
-                <input [(ngModel)]="slot.time" [readonly]="!isEditMode" placeholder="e.g. 08:00 AM - 10:00 AM" class="bg-transparent border-none outline-none font-medium text-slate-600 placeholder-slate-300 w-full focus:ring-2 focus:ring-emerald-100 rounded-xl p-3 transition-all text-xs">
+
+              <td class="py-4 px-4 align-top">
+                <div *ngIf="isEditMode" class="flex flex-nowrap items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl p-2 min-w-[320px] shadow-inner w-max">
+                  <div class="flex items-center bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm w-[145px]">
+                    <input [(ngModel)]="slot.startHour" (blur)="formatTime(slot, 'startHour')" (keyup.enter)="$event.target.blur()" placeholder="08:00" class="w-12 shrink-0 bg-transparent text-sm font-black text-center outline-none border-none p-0 focus:ring-0">
+                    <div class="w-px h-5 bg-slate-200 mx-1 shrink-0"></div>
+                    <select [(ngModel)]="slot.startAmPm" class="shrink-0 w-[60px] bg-transparent text-sm font-black outline-none cursor-pointer text-emerald-600 border-none py-0 pl-1 pr-6 focus:ring-0">
+                      <option value="AM">AM</option><option value="PM">PM</option>
+                    </select>
+                  </div>
+                  <span class="text-slate-300 font-black px-1 shrink-0">-</span>
+                  <div class="flex items-center bg-white border border-slate-200 rounded-lg p-1.5 shadow-sm w-[145px]">
+                    <input [(ngModel)]="slot.endHour" (blur)="formatTime(slot, 'endHour')" (keyup.enter)="$event.target.blur()" placeholder="09:00" class="w-12 shrink-0 bg-transparent text-sm font-black text-center outline-none border-none p-0 focus:ring-0">
+                    <div class="w-px h-5 bg-slate-200 mx-1 shrink-0"></div>
+                    <select [(ngModel)]="slot.endAmPm" class="shrink-0 w-[60px] bg-transparent text-sm font-black outline-none cursor-pointer text-emerald-600 border-none py-0 pl-1 pr-6 focus:ring-0">
+                      <option value="AM">AM</option><option value="PM">PM</option>
+                    </select>
+                  </div>
+                </div>
+                <span *ngIf="!isEditMode" class="font-bold text-slate-500 text-xs tracking-tight whitespace-nowrap block mt-2">
+                  {{slot.startHour}} {{slot.startAmPm}} - {{slot.endHour}} {{slot.endAmPm}}
+                </span>
               </td>
 
-              <td class="py-4 px-4 relative">
+              <td class="py-4 px-4 relative align-top">
                 <div *ngIf="isEditMode" class="relative w-full">
                   <div (click)="$event.stopPropagation(); toggleScheduleDropdown(slot)"
-                       class="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 flex justify-between items-center cursor-pointer hover:border-emerald-200 transition-all focus-within:ring-2 ring-emerald-100 min-h-[44px]">
+                       class="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 flex justify-between items-center cursor-pointer hover:border-emerald-200 transition-all focus-within:ring-2 ring-emerald-100 min-h-[48px]">
                          <span class="text-[11px] font-black text-slate-700 uppercase truncate">
                             {{ slot.subject || 'Select Subject' }}
                          </span>
@@ -265,15 +285,18 @@
                     <div *ngIf="selectedTeacher.assignedSubjectsArray.length === 0" class="p-4 text-[10px] font-bold text-slate-400 text-center uppercase tracking-widest">No Subjects Found</div>
                   </div>
                 </div>
-                <span *ngIf="!isEditMode" class="font-black text-slate-700 uppercase text-[11px] block px-2">{{slot.subject || '-'}}</span>
+                <span *ngIf="!isEditMode" class="font-black text-slate-700 uppercase text-[11px] block px-2 mt-2">{{slot.subject || '-'}}</span>
               </td>
 
-              <td class="py-4 px-4">
-                <input [(ngModel)]="slot.class" [readonly]="!isEditMode" placeholder="e.g. Grade 10 - A" class="bg-transparent border-none outline-none font-bold text-slate-400 placeholder-slate-300 w-full focus:ring-2 focus:ring-emerald-100 rounded-xl p-3 transition-all text-xs">
+              <td class="py-4 px-4 align-top">
+                <div *ngIf="isEditMode" class="min-h-[48px] flex items-center">
+                  <input [(ngModel)]="slot.class" [readonly]="!isEditMode" placeholder="e.g. Grade 10 - A" class="bg-transparent border-none outline-none font-bold text-slate-400 placeholder-slate-300 w-full focus:ring-2 focus:ring-emerald-100 rounded-xl p-3 transition-all text-xs">
+                </div>
+                <div *ngIf="!isEditMode" class="mt-2 text-xs font-bold text-slate-400 pl-2">{{slot.class || '-'}}</div>
               </td>
 
-              <td *ngIf="isEditMode" class="py-4 px-4 text-right">
-                <button (click)="removeSlot(slot)" class="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+              <td *ngIf="isEditMode" class="py-4 px-4 text-right align-top">
+                <button (click)="removeSlot(slot)" class="p-2 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all mt-1">
                   <span translate="no" class="material-symbols-outlined notranslate text-xl">delete</span>
                 </button>
               </td>

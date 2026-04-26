@@ -1,144 +1,147 @@
 <div class="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 flex flex-col relative overflow-hidden font-display text-slate-800 isolation-auto">
 
-  <div class="absolute top-[-10%] left-[-10%] w-[40rem] h-[40rem] bg-emerald-200/20 rounded-full blur-3xl animate-pulse pointer-events-none z-[-1]"></div>
-  <div class="absolute bottom-[-10%] right-[-10%] w-[35rem] h-[35rem] bg-teal-200/20 rounded-full blur-3xl animate-pulse delay-700 pointer-events-none z-[-1]"></div>
+  <div class="absolute top-[-10%] left-[-10%] w-[20rem] md:w-[40rem] h-[20rem] md:h-[40rem] bg-emerald-200/20 rounded-full blur-3xl animate-pulse pointer-events-none z-[-1]"></div>
+  <div class="absolute bottom-[-10%] right-[-10%] w-[20rem] md:w-[35rem] h-[20rem] md:h-[35rem] bg-teal-200/20 rounded-full blur-3xl animate-pulse delay-700 pointer-events-none z-[-1]"></div>
 
-  <header class="w-full max-w-7xl mx-auto p-8 flex justify-between items-center relative z-10">
-    <div class="flex items-center gap-3">
-      <div class="size-10 !bg-white rounded-xl shadow-sm flex items-center justify-center border border-emerald-100">
-        <img src="assets/UUMIS-Logo.jpg" alt="Logo" class="w-6 h-6 object-contain">
+  <header class="w-full max-w-7xl mx-auto p-4 md:p-8 flex justify-between items-center relative z-10">
+    <div class="flex items-center gap-2 md:gap-3">
+      <div class="size-8 md:size-10 !bg-white rounded-lg md:rounded-xl shadow-sm flex items-center justify-center border border-emerald-100">
+        <img src="assets/UUMIS-Logo.jpg" alt="Logo" class="w-5 h-5 md:w-6 md:h-6 object-contain">
       </div>
-      <span class="text-xl font-black text-slate-800 tracking-tight uppercase">UUMIS<span class="text-emerald-500">PORTAL</span></span>
+      <span class="text-lg md:text-xl font-black text-slate-800 tracking-tight uppercase">UUMIS<span class="text-emerald-500">PORTAL</span></span>
     </div>
 
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-2 md:gap-4">
       <button (click)="goHome()" class="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-full !bg-white border border-emerald-100 text-slate-600 font-bold text-xs uppercase tracking-widest hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-200 transition-all shadow-sm cursor-pointer z-50">
         <span translate="no" class="material-symbols-outlined notranslate text-base">arrow_back</span>
-        Back to Home
+        Home
       </button>
-      <button class="px-6 py-2.5 rounded-full !bg-white border border-emerald-100 text-emerald-600 font-black text-xs uppercase tracking-widest hover:bg-emerald-50 transition-all shadow-sm cursor-pointer z-50">
-        Need Help?
+      <button class="px-4 py-2 md:px-6 md:py-2.5 rounded-full !bg-white border border-emerald-100 text-emerald-600 font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-emerald-50 transition-all shadow-sm cursor-pointer z-50">
+        Help?
       </button>
     </div>
   </header>
 
-  <main class="flex-1 flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-24 px-6 relative z-10 max-w-7xl mx-auto w-full">
+  <main class="flex-1 flex flex-col lg:flex-row items-center justify-center gap-8 md:gap-12 lg:gap-24 px-4 sm:px-6 relative z-10 max-w-7xl mx-auto w-full py-8 md:py-0">
 
-    <div class="flex-1 space-y-8 max-w-xl text-center lg:text-left relative z-20">
+    <div class="flex-1 space-y-6 md:space-y-8 max-w-xl text-center lg:text-left relative z-20">
 
       <div *ngIf="currentView === 'login'" class="animate-fade-in">
-        <span class="px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-widest">Academic Portal</span>
-        <h1 class="text-6xl lg:text-7xl font-black text-slate-900 mt-6 leading-[1.1] tracking-tighter">
-          Welcome <br> <span class="text-emerald-500">Back.</span>
+        <span class="px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-[9px] md:text-[10px] font-black uppercase tracking-widest">Academic Portal</span>
+        <h1 class="text-5xl sm:text-6xl lg:text-7xl font-black text-slate-900 mt-4 md:mt-6 leading-[1.1] tracking-tighter">
+          Welcome <br class="hidden sm:block"> <span class="text-emerald-500">Back.</span>
         </h1>
-        <p class="text-lg text-slate-500 mt-6 font-medium leading-relaxed max-w-md mx-auto lg:mx-0">
+        <p class="text-base sm:text-lg text-slate-500 mt-4 md:mt-6 font-medium leading-relaxed max-w-md mx-auto lg:mx-0 px-4 sm:px-0">
           Secure access for Students, Parents, and Staff. Manage your academic journey with ease.
         </p>
       </div>
 
       <div *ngIf="currentView === 'forgot-password'" class="animate-fade-in">
-        <span class="px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-widest">Recovery</span>
-        <h1 class="text-5xl lg:text-6xl font-black text-slate-900 mt-6 leading-[1.1] tracking-tighter">
-          Forgot your <br> <span class="text-emerald-500">Password?</span>
+        <span class="px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-[9px] md:text-[10px] font-black uppercase tracking-widest">Recovery</span>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 mt-4 md:mt-6 leading-[1.1] tracking-tighter">
+          Forgot your <br class="hidden sm:block"> <span class="text-emerald-500">Password?</span>
         </h1>
-        <p class="text-lg text-slate-500 mt-6 font-medium leading-relaxed max-w-md mx-auto lg:mx-0">
+        <p class="text-base sm:text-lg text-slate-500 mt-4 md:mt-6 font-medium leading-relaxed max-w-md mx-auto lg:mx-0 px-4 sm:px-0">
           Don't worry, it happens to the best of us. Enter your details to verify your identity.
         </p>
       </div>
 
       <div *ngIf="currentView === 'reset-password'" class="animate-fade-in">
-        <span class="px-4 py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase tracking-widest">Security</span>
-        <h1 class="text-5xl lg:text-6xl font-black text-slate-900 mt-6 leading-[1.1] tracking-tighter">
-          Secure your <br> <span class="text-emerald-500">Account.</span>
+        <span class="px-3 py-1 md:px-4 md:py-1.5 rounded-full bg-emerald-100 text-emerald-700 text-[9px] md:text-[10px] font-black uppercase tracking-widest">Security</span>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 mt-4 md:mt-6 leading-[1.1] tracking-tighter">
+          Secure your <br class="hidden sm:block"> <span class="text-emerald-500">Account.</span>
         </h1>
-        <p class="text-lg text-slate-500 mt-6 font-medium leading-relaxed max-w-md mx-auto lg:mx-0">
+        <p class="text-base sm:text-lg text-slate-500 mt-4 md:mt-6 font-medium leading-relaxed max-w-md mx-auto lg:mx-0 px-4 sm:px-0">
           Please choose a strong, unique password to ensure your data stays protected.
         </p>
       </div>
 
-      <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-        <div class="flex items-center gap-4 p-4 rounded-2xl !bg-white border border-emerald-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer group z-20 relative">
-          <div class="size-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
-            <span translate="no" class="material-symbols-outlined notranslate">school</span>
+      <div class="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center lg:justify-start px-2 sm:px-0">
+        <div class="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl !bg-white border border-emerald-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer group z-20 relative flex-1 sm:flex-none">
+          <div class="size-10 md:size-12 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white transition-colors shrink-0">
+            <span translate="no" class="material-symbols-outlined notranslate text-lg md:text-xl">school</span>
           </div>
           <div class="text-left">
-            <p class="font-black text-slate-800 text-sm">Student Access</p>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Grades & Schedules</p>
+            <p class="font-black text-slate-800 text-xs md:text-sm">Student Access</p>
+            <p class="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-wide">Grades & Schedules</p>
           </div>
         </div>
-        <div class="flex items-center gap-4 p-4 rounded-2xl !bg-white border border-blue-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer group z-20 relative">
-          <div class="size-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-500 group-hover:text-white transition-colors">
-            <span translate="no" class="material-symbols-outlined notranslate">admin_panel_settings</span>
+        <div class="flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-2xl !bg-white border border-blue-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer group z-20 relative flex-1 sm:flex-none">
+          <div class="size-10 md:size-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-500 group-hover:text-white transition-colors shrink-0">
+            <span translate="no" class="material-symbols-outlined notranslate text-lg md:text-xl">admin_panel_settings</span>
           </div>
           <div class="text-left">
-            <p class="font-black text-slate-800 text-sm">Staff Portal</p>
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Admin Tools</p>
+            <p class="font-black text-slate-800 text-xs md:text-sm">Staff Portal</p>
+            <p class="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase tracking-wide">Admin Tools</p>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="flex-1 w-full max-w-md relative z-30">
-      <div class="!bg-white p-10 rounded-[3rem] shadow-2xl shadow-emerald-100/50 border border-emerald-50 relative overflow-hidden transition-all duration-300">
+    <div class="flex-1 w-full max-w-sm sm:max-w-md relative z-30 mb-8 lg:mb-0 mt-4 md:mt-0">
+      <div class="!bg-white p-6 sm:p-8 md:p-10 rounded-[2rem] md:rounded-[3rem] shadow-2xl shadow-emerald-100/50 border border-emerald-50 relative overflow-hidden transition-all duration-300">
 
-        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
+        <div class="absolute top-0 left-0 w-full h-1.5 md:h-2 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
 
         <div *ngIf="currentView === 'login'" class="animate-fade-in">
-          <div class="mb-8">
-            <h2 class="text-3xl font-black text-slate-900 tracking-tight">Log in</h2>
-            <p class="text-sm font-bold text-slate-400 mt-2">Please enter your credentials to continue.</p>
+          <div class="mb-6 md:mb-8 text-center sm:text-left">
+            <h2 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Log in</h2>
+            <p class="text-xs md:text-sm font-bold text-slate-400 mt-1 md:mt-2">Please enter your credentials to continue.</p>
           </div>
 
-          <form (ngSubmit)="onLogin()" class="space-y-6 relative z-40">
-            <div class="space-y-2">
+          <form (ngSubmit)="onLogin()" class="space-y-4 md:space-y-6 relative z-40">
+            <div class="space-y-1.5 md:space-y-2">
               <label class="input-label">Username or ID</label>
               <div class="relative group">
-                <div class="input-icon"><span translate="no" class="material-symbols-outlined notranslate text-slate-300 group-focus-within:text-emerald-500 transition-colors">person</span></div>
+                <div class="input-icon"><span translate="no" class="material-symbols-outlined notranslate text-slate-300 group-focus-within:text-emerald-500 transition-colors text-lg md:text-xl">person</span></div>
                 <input type="text" [(ngModel)]="username" name="username" class="auth-input" placeholder="Enter your ID">
               </div>
             </div>
 
-            <div class="space-y-2">
+            <div class="space-y-1.5 md:space-y-2">
               <div class="flex justify-between items-center ml-1">
                 <label class="input-label">Password</label>
-                <button type="button" (click)="switchView('forgot-password')" class="text-[10px] font-black text-emerald-500 uppercase tracking-widest hover:text-emerald-600 cursor-pointer relative z-50">Forgot Password?</button>
+                <button type="button" (click)="switchView('forgot-password')" class="text-[9px] md:text-[10px] font-black text-emerald-500 uppercase tracking-widest hover:text-emerald-600 cursor-pointer relative z-50">Forgot Password?</button>
               </div>
               <div class="relative group">
-                <div class="input-icon"><span translate="no" class="material-symbols-outlined notranslate text-slate-300 group-focus-within:text-emerald-500 transition-colors">lock</span></div>
+                <div class="input-icon"><span translate="no" class="material-symbols-outlined notranslate text-slate-300 group-focus-within:text-emerald-500 transition-colors text-lg md:text-xl">lock</span></div>
                 <input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" name="password" class="auth-input pr-12" placeholder="Enter password">
                 <button type="button" (click)="showPassword = !showPassword" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-300 hover:text-slate-500 transition-colors cursor-pointer z-50">
-                  <span translate="no" class="material-symbols-outlined notranslate text-xl">{{ showPassword ? 'visibility' : 'visibility_off' }}</span>
+                  <span translate="no" class="material-symbols-outlined notranslate text-lg md:text-xl">{{ showPassword ? 'visibility' : 'visibility_off' }}</span>
                 </button>
               </div>
             </div>
 
-            <button type="submit" class="auth-btn mt-4">Sign In</button>
+            <button type="submit" class="auth-btn mt-2 md:mt-4">Sign In</button>
+            <button type="button" (click)="goHome()" class="w-full mt-3 flex md:hidden items-center justify-center gap-1 text-[10px] font-black text-slate-400 hover:text-emerald-500 uppercase tracking-widest transition-colors cursor-pointer">
+              <span translate="no" class="material-symbols-outlined notranslate text-[14px]">arrow_back</span> Return Home
+            </button>
           </form>
         </div>
 
         <div *ngIf="currentView === 'forgot-password'" class="animate-fade-in">
-          <div class="mb-8">
-            <h2 class="text-3xl font-black text-slate-900 tracking-tight">Reset Password</h2>
-            <p class="text-sm font-bold text-slate-400 mt-2">Enter your registered email or username.</p>
+          <div class="mb-6 md:mb-8 text-center sm:text-left">
+            <h2 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">Reset Password</h2>
+            <p class="text-xs md:text-sm font-bold text-slate-400 mt-1 md:mt-2">Enter your registered email or username.</p>
           </div>
 
-          <form (ngSubmit)="onVerifyEmail()" class="space-y-6 relative z-40">
-            <div class="space-y-2">
+          <form (ngSubmit)="onVerifyEmail()" class="space-y-4 md:space-y-6 relative z-40">
+            <div class="space-y-1.5 md:space-y-2">
               <label class="input-label">Email or Username</label>
               <div class="relative group">
-                <div class="input-icon"><span translate="no" class="material-symbols-outlined notranslate text-slate-300 group-focus-within:text-emerald-500 transition-colors">mail</span></div>
+                <div class="input-icon"><span translate="no" class="material-symbols-outlined notranslate text-slate-300 group-focus-within:text-emerald-500 transition-colors text-lg md:text-xl">mail</span></div>
                 <input type="text" [(ngModel)]="forgotData.email" name="forgotEmail" class="auth-input" placeholder="student@school.edu">
               </div>
             </div>
 
             <button type="submit" class="auth-btn flex items-center justify-center gap-2">
               <span>Verify Your Email</span>
-              <span translate="no" class="material-symbols-outlined notranslate text-lg">arrow_forward</span>
+              <span translate="no" class="material-symbols-outlined notranslate text-base md:text-lg">arrow_forward</span>
             </button>
 
             <div class="flex items-center justify-center pt-2">
-              <button type="button" (click)="switchView('login')" class="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-emerald-500 transition-colors cursor-pointer relative z-50">
-                <span translate="no" class="material-symbols-outlined notranslate text-base">arrow_back</span>
+              <button type="button" (click)="switchView('login')" class="flex items-center gap-1 md:gap-2 text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-emerald-500 transition-colors cursor-pointer relative z-50">
+                <span translate="no" class="material-symbols-outlined notranslate text-sm md:text-base">arrow_back</span>
                 Back to Login
               </button>
             </div>
@@ -146,120 +149,119 @@
         </div>
 
         <div *ngIf="currentView === 'reset-password'" class="animate-fade-in">
-          <div class="mb-8">
-            <h2 class="text-3xl font-black text-slate-900 tracking-tight">Reset New Password</h2>
-            <p class="text-sm font-bold text-slate-400 mt-2">Create your new login credentials.</p>
+          <div class="mb-6 md:mb-8 text-center sm:text-left">
+            <h2 class="text-2xl md:text-3xl font-black text-slate-900 tracking-tight">New Password</h2>
+            <p class="text-xs md:text-sm font-bold text-slate-400 mt-1 md:mt-2">Create your new login credentials.</p>
           </div>
 
-          <form (ngSubmit)="onResetPassword()" class="space-y-5 relative z-40">
+          <form (ngSubmit)="onResetPassword()" class="space-y-4 md:space-y-5 relative z-40">
 
-            <div class="space-y-2">
+            <div class="space-y-1.5 md:space-y-2">
               <label class="input-label">Verification Code</label>
               <div class="relative group">
-                <div class="input-icon"><span translate="no" class="material-symbols-outlined notranslate text-slate-300 group-focus-within:text-emerald-500 transition-colors">key</span></div>
+                <div class="input-icon"><span translate="no" class="material-symbols-outlined notranslate text-slate-300 group-focus-within:text-emerald-500 transition-colors text-lg md:text-xl">key</span></div>
                 <input type="text" [(ngModel)]="resetData.code" name="code" class="auth-input" placeholder="Enter 6-digit code">
               </div>
             </div>
 
-            <div class="space-y-2">
+            <div class="space-y-1.5 md:space-y-2">
               <label class="input-label">New Password</label>
               <div class="relative group">
-                <div class="input-icon"><span translate="no" class="material-symbols-outlined notranslate text-slate-300 group-focus-within:text-emerald-500 transition-colors">lock</span></div>
+                <div class="input-icon"><span translate="no" class="material-symbols-outlined notranslate text-slate-300 group-focus-within:text-emerald-500 transition-colors text-lg md:text-xl">lock</span></div>
                 <input [type]="showResetPass ? 'text' : 'password'" [(ngModel)]="resetData.newPassword" name="newPassword" class="auth-input pr-12" placeholder="Enter new password">
                 <button type="button" (click)="showResetPass = !showResetPass" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-300 hover:text-slate-500 transition-colors cursor-pointer z-50">
-                  <span translate="no" class="material-symbols-outlined notranslate text-xl">{{ showResetPass ? 'visibility' : 'visibility_off' }}</span>
+                  <span translate="no" class="material-symbols-outlined notranslate text-lg md:text-xl">{{ showResetPass ? 'visibility' : 'visibility_off' }}</span>
                 </button>
               </div>
             </div>
 
-            <div class="space-y-2">
-              <label class="input-label">Confirm New Password</label>
+            <div class="space-y-1.5 md:space-y-2">
+              <label class="input-label">Confirm Password</label>
               <div class="relative group">
-                <div class="input-icon"><span translate="no" class="material-symbols-outlined notranslate text-slate-300 group-focus-within:text-emerald-500 transition-colors">lock_reset</span></div>
+                <div class="input-icon"><span translate="no" class="material-symbols-outlined notranslate text-slate-300 group-focus-within:text-emerald-500 transition-colors text-lg md:text-xl">lock_reset</span></div>
                 <input [type]="showConfirmResetPass ? 'text' : 'password'" [(ngModel)]="resetData.confirmNewPassword" name="confirmNewPassword" class="auth-input pr-12" placeholder="Re-enter new password">
                 <button type="button" (click)="showConfirmResetPass = !showConfirmResetPass" class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-300 hover:text-slate-500 transition-colors cursor-pointer z-50">
-                  <span translate="no" class="material-symbols-outlined notranslate text-xl">{{ showConfirmResetPass ? 'visibility' : 'visibility_off' }}</span>
+                  <span translate="no" class="material-symbols-outlined notranslate text-lg md:text-xl">{{ showConfirmResetPass ? 'visibility' : 'visibility_off' }}</span>
                 </button>
               </div>
             </div>
 
-            <div class="!bg-slate-50 rounded-2xl p-4 border border-slate-100">
-              <p class="text-[10px] font-black text-slate-400 mb-3 uppercase tracking-widest">Password Requirements</p>
-              <ul class="grid grid-cols-2 gap-y-2 gap-x-4">
+            <div class="!bg-slate-50 rounded-xl md:rounded-2xl p-3 md:p-4 border border-slate-100">
+              <p class="text-[9px] md:text-[10px] font-black text-slate-400 mb-2 md:mb-3 uppercase tracking-widest">Requirements</p>
+              <ul class="grid grid-cols-2 gap-y-1.5 md:gap-y-2 gap-x-2 md:gap-x-4">
                 <li class="req-item transition-all duration-200" [ngClass]="{'text-emerald-500': isLengthValid, 'text-slate-400': !isLengthValid}">
-                  <span translate="no" class="material-symbols-outlined notranslate text-[14px]">{{ isLengthValid ? 'check_circle' : 'radio_button_unchecked' }}</span> 8+ Characters
+                  <span translate="no" class="material-symbols-outlined notranslate text-[12px] md:text-[14px]">{{ isLengthValid ? 'check_circle' : 'radio_button_unchecked' }}</span> 8+ Chars
                 </li>
                 <li class="req-item transition-all duration-200" [ngClass]="{'text-emerald-500': hasUppercase, 'text-slate-400': !hasUppercase}">
-                  <span translate="no" class="material-symbols-outlined notranslate text-[14px]">{{ hasUppercase ? 'check_circle' : 'radio_button_unchecked' }}</span> 1 Uppercase
+                  <span translate="no" class="material-symbols-outlined notranslate text-[12px] md:text-[14px]">{{ hasUppercase ? 'check_circle' : 'radio_button_unchecked' }}</span> 1 Upper
                 </li>
                 <li class="req-item transition-all duration-200" [ngClass]="{'text-emerald-500': hasNumber, 'text-slate-400': !hasNumber}">
-                  <span translate="no" class="material-symbols-outlined notranslate text-[14px]">{{ hasNumber ? 'check_circle' : 'radio_button_unchecked' }}</span> 1 Number
+                  <span translate="no" class="material-symbols-outlined notranslate text-[12px] md:text-[14px]">{{ hasNumber ? 'check_circle' : 'radio_button_unchecked' }}</span> 1 Num
                 </li>
                 <li class="req-item transition-all duration-200" [ngClass]="{'text-emerald-500': hasSymbol, 'text-slate-400': !hasSymbol}">
-                  <span translate="no" class="material-symbols-outlined notranslate text-[14px]">{{ hasSymbol ? 'check_circle' : 'radio_button_unchecked' }}</span> 1 Symbol
+                  <span translate="no" class="material-symbols-outlined notranslate text-[12px] md:text-[14px]">{{ hasSymbol ? 'check_circle' : 'radio_button_unchecked' }}</span> 1 Symbol
                 </li>
               </ul>
             </div>
 
-            <button type="submit" class="auth-btn">Set New Password</button>
+            <button type="submit" class="auth-btn mt-2 md:mt-0">Set Password</button>
           </form>
         </div>
 
-        <div class="mt-8 text-center">
-          <p class="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Protected by UUMIS Secure</p>
+        <div class="mt-6 md:mt-8 text-center">
+          <p class="text-[9px] md:text-[10px] font-bold text-slate-300 uppercase tracking-widest">Protected by UUMIS Secure</p>
         </div>
       </div>
     </div>
 
   </main>
 
-  <footer class="w-full text-center p-6 text-[10px] font-bold text-emerald-800/40 uppercase tracking-widest relative z-10">
+  <footer class="w-full text-center p-4 md:p-6 text-[9px] md:text-[10px] font-bold text-emerald-800/40 uppercase tracking-widest relative z-10 pb-8 lg:pb-6">
     &copy; 2026 UUMIS Systems. All rights reserved.
   </footer>
 
   <div *ngIf="showSuccessMessage" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm transition-all duration-500 animate-fade-in">
-    <div class="!bg-white p-10 rounded-[2.5rem] shadow-2xl border border-emerald-100 max-w-sm w-full text-center relative overflow-hidden transform transition-all scale-100 hover:scale-[1.01]">
-      <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
+    <div class="!bg-white p-8 md:p-10 rounded-[2rem] md:rounded-[2.5rem] shadow-2xl border border-emerald-100 max-w-sm w-full text-center relative overflow-hidden transform transition-all scale-100 hover:scale-[1.01]">
+      <div class="absolute top-0 left-0 w-full h-1.5 md:h-2 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
 
-      <div class="size-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-6 text-emerald-500 animate-bounce">
-        <span translate="no" class="material-symbols-outlined notranslate text-4xl">mark_email_read</span>
+      <div class="size-16 md:size-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4 md:mb-6 text-emerald-500 animate-bounce">
+        <span translate="no" class="material-symbols-outlined notranslate text-3xl md:text-4xl">mark_email_read</span>
       </div>
 
       <ng-container *ngIf="modalType === 'email-sent'">
-        <h3 class="text-2xl font-black text-slate-900 mb-3 tracking-tight">Code Sent!</h3>
-        <p class="text-sm font-bold text-slate-400 mb-6 leading-relaxed">
-          We sent a code to <span class="text-emerald-500">{{ forgotData.email }}</span>.
+        <h3 class="text-xl md:text-2xl font-black text-slate-900 mb-2 md:mb-3 tracking-tight">Code Sent!</h3>
+        <p class="text-xs md:text-sm font-bold text-slate-400 mb-4 md:mb-6 leading-relaxed">
+          We sent a code to <span class="text-emerald-500 break-all">{{ forgotData.email }}</span>.
         </p>
 
         <div class="mb-4">
           <input type="text" [(ngModel)]="resetData.code" placeholder="Enter 6-digit Code"
-                 class="w-full bg-slate-50 border border-emerald-200 rounded-xl p-3 text-center font-black tracking-widest text-lg focus:ring-2 focus:ring-emerald-500 outline-none">
+                 class="w-full bg-slate-50 border border-emerald-200 rounded-xl p-3 text-center font-black tracking-widest text-base md:text-lg focus:ring-2 focus:ring-emerald-500 outline-none">
         </div>
 
-        <button (click)="proceedToReset()" class="w-full text-white bg-emerald-500 hover:bg-emerald-600 font-black rounded-2xl text-sm px-6 py-4 uppercase tracking-widest shadow-lg shadow-emerald-200 transition-all hover:scale-[1.02] cursor-pointer">
+        <button (click)="proceedToReset()" class="w-full text-white bg-emerald-500 hover:bg-emerald-600 font-black rounded-xl md:rounded-2xl text-xs md:text-sm px-5 py-3.5 md:py-4 uppercase tracking-widest shadow-lg shadow-emerald-200 transition-all hover:scale-[1.02] cursor-pointer">
           Verify Code
         </button>
       </ng-container>
-
     </div>
   </div>
-
 </div>
 
 <style>
+  /* Responsive sizing for the inputs */
   .auth-input {
-    @apply w-full !bg-slate-50 border border-slate-100 text-slate-800 text-sm font-bold rounded-2xl focus:ring-emerald-500 focus:border-emerald-500 block pl-12 p-4 transition-all outline-none hover:bg-white hover:border-emerald-200 focus:!bg-white focus:shadow-lg focus:shadow-emerald-100/50;
+    @apply w-full !bg-slate-50 border border-slate-100 text-slate-800 text-sm font-bold rounded-xl md:rounded-2xl focus:ring-emerald-500 focus:border-emerald-500 block pl-10 md:pl-12 p-3 md:p-4 transition-all outline-none hover:bg-white hover:border-emerald-200 focus:!bg-white focus:shadow-lg focus:shadow-emerald-100/50;
   }
   .input-label {
-    @apply text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1;
+    @apply text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1;
   }
   .input-icon {
-    @apply absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none;
+    @apply absolute inset-y-0 left-0 pl-3 md:pl-4 flex items-center pointer-events-none;
   }
   .auth-btn {
-    @apply w-full text-white bg-emerald-500 hover:bg-emerald-600 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-black rounded-2xl text-sm px-5 py-4 text-center uppercase tracking-widest shadow-lg shadow-emerald-200 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer relative z-50;
+    @apply w-full text-white bg-emerald-500 hover:bg-emerald-600 focus:ring-4 focus:outline-none focus:ring-emerald-200 font-black rounded-xl md:rounded-2xl text-xs md:text-sm px-4 py-3.5 md:px-5 md:py-4 text-center uppercase tracking-widest shadow-lg shadow-emerald-200 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 cursor-pointer relative z-50;
   }
   .req-item {
-    @apply flex items-center gap-2 text-xs font-bold;
+    @apply flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs font-bold;
   }
 </style>

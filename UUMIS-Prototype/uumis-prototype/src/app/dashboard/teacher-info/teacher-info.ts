@@ -28,7 +28,6 @@ export class TeacherInfoComponent implements OnInit {
 
   academicLevels = ['Kindergarten', 'Primary', 'Lower Secondary', 'Upper Secondary'];
 
-  // Temps for the dropdown before adding to the array
   tempLevel: string = '';
   tempYear: string = '';
 
@@ -40,20 +39,18 @@ export class TeacherInfoComponent implements OnInit {
     return [];
   }
 
-  // --- NEW: Smart Subject Filter for Multiple Classes ---
   get filteredSubjectsForTeacher() {
     if (!this.selectedTeacher.assignedClassesArray || this.selectedTeacher.assignedClassesArray.length === 0) {
       return [];
     }
     return this.availableSubjects.filter(s => {
-      const subjLevel = (s.level || '').toLowerCase();
-      const subjYear = (s.yearGroup || '').toLowerCase();
+      const subjLevel = (s.level || '').trim().toLowerCase();
+      const subjYear = (s.yearGroup || s.year_group || '').trim().toLowerCase();
 
-      // Check if this subject matches ANY of the teacher's assigned classes
       return this.selectedTeacher.assignedClassesArray.some((c: string) => {
-        const parts = c.split(' - ');
+        const parts = c.includes(' - ') ? c.split(' - ') : c.split('-');
         const cLevel = (parts[0] || '').trim().toLowerCase();
-        const cYear = (parts[1] || '').trim().toLowerCase();
+        const cYear = (parts.length > 1 ? parts[1] : parts[0]).trim().toLowerCase();
         return subjLevel === cLevel && subjYear === cYear;
       });
     });
@@ -116,31 +113,39 @@ export class TeacherInfoComponent implements OnInit {
     this.authService.getTeachers().subscribe({
       next: (data) => {
         this.teachers = data.map((t: any, index: number) => {
-          // --- NEW: Parse multi-class assignments ---
           const classArray = t.bio && t.bio !== 'Unassigned' ? t.bio.split(',').map((c: string) => c.trim()) : [];
+
+          const assignedSubjRaw = t.assignedSubjects || t.assigned_subjects || '';
+          const schedRaw = t.scheduleJson || t.schedule_json;
+          const certsRaw = t.certificatesJson || t.certificates_json;
+
+          let parsedSchedule = this.getNewTeacherTemplate().schedule;
+          if (schedRaw) {
+            const temp = JSON.parse(schedRaw);
+            parsedSchedule = temp.map((s:any) => ({
+              day: s.day,
+              startHour: s.startHour || '08:00', startAmPm: s.startAmPm || 'AM',
+              endHour: s.endHour || '09:00', endAmPm: s.endAmPm || 'AM',
+              subject: s.subject || '', class: s.class || ''
+            }));
+          }
 
           return {
             dbId: t.id,
             no: index + 1,
-            name: t.fullName || t.username,
+            name: t.full_name || t.fullName || t.username,
             phone: t.phone || '',
             email: t.email || '',
-            assignedSubjectsArray: t.assignedSubjects ? t.assignedSubjects.split(',').map((s: string) => s.trim()) : [],
+            assignedSubjectsArray: assignedSubjRaw ? assignedSubjRaw.split(',').map((s: string) => s.trim()) : [],
             assignedClassesArray: classArray,
             website: '', linkedIn: '', emergencyContact: '',
             summary: t.summary || 'Experienced educator dedicated to student success.',
             education: '', experience: '',
-            hardSkills: t.hardSkills || '',
-            softSkills: t.softSkills || '',
+            hardSkills: t.hardSkills || t.hard_skills || '',
+            softSkills: t.softSkills || t.soft_skills || '',
             philosophy: t.philosophy || 'Engaging students through interactive learning.',
-            schedule: t.scheduleJson ? JSON.parse(t.scheduleJson) : [
-              { day: 'Sunday', time: '', subject: '', class: '' },
-              { day: 'Monday', time: '', subject: '', class: '' },
-              { day: 'Tuesday', time: '', subject: '', class: '' },
-              { day: 'Wednesday', time: '', subject: '', class: '' },
-              { day: 'Thursday', time: '', subject: '', class: '' }
-            ],
-            certificates: t.certificatesJson ? JSON.parse(t.certificatesJson) : []
+            schedule: parsedSchedule,
+            certificates: certsRaw ? JSON.parse(certsRaw) : []
           };
         });
       },
@@ -150,7 +155,9 @@ export class TeacherInfoComponent implements OnInit {
 
   loadSubjects() {
     this.authService.getSubjects().subscribe({
-      next: (data) => this.availableSubjects = data.filter(s => s.active)
+      next: (data) => {
+        this.availableSubjects = data;
+      }
     });
   }
 
@@ -160,11 +167,11 @@ export class TeacherInfoComponent implements OnInit {
       phone: '', email: '', website: '', linkedIn: '', emergencyContact: '',
       summary: '', education: '', experience: '', hardSkills: '', softSkills: '', philosophy: '',
       schedule: [
-        { day: 'Sunday', time: '', subject: '', class: '' },
-        { day: 'Monday', time: '', subject: '', class: '' },
-        { day: 'Tuesday', time: '', subject: '', class: '' },
-        { day: 'Wednesday', time: '', subject: '', class: '' },
-        { day: 'Thursday', time: '', subject: '', class: '' }
+        { day: 'Sunday', startHour: '08:00', startAmPm: 'AM', endHour: '09:00', endAmPm: 'AM', subject: '', class: '' },
+        { day: 'Monday', startHour: '08:00', startAmPm: 'AM', endHour: '09:00', endAmPm: 'AM', subject: '', class: '' },
+        { day: 'Tuesday', startHour: '08:00', startAmPm: 'AM', endHour: '09:00', endAmPm: 'AM', subject: '', class: '' },
+        { day: 'Wednesday', startHour: '08:00', startAmPm: 'AM', endHour: '09:00', endAmPm: 'AM', subject: '', class: '' },
+        { day: 'Thursday', startHour: '08:00', startAmPm: 'AM', endHour: '09:00', endAmPm: 'AM', subject: '', class: '' }
       ],
       certificates: []
     };
@@ -195,16 +202,13 @@ export class TeacherInfoComponent implements OnInit {
     this.buildGroupedSchedule();
   }
 
-  // --- NEW: Add & Remove Multi-Classes ---
   addClass() {
     if (this.tempLevel && this.tempYear) {
       const combo = `${this.tempLevel} - ${this.tempYear}`;
       if (!this.selectedTeacher.assignedClassesArray.includes(combo)) {
         this.selectedTeacher.assignedClassesArray.push(combo);
-        // Clear temp inputs after adding
         this.tempLevel = '';
         this.tempYear = '';
-        // Clear assigned subjects because the scope has changed
         this.selectedTeacher.assignedSubjectsArray = [];
         this.selectedTeacher = this.selectedTeacher;
       }
@@ -213,7 +217,7 @@ export class TeacherInfoComponent implements OnInit {
 
   removeClass(className: string) {
     this.selectedTeacher.assignedClassesArray = this.selectedTeacher.assignedClassesArray.filter((c: string) => c !== className);
-    this.selectedTeacher.assignedSubjectsArray = []; // Clear subjects on class removal
+    this.selectedTeacher.assignedSubjectsArray = [];
     this.selectedTeacher = this.selectedTeacher;
   }
 
@@ -228,7 +232,7 @@ export class TeacherInfoComponent implements OnInit {
   }
 
   addSlot(dayName: string) {
-    this.selectedTeacher.schedule.push({ day: dayName, time: '', subject: '', class: '' });
+    this.selectedTeacher.schedule.push({ day: dayName, startHour: '08:00', startAmPm: 'AM', endHour: '09:00', endAmPm: 'AM', subject: '', class: '' });
     this.selectedTeacher = this.selectedTeacher;
     this.buildGroupedSchedule();
   }
@@ -277,13 +281,24 @@ export class TeacherInfoComponent implements OnInit {
     this.selectedTeacher = this.selectedTeacher;
   }
 
+  formatTime(slot: any, field: string) {
+    let val = slot[field];
+    if (!val) return;
+    val = val.trim();
+    if (!val.includes(':')) {
+      let num = parseInt(val, 10);
+      if (!isNaN(num)) {
+        slot[field] = `${num < 10 ? '0' + num : num}:00`;
+      }
+    }
+  }
+
   saveData() {
     if (!this.selectedTeacher.dbId) {
       alert("Teacher must be registered through Auth Portal first!");
       return;
     }
 
-    // Join array into comma separated string for the DB
     const combinedBio = this.selectedTeacher.assignedClassesArray.length > 0
       ? this.selectedTeacher.assignedClassesArray.join(', ')
       : 'Unassigned';

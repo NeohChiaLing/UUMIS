@@ -16,7 +16,23 @@ export class UserRolesComponent implements OnInit {
   searchTerm: string = '';
   selectedRoleFilter: string = 'All';
 
-  availableRoles = ['admin', 'staff', 'teacher', 'parent', 'student'];
+  // THE FIX: We use objects now so the database gets the exact code ('financial_manager')
+  // but your dashboard UI displays it cleanly as "Financial Manager"
+  availableRoles = [
+    { value: 'admin', label: 'Admin' },
+    { value: 'staff', label: 'General Staff' },
+    { value: 'register_manager', label: 'Register Manager' },
+    { value: 'financial_manager', label: 'Financial Manager' },
+    { value: 'teacher', label: 'Teacher' },
+    { value: 'parent', label: 'Parent' },
+    { value: 'student', label: 'Student' }
+  ];
+
+  // Modal State Variables
+  showInviteModal: boolean = false;
+  inviteEmail: string = '';
+  inviteRole: string = 'staff';
+  isInviting: boolean = false;
 
   constructor(private location: Location, private authService: AuthService) {}
 
@@ -29,7 +45,6 @@ export class UserRolesComponent implements OnInit {
       next: (res: any) => {
         let rawUsers = Array.isArray(res) ? res : (res.users || res.data || []);
 
-        // THE FIX: Added .trim() to catch any hidden spaces coming from the database
         this.users = rawUsers.map((u: any) => {
           if (u.role) {
             u.role = u.role.trim().toLowerCase();
@@ -66,7 +81,8 @@ export class UserRolesComponent implements OnInit {
 
   changeRole(user: any, event: any) {
     const newRole = event.target.value.toLowerCase();
-    if(confirm(`Change ${user.fullName || user.username}'s role to ${newRole.toUpperCase()}?`)) {
+
+    if(confirm(`Change ${user.fullName || user.username}'s role to ${this.formatRole(newRole).toUpperCase()}?`)) {
       this.authService.updateUserRole(user.id, newRole).subscribe({
         next: () => {
           user.role = newRole;
@@ -74,11 +90,11 @@ export class UserRolesComponent implements OnInit {
         },
         error: () => {
           alert('Failed to update role.');
-          event.target.value = user.role || 'student'; // Revert dropdown on failure
+          event.target.value = user.role || 'student';
         }
       });
     } else {
-      event.target.value = user.role || 'student'; // Revert dropdown if cancelled
+      event.target.value = user.role || 'student';
     }
   }
 
@@ -87,10 +103,50 @@ export class UserRolesComponent implements OnInit {
       this.authService.deleteUser(user.id).subscribe({
         next: () => {
           alert('User deleted successfully.');
-          this.loadUsers(); // Refresh the table
+          this.loadUsers();
         },
         error: () => alert('Failed to delete user. They might be linked to existing records.')
       });
     }
+  }
+
+  // THE FIX: This helper cleans up the ugly underscores in the database role names for the UI!
+  formatRole(roleValue: string): string {
+    if (!roleValue) return 'Student';
+    const found = this.availableRoles.find(r => r.value === roleValue.toLowerCase());
+    return found ? found.label : roleValue;
+  }
+
+  // --- Invite Modal Functions ---
+  openInviteModal() {
+    this.inviteEmail = '';
+    this.inviteRole = 'staff';
+    this.showInviteModal = true;
+  }
+
+  closeInviteModal() {
+    this.showInviteModal = false;
+  }
+
+  submitInvite() {
+    if (!this.inviteEmail) {
+      alert("Please enter an email address.");
+      return;
+    }
+
+    this.isInviting = true;
+    this.authService.inviteUser(this.inviteEmail, this.inviteRole).subscribe({
+      next: (res: any) => {
+        alert(res.message || 'User invited successfully! They will receive an email shortly.');
+        this.isInviting = false;
+        this.closeInviteModal();
+        this.loadUsers(); // Refresh the table to show the new user
+      },
+      error: (err) => {
+        console.error(err);
+        alert(err.error?.message || 'Failed to send invite. Please check the email and try again.');
+        this.isInviting = false;
+      }
+    });
   }
 }
