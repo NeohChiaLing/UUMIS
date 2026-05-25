@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import html2canvas from 'html2canvas'; // Added html2canvas!
+import html2canvas from 'html2canvas';
 import { AuthService } from '../../services/auth.service';
 
 interface NotificationHistory {
@@ -39,7 +40,7 @@ interface QuickTemplate {
 @Component({
   selector: 'app-notification',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './notification.html',
   styles: [`
     ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -74,9 +75,9 @@ export class NotificationComponent implements OnInit {
   filteredHistory: NotificationHistory[] = [];
   searchTerm: string = '';
 
-  // Used for rendering the formal PDF
   selectedItemForPdf: NotificationHistory | null = null;
   isGeneratingPDF: boolean = false;
+  generatingId: number | null = null;
 
   templates: QuickTemplate[] = [
     { id: 1, title: 'Event Reminder', subject: 'Upcoming School Event', body: 'Dear Parents, this is a reminder about the upcoming event on [Date].', icon: 'event', colorClass: 'text-blue-500 bg-blue-100' },
@@ -84,7 +85,11 @@ export class NotificationComponent implements OnInit {
     { id: 3, title: 'Fee Payment', subject: 'Tuition Fee Due', body: 'This is a reminder that the tuition fees for this term are due by [Date].', icon: 'payments', colorClass: 'text-indigo-500 bg-indigo-100' }
   ];
 
-  constructor(private location: Location, private authService: AuthService) {}
+  constructor(
+    private location: Location,
+    private authService: AuthService,
+    private http: HttpClient
+  ) {}
 
   ngOnInit() {
     this.loadNotifications();
@@ -183,8 +188,12 @@ export class NotificationComponent implements OnInit {
       this.historyList = this.historyList.filter(item => !selectedIds.includes(item.id));
       this.filterHistory();
       this.selectAll = false;
+
       selectedIds.forEach(id => {
-        try { fetch(`/api/notifications/${id}`, { method: 'DELETE' }); } catch(e) {}
+        this.http.delete(`/api/notifications/${id}`).subscribe({
+          next: () => console.log('Deleted successfully'),
+          error: (e) => console.error('Delete failed', e)
+        });
       });
     }
   }
@@ -193,18 +202,31 @@ export class NotificationComponent implements OnInit {
     if (confirm(`Are you sure you want to delete the message: "${item.subject}"?`)) {
       this.historyList = this.historyList.filter(i => i.id !== item.id);
       this.filterHistory();
-      try { fetch(`/api/notifications/${item.id}`, { method: 'DELETE' }); } catch(e) {}
+
+      this.http.delete(`/api/notifications/${item.id}`).subscribe({
+        next: () => console.log('Deleted successfully'),
+        error: (e) => console.error('Delete failed', e)
+      });
     }
   }
 
-  // --- NEW: Download Attachment directly to computer ---
-  downloadAttachment(dataUri: string, fileName: string) {
-    const link = document.createElement('a');
-    link.href = dataUri;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  downloadAttachment(id: number, type: 'doc' | 'image', fileName: string) {
+    this.http.get<any>(`/api/notifications/${id}`).subscribe({
+      next: (fullItem) => {
+        const dataUri = type === 'doc' ? fullItem.docData : fullItem.imageData;
+        if (!dataUri) {
+          alert('Attachment data is missing or corrupted.');
+          return;
+        }
+        const link = document.createElement('a');
+        link.href = dataUri;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      },
+      error: () => alert('Failed to download attachment.')
+    });
   }
 
   downloadFullReport() {
@@ -222,42 +244,53 @@ export class NotificationComponent implements OnInit {
     doc.save('Notification_History.pdf');
   }
 
-  // --- REWRITTEN: Beautiful Formal PDF Generator ---
   downloadSingleItem(item: NotificationHistory) {
-    this.selectedItemForPdf = item;
+    this.generatingId = item.id;
     this.isGeneratingPDF = true;
 
-    // Give Angular a tiny moment to render the hidden HTML template
-    setTimeout(() => {
-      const element = document.getElementById('formal-notification-pdf');
-      if (element) {
-        html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
-          const imgData = canvas.toDataURL('image/png');
-          const pdf = new jsPDF('p', 'mm', 'a4');
-          const pdfWidth = pdf.internal.pageSize.getWidth();
-          const pdfHeight = pdf.internal.pageSize.getHeight();
+    this.http.get<NotificationHistory>(`/api/notifications/${item.id}`).subscribe({
+      next: (fullItem) => {
+        this.selectedItemForPdf = fullItem;
 
-          let imgWidth = pdfWidth;
-          let imgHeight = (canvas.height * pdfWidth) / canvas.width;
+        setTimeout(() => {
+          const element = document.getElementById('formal-notification-pdf');
+          if (element) {
+            html2canvas(element, { scale: 2, useCORS: true }).then(canvas => {
+              const imgData = canvas.toDataURL('image/png');
+              const pdf = new jsPDF('p', 'mm', 'a4');
+              const pdfWidth = pdf.internal.pageSize.getWidth();
+              const pdfHeight = pdf.internal.pageSize.getHeight();
 
-          if (imgHeight > pdfHeight) {
-            const scaleRatio = pdfHeight / imgHeight;
-            imgWidth = imgWidth * scaleRatio;
-            imgHeight = imgHeight * scaleRatio;
+              let imgWidth = pdfWidth;
+              let imgHeight = (canvas.height * pdfWidth) / canvas.width;
+
+              if (imgHeight > pdfHeight) {
+                const scaleRatio = pdfHeight / imgHeight;
+                imgWidth = imgWidth * scaleRatio;
+                imgHeight = imgHeight * scaleRatio;
+              }
+
+              pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+              pdf.save(`Notice_${item.id}_${item.subject.replace(/\s+/g, '_')}.pdf`);
+
+              this.isGeneratingPDF = false;
+              this.generatingId = null;
+              this.selectedItemForPdf = null;
+            }).catch(err => {
+              console.error('PDF Generation Error:', err);
+              alert('Failed to generate PDF.');
+              this.isGeneratingPDF = false;
+              this.generatingId = null;
+              this.selectedItemForPdf = null;
+            });
           }
-
-          pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-          pdf.save(`Notice_${item.id}_${item.subject.replace(/\s+/g, '_')}.pdf`);
-
-          this.isGeneratingPDF = false;
-          this.selectedItemForPdf = null;
-        }).catch(err => {
-          console.error('PDF Generation Error:', err);
-          alert('Failed to generate PDF.');
-          this.isGeneratingPDF = false;
-          this.selectedItemForPdf = null;
-        });
+        }, 200);
+      },
+      error: () => {
+        alert('Failed to fetch full notification details.');
+        this.isGeneratingPDF = false;
+        this.generatingId = null;
       }
-    }, 200);
+    });
   }
 }

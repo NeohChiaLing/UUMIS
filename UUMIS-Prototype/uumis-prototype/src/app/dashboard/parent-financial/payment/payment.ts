@@ -36,7 +36,32 @@ export class PaymentComponent implements OnInit {
     if (this.currentUser && this.currentUser.role.toLowerCase() === 'parent') {
       this.authService.getStudents().subscribe({
         next: (students: any[]) => {
-          this.myChildren = students.filter(s => s.parentId === this.currentUser.id);
+
+          // THE FIX: Included JSON Unpacking Engine
+          this.myChildren = students
+            .filter(s => s.parentId === this.currentUser.id || s.parent_id === this.currentUser.id)
+            .map(child => {
+              let profileData: any = {};
+              const rawProfileJson = child.profile_json || child.profileJson;
+
+              if (rawProfileJson) {
+                try { profileData = JSON.parse(rawProfileJson); } catch (e) {}
+              }
+
+              let displayName = child.fullName || child.username || 'No Name';
+              if (profileData.firstName || profileData.lastName || profileData.familyName) {
+                const lName = profileData.lastName || profileData.familyName || '';
+                displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+              }
+
+              return {
+                ...child,
+                displayName: displayName,
+                fullName: displayName, // Overrides core field so HTML instantly uses the proper name
+                name: displayName
+              };
+            });
+
         }
       });
     }
@@ -65,8 +90,13 @@ export class PaymentComponent implements OnInit {
     this.authService.getStudentPayments(this.childId).subscribe({
       next: (txns: any[]) => {
         this.transactions = txns.map(t => ({
-          id: t.id, date: t.date, desc: t.description || t.invoiceNumber,
-          amount: t.amount, status: t.status, receiptUrl: t.fileUrl, receiptFile: t.receiptFile
+          id: t.id,
+          date: t.date,
+          desc: t.description || t.invoiceNumber,
+          amount: t.amount,
+          status: t.status,
+          receiptUrl: t.fileUrl || t.receiptUrl || t.receipt_file_url || t.receiptFileUrl,
+          receiptFile: t.receiptFile || t.receipt_file || t.receiptFileName || t.receipt_file_name
         }));
       },
       error: (err) => console.error(err)
@@ -101,10 +131,14 @@ export class PaymentComponent implements OnInit {
     if (!this.uploadData.fileUrl) { alert('Select a receipt file to upload.'); return; }
 
     const payload = {
-      date: this.uploadData.date, description: 'Payment Proof Uploaded',
-      invoiceNumber: 'REF-' + Math.floor(Math.random() * 100000), method: 'Bank Transfer',
-      amount: this.uploadData.amount, status: 'Pending',
-      receiptFile: this.uploadData.fileName, fileUrl: this.uploadData.fileUrl
+      date: this.uploadData.date,
+      description: 'Payment Proof Uploaded',
+      invoiceNumber: 'REF-' + Math.floor(Math.random() * 100000),
+      method: 'Bank Transfer',
+      amount: this.uploadData.amount,
+      status: 'Pending',
+      receiptFileName: this.uploadData.fileName,
+      receiptFileUrl: this.uploadData.fileUrl
     };
 
     this.authService.addPayment(this.childId, payload).subscribe({

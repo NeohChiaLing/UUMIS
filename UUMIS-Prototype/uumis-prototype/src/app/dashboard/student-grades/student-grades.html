@@ -1,60 +1,60 @@
-<div class="min-h-screen bg-[#f0fdf4] font-display text-slate-800 p-6 lg:p-10 relative overflow-hidden">
+<div class="min-h-screen bg-[#f0fdf4] font-display text-slate-800 p-4 sm:p-6 lg:p-10 relative overflow-hidden flex flex-col">
 
-  <div class="max-w-5xl mx-auto space-y-8">
-    <div class="flex justify-between items-center">
-      <div class="flex items-center gap-5">
-        <button (click)="goBack()" class="size-11 flex items-center justify-center rounded-full bg-white border border-emerald-100 text-slate-400 hover:text-emerald-500 shadow-sm transition-all">
-          <span translate="no" class="material-symbols-outlined notranslate">arrow_back</span>
+  <div class="max-w-5xl mx-auto space-y-6 sm:space-y-8 flex-1 flex flex-col w-full overflow-y-auto">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 sm:gap-6 shrink-0">
+      <div class="flex items-center gap-3 sm:gap-5 w-full md:w-auto">
+        <button (click)="goBack()" class="size-9 sm:size-11 flex-none flex items-center justify-center rounded-full bg-white border border-emerald-100 text-slate-400 hover:text-emerald-500 shadow-sm transition-all">
+          <span translate="no" class="material-symbols-outlined notranslate font-bold text-[20px] sm:text-[24px]">arrow_back</span>
         </button>
-        <div>
-          <h1 class="text-3xl font-black uppercase tracking-tight text-emerald-900">My <span class="text-emerald-500">Grades</span></h1>
-          <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Examination Results</p>
+        <div class="min-w-0">
+          <h1 class="text-2xl sm:text-3xl font-black uppercase tracking-tight text-emerald-900 truncate">My <span class="text-emerald-500">Grades</span></h1>
+          <p class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-widest mt-0.5 sm:mt-1 truncate">Examination Results</p>
         </div>
       </div>
-      <div class="flex items-center gap-4">
 
-        <select *ngIf="enrolledYears.length > 0" [(ngModel)]="selectedYear" (change)="filterGrades()" class="px-5 py-3 bg-white border border-emerald-100 rounded-xl text-[10px] font-black uppercase text-emerald-800 shadow-sm focus:ring-2 focus:ring-emerald-200 outline-none cursor-pointer tracking-widest">
-          <option *ngFor="let y of enrolledYears" [value]="y">{{ y }} Report</option>
+      <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-4 w-full md:w-auto">
+        <select [(ngModel)]="selectedYear" (change)="filterGrades()" class="w-full sm:w-auto px-4 sm:px-5 py-2.5 sm:py-3 bg-white border border-emerald-100 rounded-xl text-[9px] sm:text-[10px] font-black uppercase text-emerald-800 shadow-sm focus:ring-2 focus:ring-emerald-200 outline-none cursor-pointer tracking-widest">
+          <option *ngFor="let y of allYears" [value]="y">{{ y }} Report</option>
         </select>
 
-        <button (click)="downloadReportCard()" [disabled]="isGeneratingPDF" *ngIf="mainGrades.length > 0 || taskGrades.length > 0" class="flex items-center gap-2 px-6 py-3 bg-emerald-500 text-white rounded-xl font-black uppercase text-[10px] shadow-lg hover:bg-emerald-600 transition-all disabled:opacity-50">
-          <span *ngIf="isGeneratingPDF" translate="no" class="material-symbols-outlined notranslate text-sm animate-spin">progress_activity</span>
-          <span *ngIf="!isGeneratingPDF" translate="no" class="material-symbols-outlined notranslate text-sm">download</span>
+        <button (click)="downloadReportCard()" [disabled]="isGeneratingPDF" *ngIf="mainGrades.length > 0 || taskGrades.length > 0" class="w-full sm:w-auto flex justify-center items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-emerald-500 text-white rounded-xl font-black uppercase text-[9px] sm:text-[10px] shadow-lg hover:bg-emerald-600 transition-all disabled:opacity-50">
+          <span *ngIf="isGeneratingPDF" translate="no" class="material-symbols-outlined notranslate text-[16px] sm:text-sm animate-spin">progress_activity</span>
+          <span *ngIf="!isGeneratingPDF" translate="no" class="material-symbols-outlined notranslate text-[16px] sm:text-sm">download</span>
           {{ isGeneratingPDF ? 'Generating...' : 'Download Report Card' }}
         </button>
       </div>
     </div>
 
-    <div *ngIf="mainGrades.length === 0 && taskGrades.length === 0" class="bg-white rounded-[2.5rem] border border-emerald-100 shadow-sm flex flex-col items-center justify-center h-64 animate-fade-in">
-      <span translate="no" class="material-symbols-outlined notranslate text-6xl text-emerald-100 mb-4">school</span>
-      <p class="text-sm font-black uppercase tracking-widest text-slate-400">No Grades Posted Yet For {{ selectedYear }}.</p>
+    <div *ngIf="mainGrades.length === 0 && taskGrades.length === 0" class="bg-white rounded-[2rem] sm:rounded-[2.5rem] border border-emerald-100 shadow-sm flex flex-col items-center justify-center h-48 sm:h-64 animate-fade-in mx-1 sm:mx-0 shrink-0">
+      <span translate="no" class="material-symbols-outlined notranslate text-5xl sm:text-6xl text-emerald-100 mb-3 sm:mb-4">school</span>
+      <p class="text-xs sm:text-sm font-black uppercase tracking-widest text-slate-400 text-center px-4">No Curriculum found for {{ selectedYear }}.</p>
     </div>
 
-    <div *ngIf="mainGrades.length > 0" class="animate-fade-in">
-      <h4 class="text-xs font-black text-emerald-700 uppercase tracking-widest mb-4 pl-2 flex items-center gap-2">
-        <span translate="no" class="material-symbols-outlined notranslate text-lg">menu_book</span> Core Subjects
+    <div *ngIf="mainGrades.length > 0" class="animate-fade-in shrink-0">
+      <h4 class="text-[10px] sm:text-xs font-black text-emerald-700 uppercase tracking-widest mb-3 sm:mb-4 pl-1 sm:pl-2 flex items-center gap-1.5 sm:gap-2">
+        <span translate="no" class="material-symbols-outlined notranslate text-base sm:text-lg">menu_book</span> Core Subjects
       </h4>
-      <div class="bg-white rounded-[2.5rem] border border-emerald-100 overflow-hidden shadow-sm">
-        <table class="w-full text-left">
+      <div class="bg-white rounded-[1.5rem] sm:rounded-[2.5rem] border border-emerald-100 overflow-x-auto shadow-sm w-full">
+        <table class="w-full min-w-[500px] text-left">
           <thead class="bg-emerald-50/50 border-b border-emerald-100">
           <tr>
-            <th class="p-6 text-[10px] font-black uppercase text-emerald-800 tracking-widest">Subject</th>
-            <th class="p-6 text-[10px] font-black uppercase text-emerald-800 tracking-widest">Mark</th>
-            <th class="p-6 text-[10px] font-black uppercase text-emerald-800 tracking-widest">Grade</th>
-            <th class="p-6 text-right text-[10px] font-black uppercase text-emerald-800 tracking-widest">Status</th>
+            <th class="p-4 sm:p-6 text-[9px] sm:text-[10px] font-black uppercase text-emerald-800 tracking-widest whitespace-nowrap">Subject</th>
+            <th class="p-4 sm:p-6 text-[9px] sm:text-[10px] font-black uppercase text-emerald-800 tracking-widest whitespace-nowrap text-center">Mark</th>
+            <th class="p-4 sm:p-6 text-[9px] sm:text-[10px] font-black uppercase text-emerald-800 tracking-widest whitespace-nowrap text-center">Grade</th>
+            <th class="p-4 sm:p-6 text-right text-[9px] sm:text-[10px] font-black uppercase text-emerald-800 tracking-widest whitespace-nowrap">Status</th>
           </tr>
           </thead>
           <tbody class="divide-y divide-emerald-50">
           <tr *ngFor="let g of mainGrades" class="hover:bg-emerald-50/20 transition-colors">
-            <td class="p-6 font-bold text-slate-700 uppercase">{{g.subject}}</td>
-            <td class="p-6 font-black text-slate-800">{{g.mark}}</td>
-            <td class="p-6">
-              <span [class]="getGradeClass(getGradeLetter(g.mark, g.grade_letter || g.gradeLetter))" class="px-3 py-1 rounded-lg text-xs font-black">
-                {{ getGradeLetter(g.mark, g.grade_letter || g.gradeLetter) }}
+            <td translate="no" class="notranslate p-4 sm:p-6 font-bold text-xs sm:text-sm text-slate-700 uppercase min-w-[120px]">{{g.subject}}</td>
+            <td class="p-4 sm:p-6 font-black text-base sm:text-lg text-slate-800 text-center">{{g.mark}}</td>
+            <td class="p-4 sm:p-6 text-center">
+              <span [class]="getGradeClass(getGradeLetter(g.mark, g.gradeLetter || g.grade_letter))" class="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-[10px] sm:text-[10px] font-black inline-block">
+                {{ getGradeLetter(g.mark, g.gradeLetter || g.grade_letter) }}
               </span>
             </td>
-            <td class="p-6 text-right">
-              <span class="text-[10px] font-bold uppercase text-slate-400">{{g.status || 'Graded'}}</span>
+            <td class="p-4 sm:p-6 text-right">
+              <span [ngClass]="g.status === 'Pending' ? 'bg-orange-50 text-orange-500' : 'bg-slate-50 text-slate-400'" class="px-2 py-1 rounded text-[9px] sm:text-[10px] font-bold uppercase whitespace-nowrap">{{g.status || 'Graded'}}</span>
             </td>
           </tr>
           </tbody>
@@ -62,33 +62,35 @@
       </div>
     </div>
 
-    <div *ngIf="taskGrades.length > 0" class="animate-fade-in">
-      <h4 class="text-xs font-black text-sky-600 uppercase tracking-widest mb-4 pl-2 flex items-center gap-2">
-        <span translate="no" class="material-symbols-outlined notranslate text-lg">task</span> Assignments & Quizzes
+    <div *ngIf="taskGrades.length > 0" class="animate-fade-in shrink-0">
+      <h4 class="text-[10px] sm:text-xs font-black text-sky-600 uppercase tracking-widest mb-3 sm:mb-4 pl-1 sm:pl-2 flex items-center gap-1.5 sm:gap-2">
+        <span translate="no" class="material-symbols-outlined notranslate text-base sm:text-lg">task</span> Assignments & Quizzes
       </h4>
-      <div class="bg-white rounded-[2.5rem] border border-emerald-100 overflow-hidden shadow-sm">
-        <table class="w-full text-left">
+      <div class="bg-white rounded-[1.5rem] sm:rounded-[2.5rem] border border-emerald-100 overflow-x-auto shadow-sm w-full">
+        <table class="w-full min-w-[500px] text-left">
           <thead class="bg-emerald-50/50 border-b border-emerald-100">
           <tr>
-            <th class="p-6 text-[10px] font-black uppercase text-emerald-800 tracking-widest">Task Name</th>
-            <th class="p-6 text-[10px] font-black uppercase text-emerald-800 tracking-widest">Score</th>
-            <th class="p-6 text-[10px] font-black uppercase text-emerald-800 tracking-widest">Percentage</th>
-            <th class="p-6 text-right text-[10px] font-black uppercase text-emerald-800 tracking-widest">Status</th>
+            <th class="p-4 sm:p-6 text-[9px] sm:text-[10px] font-black uppercase text-emerald-800 tracking-widest whitespace-nowrap">Task Name</th>
+            <th class="p-4 sm:p-6 text-[9px] sm:text-[10px] font-black uppercase text-emerald-800 tracking-widest whitespace-nowrap text-center">Score</th>
+            <th class="p-4 sm:p-6 text-[9px] sm:text-[10px] font-black uppercase text-emerald-800 tracking-widest whitespace-nowrap text-center">Percentage</th>
+            <th class="p-4 sm:p-6 text-right text-[9px] sm:text-[10px] font-black uppercase text-emerald-800 tracking-widest whitespace-nowrap">Status</th>
           </tr>
           </thead>
           <tbody class="divide-y divide-emerald-50">
           <tr *ngFor="let g of taskGrades" class="hover:bg-sky-50/20 transition-colors">
-            <td class="p-6 font-bold text-sky-900 uppercase text-xs">{{g.subject}}</td>
-            <td class="p-6 font-black text-slate-800">{{g.mark}}</td>
-            <td class="p-6 font-black text-sky-600 text-xs">{{g.grade_letter || g.gradeLetter}}</td>
-            <td class="p-6 text-right">
-              <span class="text-[10px] font-bold uppercase text-slate-400">{{g.status || 'Graded'}}</span>
+            <td translate="no" class="notranslate p-4 sm:p-6 font-bold text-sky-900 uppercase text-[10px] sm:text-xs min-w-[150px]">{{g.subject}}</td>
+            <td class="p-4 sm:p-6 font-black text-sm sm:text-base text-slate-800 text-center">{{g.mark}}</td>
+            <td class="p-4 sm:p-6 font-black text-sky-600 text-[10px] sm:text-xs text-center">{{g.gradeLetter || g.grade_letter || '-'}}</td>
+            <td class="p-4 sm:p-6 text-right">
+              <span [ngClass]="g.status === 'Pending' ? 'bg-orange-50 text-orange-500' : 'bg-slate-50 text-slate-400'" class="px-2 py-1 rounded text-[9px] sm:text-[10px] font-bold uppercase whitespace-nowrap">{{g.status || 'Graded'}}</span>
             </td>
           </tr>
           </tbody>
         </table>
       </div>
     </div>
+
+    <div class="h-24 md:h-32 w-full shrink-0"></div>
   </div>
 
   <div id="formal-report-pdf" class="absolute top-0 left-[-9999px] w-[800px] bg-white text-black p-12 font-sans z-[-1]">
@@ -113,7 +115,7 @@
       <tbody>
       <tr>
         <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 uppercase text-[10px] tracking-widest">Student Name</td>
-        <td class="border border-gray-300 p-3 font-bold text-base" colspan="3">{{ studentName }}</td>
+        <td translate="no" class="notranslate border border-gray-300 p-3 font-bold text-base" colspan="3">{{ studentName }}</td>
       </tr>
       <tr>
         <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 uppercase text-[10px] tracking-widest">Class / Year</td>
@@ -136,9 +138,9 @@
       </thead>
       <tbody>
       <tr *ngFor="let g of mainGrades">
-        <td class="border border-gray-300 p-3 font-bold">{{ g.subject }}</td>
+        <td translate="no" class="notranslate border border-gray-300 p-3 font-bold">{{ g.subject }}</td>
         <td class="border border-gray-300 p-3 text-center">{{ g.mark }}</td>
-        <td class="border border-gray-300 p-3 text-center font-bold" [ngClass]="getGradeClassText(getGradeLetter(g.mark, g.grade_letter || g.gradeLetter))">{{ getGradeLetter(g.mark, g.grade_letter || g.gradeLetter) }}</td>
+        <td class="border border-gray-300 p-3 text-center font-bold" [ngClass]="getGradeClassText(getGradeLetter(g.mark, g.gradeLetter || g.grade_letter))">{{ getGradeLetter(g.mark, g.gradeLetter || g.grade_letter) }}</td>
         <td class="border border-gray-300 p-3 text-right text-gray-500 text-xs">{{ g.status || 'Graded' }}</td>
       </tr>
       </tbody>
@@ -156,9 +158,9 @@
       </thead>
       <tbody>
       <tr *ngFor="let g of taskGrades">
-        <td class="border border-gray-300 p-3 font-bold text-xs uppercase">{{ g.subject }}</td>
+        <td translate="no" class="notranslate border border-gray-300 p-3 font-bold text-xs uppercase">{{ g.subject }}</td>
         <td class="border border-gray-300 p-3 text-center">{{ g.mark }}</td>
-        <td class="border border-gray-300 p-3 text-center font-bold text-blue-600">{{ g.grade_letter || g.gradeLetter }}</td>
+        <td class="border border-gray-300 p-3 text-center font-bold text-blue-600">{{ g.gradeLetter || g.grade_letter }}</td>
         <td class="border border-gray-300 p-3 text-right text-gray-500 text-xs">{{ g.status || 'Graded' }}</td>
       </tr>
       </tbody>

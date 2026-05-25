@@ -40,9 +40,21 @@ export class StaffProfileComponent implements OnInit {
         const myFreshProfile = users.find(u => u.id === this.currentUser.id || (u.email && u.email === this.currentUser.email));
 
         if (myFreshProfile) {
+          // THE FIX: Unpack JSON so Staff see their real name if populated
+          let profileData: any = {};
+          const rawJson = myFreshProfile.profile_json || myFreshProfile.profileJson;
+          if (rawJson) {
+            try { profileData = JSON.parse(rawJson); } catch(e){}
+          }
+          let displayName = myFreshProfile.fullName || myFreshProfile.username;
+          if (profileData.firstName || profileData.lastName || profileData.familyName) {
+            const lName = profileData.lastName || profileData.familyName || '';
+            displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+          }
+
           this.selectedStaff = {
             dbId: myFreshProfile.id,
-            name: myFreshProfile.fullName || myFreshProfile.username,
+            name: displayName,
             role: myFreshProfile.role || 'Staff',
             email: myFreshProfile.email || '',
             phone: myFreshProfile.phone || '',
@@ -68,10 +80,14 @@ export class StaffProfileComponent implements OnInit {
       certificatesJson: JSON.stringify(this.selectedStaff.certificates)
     };
 
-    // Utilizing the flexible backend endpoint
     this.authService.adminUpdateTeacher(this.selectedStaff.dbId, payload).subscribe({
       next: () => {
         alert('Your Staff Profile Updates have been saved!');
+
+        let lsUser = JSON.parse(localStorage.getItem('user') || '{}');
+        lsUser.fullName = this.selectedStaff.name;
+        localStorage.setItem('user', JSON.stringify(lsUser));
+
         this.isEditMode = false;
       },
       error: () => alert('Failed to save profile details. Check connection.')

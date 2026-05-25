@@ -12,6 +12,8 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./admin-dashboard.css']
 })
 export class AdminDashboardComponent implements OnInit {
+// ADD THIS LINE RIGHT HERE:
+  isMobileMenuOpen: boolean = false;
 
   lang = { text: { sidebar: {
         dashboard: 'Dashboard', management: 'Management', students: 'Students',

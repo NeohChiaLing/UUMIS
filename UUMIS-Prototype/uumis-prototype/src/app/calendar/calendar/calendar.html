@@ -61,9 +61,9 @@
               {{ sem.name }}
             </h2>
           </div>
-          <div *ngIf="isAdmin" class="flex gap-2 w-full sm:w-auto justify-end">
-            <button (click)="openEditSemester(i)" class="size-8 md:size-10 rounded-full bg-white text-sky-700 flex items-center justify-center hover:bg-sky-500 hover:text-white transition-all shadow-md"><span translate="no" class="material-symbols-outlined text-[14px] md:text-[18px] notranslate">edit</span></button>
-            <button (click)="deleteSemester(i)" class="size-8 md:size-10 rounded-full bg-white text-red-600 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-md"><span translate="no" class="material-symbols-outlined text-[14px] md:text-[18px] notranslate">delete</span></button>
+          <div *ngIf="isAdmin" class="flex gap-2 w-full sm:w-auto justify-end opacity-100 md:opacity-0 group-hover:opacity-100 transition-opacity">
+            <button (click)="openEditSemester(i)" class="size-8 md:size-10 rounded-full bg-sky-100 text-sky-700 flex items-center justify-center hover:bg-sky-500 hover:text-white transition-all shadow-md"><span translate="no" class="material-symbols-outlined text-[14px] md:text-[18px] notranslate">edit</span></button>
+            <button (click)="deleteSemester(i)" class="size-8 md:size-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all shadow-md"><span translate="no" class="material-symbols-outlined text-[14px] md:text-[18px] notranslate">delete</span></button>
           </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
@@ -74,6 +74,68 @@
       </div>
     </section>
 
+    <div class="h-24 md:h-32 w-full shrink-0 block mt-8"></div>
   </main>
   <app-footer></app-footer>
+
+  <div *ngIf="editMode" class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+    <div class="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
+        <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight">Edit {{ editMode === 'header' ? 'Header' : 'Semester' }}</h3>
+        <button (click)="closeEditModal(); editMode = null" class="text-slate-400 hover:text-red-500 transition-colors">
+          <span translate="no" class="material-symbols-outlined text-2xl">close</span>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto flex-1 space-y-4 custom-scrollbar">
+
+        <ng-container *ngIf="editMode === 'header'">
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Badge</label><input [(ngModel)]="editData.badge" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Title Start</label><input [(ngModel)]="editData.titleStart" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Title Highlight</label><input [(ngModel)]="editData.titleHighlight" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Description</label><textarea [(ngModel)]="editData.description" rows="3" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-medium focus:ring-2 focus:ring-sky-200 outline-none"></textarea></div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Background Image</label>
+            <div class="flex items-center gap-3">
+              <img *ngIf="editData.bgImage" [src]="editData.bgImage" class="h-12 w-12 object-cover rounded-lg border border-slate-200">
+              <button (click)="bgInput.click()" class="bg-slate-100 px-4 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-sky-100 hover:text-sky-600 transition-colors">Change Image</button>
+              <input #bgInput type="file" class="hidden" accept="image/*" (change)="onFileSelectedSingle($event, 'bgImage')">
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="editMode === 'semester'">
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Semester Name</label>
+            <input [(ngModel)]="editData.name" placeholder="e.g. Semester 1 (Aug - Dec 2025)" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none">
+          </div>
+          <div class="space-y-1 mt-4">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Calendar Images</label>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-3">
+              <div *ngFor="let img of editData.images; let idx = index" class="relative group rounded-xl border border-slate-200 overflow-hidden aspect-video bg-slate-50 flex items-center justify-center shadow-sm">
+                <img [src]="img" class="w-full h-full object-cover mix-blend-darken">
+                <button (click)="removeImage(idx)" class="absolute top-1.5 right-1.5 size-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                  <span translate="no" class="material-symbols-outlined text-[12px] notranslate">close</span>
+                </button>
+              </div>
+            </div>
+            <input type="file" #semImgInput (change)="onFileSelected($event)" accept="image/*" class="hidden" multiple>
+            <button (click)="semImgInput.click()" class="bg-slate-100 px-4 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-sky-100 hover:text-sky-600 transition-colors flex items-center gap-2 w-fit border border-slate-200 shadow-sm">
+              <span translate="no" class="material-symbols-outlined text-[16px] notranslate">add_photo_alternate</span> Add Image
+            </button>
+          </div>
+        </ng-container>
+
+      </div>
+
+      <div class="p-4 border-t border-slate-100 bg-white flex justify-end shrink-0 gap-3">
+        <button (click)="editMode === 'semester' ? editMode = null : closeEditModal()" class="px-6 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-slate-200 transition-colors text-sm">Cancel</button>
+        <button (click)="editMode === 'semester' ? saveSemester() : saveEdits()" class="px-6 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-lg transition-all flex items-center gap-2">
+          <span translate="no" class="material-symbols-outlined text-[18px] notranslate">save</span> Save
+        </button>
+      </div>
+    </div>
+  </div>
+
 </div>

@@ -59,14 +59,28 @@ export class PaymentComponent implements OnInit {
           const parts = grade.split(' - ');
           const yearStr = parts.length > 1 ? parts[1].trim() : 'Unassigned';
 
+          // THE FIX: Safely parse JSON to get correct First/Last name for display
+          let profileData: any = {};
+          const rawProfileJson = user.profile_json || user.profileJson;
+
+          if (rawProfileJson) {
+            try { profileData = JSON.parse(rawProfileJson); } catch (e) {}
+          }
+
+          let displayName = user.fullName || user.username || 'No Name';
+          if (profileData.firstName || profileData.lastName || profileData.familyName) {
+            const lName = profileData.lastName || profileData.familyName || '';
+            displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+          }
+
           return {
             dbId: user.id,
-            id: user.studentId || user.verificationCode || user.username || '---',
-            name: user.fullName || user.username || 'No Name',
+            id: user.student_id || user.studentId || user.verificationCode || user.username || '---',
+            name: displayName,
             class: yearStr,
             year: yearStr,
-            totalPaid: Number(user.totalPaid) || 0.0,
-            due: Number(user.outstandingDue) || 0.0
+            totalPaid: Number(user.totalPaid || user.total_paid) || 0.0,
+            due: Number(user.outstandingDue || user.outstanding_due) || 0.0
           };
         });
 
@@ -87,7 +101,6 @@ export class PaymentComponent implements OnInit {
     }
   }
 
-  // 格式化数据库数据，防止前端显示空白
   formatTxn(t: any) {
     return {
       id: t.id,
@@ -102,18 +115,15 @@ export class PaymentComponent implements OnInit {
     };
   }
 
-  // 判断是否为家长上传的汇款证明
   isPaymentProof(txn: any): boolean {
     const desc = String(txn.description || txn.desc || '').toLowerCase();
     return desc.includes('payment proof') || desc.includes('paid');
   }
 
-  // ⭐ THE FIX: 终极自动修复账本逻辑！
   recalculateBalances() {
     let totalCharges = 0;
     let totalPayments = 0;
 
-    // 1. 重新统计所有账单和已批准的汇款
     this.transactions.forEach(txn => {
       if (this.isPaymentProof(txn)) {
         if (txn.status === 'Completed' || txn.status === 'Approved') {
@@ -130,12 +140,11 @@ export class PaymentComponent implements OnInit {
     const calculatedDue = totalCharges - totalPayments;
     this.selectedStudent.due = calculatedDue < 0 ? 0 : calculatedDue;
 
-    // 2. 自动分配付款池，智能更新账单的 UNPAID / PARTIAL / COMPLETED 状态
     let pool = totalPayments;
 
     const charges = this.transactions
       .filter(t => !this.isPaymentProof(t) && t.status !== 'Rejected')
-      .sort((a, b) => a.id - b.id); // 从最旧的账单开始抵扣
+      .sort((a, b) => a.id - b.id);
 
     charges.forEach(charge => {
       const amt = Number(charge.amount);
@@ -145,7 +154,7 @@ export class PaymentComponent implements OnInit {
         newStatus = 'Completed';
         pool -= amt;
       } else if (pool > 0) {
-        newStatus = 'PARTIAL'; // 如果不够扣整张账单，标记为部分付款！
+        newStatus = 'PARTIAL';
         pool = 0;
       }
 
@@ -155,7 +164,7 @@ export class PaymentComponent implements OnInit {
       }
     });
 
-    this.transactions.sort((a, b) => b.id - a.id); // UI 恢复按最新时间显示
+    this.transactions.sort((a, b) => b.id - a.id);
     this.submitChanges();
   }
 
@@ -164,7 +173,7 @@ export class PaymentComponent implements OnInit {
     this.authService.getStudentPayments(student.dbId).subscribe({
       next: (data: any[]) => {
         this.transactions = data.map(t => this.formatTxn(t));
-        this.recalculateBalances(); // 每次点击学生，自动修复对账单！
+        this.recalculateBalances();
       },
       error: () => console.log('Failed to fetch transactions.')
     });
@@ -235,7 +244,7 @@ export class PaymentComponent implements OnInit {
       next: (res: any) => {
         const newLocalTxn = this.formatTxn({ ...payload, id: res.id });
         this.transactions.unshift(newLocalTxn);
-        this.recalculateBalances(); // 自动修复对账单
+        this.recalculateBalances();
         this.showAddPaymentModal = false;
       },
       error: () => alert('Failed to save payment.')
@@ -248,7 +257,7 @@ export class PaymentComponent implements OnInit {
     this.authService.updatePayment(txn.id, { status: status }).subscribe({
       next: () => {
         txn.status = status;
-        this.recalculateBalances(); // 无论你是 Approve 还是 Reject，全部自动重算账单
+        this.recalculateBalances();
       },
       error: () => alert('Failed to update status.')
     });
@@ -259,7 +268,7 @@ export class PaymentComponent implements OnInit {
       this.authService.deletePayment(txnId).subscribe({
         next: () => {
           this.transactions = this.transactions.filter(t => t.id !== txnId);
-          this.recalculateBalances(); // 删掉一条记录？没关系，剩下的记录重新算！
+          this.recalculateBalances();
         },
         error: () => alert('Failed to delete payment.')
       });
@@ -320,7 +329,4 @@ export class PaymentComponent implements OnInit {
       error: () => alert('Failed to synchronize balances.')
     });
   }
-
-  openEditTransaction(txn: any) {}
-  updateTransaction() {}
 }

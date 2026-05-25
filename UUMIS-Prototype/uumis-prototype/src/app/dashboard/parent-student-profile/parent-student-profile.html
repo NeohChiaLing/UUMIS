@@ -49,8 +49,8 @@
 
             <div class="relative group cursor-pointer" (click)="triggerFileInput()">
               <div class="size-32 rounded-[2rem] bg-white p-1.5 shadow-lg transition-all hover:scale-105">
-                <div class="w-full h-full rounded-[1.5rem] bg-slate-100 flex items-center justify-center overflow-hidden relative">
-                  <span *ngIf="!studentProfile.avatarUrl" class="text-4xl font-black text-slate-400 uppercase">{{ getInitials(studentProfile.name) }}</span>
+                <div class="w-full h-full rounded-[1.5rem] bg-emerald-100 text-emerald-700 flex items-center justify-center overflow-hidden relative">
+                  <span *ngIf="!studentProfile.avatarUrl" translate="no" class="notranslate text-4xl font-black uppercase">{{ getInitials(studentProfile.name) }}</span>
                   <img *ngIf="studentProfile.avatarUrl" [src]="studentProfile.avatarUrl" class="w-full h-full object-cover">
                   <div class="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
                     <span translate="no" class="material-symbols-outlined notranslate text-white text-3xl">add_a_photo</span>
@@ -61,7 +61,7 @@
             </div>
 
             <div class="flex-1 w-full pb-2">
-              <h2 class="text-3xl font-black text-slate-800">{{studentProfile.name}}</h2>
+              <h2 translate="no" class="notranslate text-3xl font-black text-slate-800">{{studentProfile.name}}</h2>
               <p class="text-emerald-600 font-bold flex items-center gap-2 mt-1">
                 <span translate="no" class="material-symbols-outlined notranslate text-lg">school</span> {{studentProfile.grade}}
               </p>
@@ -72,156 +72,218 @@
           </div>
         </section>
 
-        <section id="contact" class="bg-white rounded-[2.5rem] shadow-sm border border-emerald-100 p-8">
-          <div class="flex items-center gap-4 mb-8 border-b border-emerald-50 pb-4">
-            <div class="p-3 bg-emerald-100 text-emerald-600 rounded-2xl"><span translate="no" class="material-symbols-outlined notranslate text-2xl">contacts</span></div>
+        <section id="contact" class="bg-white rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm border border-emerald-100 p-5 md:p-8 w-full">
+          <div class="flex items-center gap-3 md:gap-4 mb-6 md:mb-8 border-b border-emerald-50 pb-3 md:pb-4">
+            <div class="p-2.5 md:p-3 bg-emerald-100 text-emerald-600 rounded-xl md:rounded-2xl shrink-0"><span translate="no" class="material-symbols-outlined notranslate text-xl md:text-2xl">contacts</span></div>
             <div>
-              <h3 class="text-xl font-black text-slate-800">Personal Details</h3>
-              <p class="text-xs font-bold text-slate-400">Basic identification and contact information.</p>
+              <h3 class="text-lg md:text-xl font-black text-slate-800">Personal Details</h3>
+              <p class="text-[10px] md:text-xs font-bold text-slate-400">Update student information.</p>
             </div>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="space-y-1">
-              <label class="text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Date of Birth</label>
-              <input type="date" [(ngModel)]="studentProfile.dob" class="w-full bg-white border border-emerald-100 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
-            </div>
-            <div class="space-y-1">
-              <label class="text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Gender</label>
-              <select [(ngModel)]="studentProfile.gender" class="w-full bg-white border border-emerald-100 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
-                <option>Male</option>
-                <option>Female</option>
-              </select>
-            </div>
-            <div class="space-y-1 md:col-span-2">
-              <label class="text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Home Address</label>
-              <input type="text" [(ngModel)]="studentProfile.address" placeholder="Enter full residential address" class="w-full bg-white border border-emerald-100 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
-            </div>
-            <div class="space-y-1">
-              <label class="text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Passport / IC Number</label>
-              <input type="text" [(ngModel)]="studentProfile.passport" placeholder="e.g. A1234567" class="w-full bg-white border border-emerald-100 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
-            </div>
-            <div class="space-y-1">
-              <label class="text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Phone Number (Optional)</label>
-              <input type="tel" [(ngModel)]="studentProfile.phone" placeholder="e.g. +60123456789" class="w-full bg-white border border-emerald-100 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
-            </div>
-          </div>
-        </section>
 
-        <section id="medical" class="bg-white rounded-[2.5rem] shadow-sm border border-pink-100 p-8">
-          <div class="flex items-center gap-4 mb-8 border-b border-pink-50 pb-4">
-            <div class="p-3 bg-pink-100 text-pink-600 rounded-2xl"><span translate="no" class="material-symbols-outlined notranslate text-2xl">medical_services</span></div>
-            <div>
-              <h3 class="text-xl font-black text-slate-800">Medical Information</h3>
-              <p class="text-xs font-bold text-slate-400">Critical health info for emergencies.</p>
-            </div>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6">
             <div class="space-y-1">
-              <label class="text-[10px] font-black text-pink-400 uppercase tracking-widest ml-1">Blood Type</label>
-              <select [(ngModel)]="studentProfile.bloodGroup" class="w-full bg-white border border-pink-100 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-pink-200 transition-all">
-                <option>A+</option><option>A-</option>
-                <option>B+</option><option>B-</option>
-                <option>AB+</option><option>AB-</option>
-                <option>O+</option><option>O-</option>
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">First Name *</label>
+              <input type="text" translate="no" [(ngModel)]="studentProfile.firstName" class="notranslate w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Middle Name</label>
+              <input type="text" translate="no" [(ngModel)]="studentProfile.middleName" class="notranslate w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Last Name</label>
+              <input type="text" translate="no" [(ngModel)]="studentProfile.lastName" class="notranslate w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Gender</label>
+              <select [(ngModel)]="studentProfile.gender" class="w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
+                <option>Male</option><option>Female</option>
               </select>
             </div>
             <div class="space-y-1">
-              <label class="text-[10px] font-black text-pink-400 uppercase tracking-widest ml-1">Allergies</label>
-              <input type="text" [(ngModel)]="studentProfile.allergies" placeholder="e.g. Peanuts, Penicillin (Or 'None')" class="w-full bg-white border border-pink-100 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-pink-200 transition-all">
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Date of Birth</label>
+              <input type="date" [(ngModel)]="studentProfile.dob" class="w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Age</label>
+              <input type="number" [(ngModel)]="studentProfile.age" class="w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Place of Birth</label>
+              <input type="text" [(ngModel)]="studentProfile.pob" class="w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Nationality</label>
+              <input type="text" [(ngModel)]="studentProfile.nationality" class="w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Religion</label>
+              <input type="text" [(ngModel)]="studentProfile.religion" class="w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-6 pt-6 border-t border-emerald-50">
+            <div class="space-y-1">
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">IC / Passport Number</label>
+              <input type="text" [(ngModel)]="studentProfile.passport" class="w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Date of Issue</label>
+              <input type="date" [(ngModel)]="studentProfile.doi" class="w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Date of Expiration</label>
+              <input type="date" [(ngModel)]="studentProfile.doe" class="w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">First Language</label>
+              <input type="text" [(ngModel)]="studentProfile.lang1" class="w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Second Language</label>
+              <input type="text" [(ngModel)]="studentProfile.lang2" class="w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Student Mobile Number</label>
+              <input type="tel" [(ngModel)]="studentProfile.studentMobile" class="w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 pt-6 border-t border-emerald-50">
+            <div class="space-y-1">
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Primary Email</label>
+              <input type="email" [(ngModel)]="studentProfile.primaryEmail" class="w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Alternate Email</label>
+              <input type="email" [(ngModel)]="studentProfile.altEmail" class="w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
             </div>
             <div class="space-y-1 md:col-span-2">
-              <label class="text-[10px] font-black text-pink-400 uppercase tracking-widest ml-1">Medical Conditions</label>
-              <textarea [(ngModel)]="studentProfile.medicalConditions" rows="3" placeholder="List any existing medical conditions..." class="w-full bg-white border border-pink-100 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-pink-200 transition-all resize-none"></textarea>
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Home Address</label>
+              <textarea [(ngModel)]="studentProfile.address" rows="3" class="w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all resize-none"></textarea>
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] md:text-[10px] font-black text-emerald-600 uppercase tracking-widest ml-1">Home Phone</label>
+              <input type="tel" [(ngModel)]="studentProfile.homePhone" class="w-full bg-white border border-emerald-100 rounded-xl p-3 text-xs sm:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all">
             </div>
           </div>
         </section>
 
-        <section id="guardian" class="bg-white rounded-[2.5rem] shadow-sm border border-sky-100 p-8">
-          <div class="flex items-center gap-4 mb-8 border-b border-sky-50 pb-4">
-            <div class="p-3 bg-sky-100 text-sky-600 rounded-2xl"><span translate="no" class="material-symbols-outlined notranslate text-2xl">diversity_3</span></div>
+        <section id="medical" class="bg-white rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm border border-pink-100 p-5 md:p-8 w-full">
+          <div class="flex items-center gap-3 md:gap-4 mb-6 md:mb-8 border-b border-pink-50 pb-3 md:pb-4">
+            <div class="p-2.5 md:p-3 bg-pink-100 text-pink-600 rounded-xl md:rounded-2xl shrink-0"><span translate="no" class="material-symbols-outlined notranslate text-xl md:text-2xl">medical_services</span></div>
             <div>
-              <h3 class="text-xl font-black text-slate-800">Guardian Contacts</h3>
-              <p class="text-xs font-bold text-slate-400">Emergency contact details for parents.</p>
+              <h3 class="text-lg md:text-xl font-black text-slate-800">Medical Information</h3>
+              <p class="text-[10px] md:text-xs font-bold text-slate-400">Critical health info for emergencies.</p>
             </div>
           </div>
-          <div class="space-y-8">
-            <div class="bg-sky-50 p-6 rounded-[2rem] border border-sky-100 relative">
-              <span class="absolute top-0 right-0 bg-sky-200 text-sky-700 text-[9px] font-black px-4 py-1.5 rounded-bl-2xl rounded-tr-2xl uppercase tracking-wider">Father</span>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
+            <div class="space-y-1">
+              <label class="text-[9px] md:text-[10px] font-black text-pink-400 uppercase tracking-widest ml-1">Blood Type</label>
+              <select [(ngModel)]="studentProfile.bloodGroup" class="w-full bg-white border border-pink-100 rounded-xl p-3 md:p-4 text-xs md:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-pink-200 transition-all cursor-pointer">
+                <option>A+</option><option>O+</option><option>B+</option><option>AB+</option>
+              </select>
+            </div>
+            <div class="space-y-1">
+              <label class="text-[9px] md:text-[10px] font-black text-pink-400 uppercase tracking-widest ml-1">Allergies</label>
+              <input type="text" [(ngModel)]="studentProfile.allergies" class="w-full bg-white border border-pink-100 rounded-xl p-3 md:p-4 text-xs md:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-pink-200 transition-all">
+            </div>
+            <div class="space-y-1 sm:col-span-2">
+              <label class="text-[9px] md:text-[10px] font-black text-pink-400 uppercase tracking-widest ml-1">Medical Conditions</label>
+              <textarea [(ngModel)]="studentProfile.medicalConditions" rows="3" class="w-full bg-white border border-pink-100 rounded-xl p-3 md:p-4 text-xs md:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-pink-200 transition-all resize-none"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section id="guardian" class="bg-white rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm border border-sky-100 p-5 md:p-8 w-full">
+          <div class="flex items-center gap-3 md:gap-4 mb-6 md:mb-8 border-b border-sky-50 pb-3 md:pb-4">
+            <div class="p-2.5 md:p-3 bg-sky-100 text-sky-600 rounded-xl md:rounded-2xl shrink-0"><span translate="no" class="material-symbols-outlined notranslate text-xl md:text-2xl">diversity_3</span></div>
+            <div>
+              <h3 class="text-lg md:text-xl font-black text-slate-800">Guardian Contacts</h3>
+              <p class="text-[10px] md:text-xs font-bold text-slate-400">Emergency contact details for parents.</p>
+            </div>
+          </div>
+
+          <div class="space-y-6 md:space-y-8">
+            <div class="bg-sky-50 p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-sky-100 relative">
+              <span class="absolute top-0 right-0 bg-sky-200 text-sky-700 text-[8px] md:text-[9px] font-black px-3 md:px-4 py-1 md:py-1.5 rounded-bl-xl md:rounded-bl-2xl rounded-tr-xl md:rounded-tr-2xl uppercase tracking-wider">Father</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 mt-3 md:mt-2">
                 <div class="space-y-1">
-                  <label class="text-[9px] font-black text-sky-600 uppercase tracking-widest ml-1">Name</label>
-                  <input type="text" [(ngModel)]="studentProfile.father.name" placeholder="Full Name" class="w-full bg-white border-none rounded-xl p-3 text-sm font-bold text-slate-700 shadow-sm">
+                  <label class="text-[8px] md:text-[9px] font-black text-sky-600 uppercase tracking-widest ml-1">Name</label>
+                  <input type="text" translate="no" [(ngModel)]="studentProfile.father.name" class="notranslate w-full bg-white border-none rounded-lg md:rounded-xl p-2.5 md:p-3 text-xs md:text-sm font-bold text-slate-700 shadow-sm">
                 </div>
                 <div class="space-y-1">
-                  <label class="text-[9px] font-black text-sky-600 uppercase tracking-widest ml-1">IC / Passport</label>
-                  <input type="text" [(ngModel)]="studentProfile.father.ic" placeholder="ID Number" class="w-full bg-white border-none rounded-xl p-3 text-sm font-bold text-slate-700 shadow-sm">
+                  <label class="text-[8px] md:text-[9px] font-black text-sky-600 uppercase tracking-widest ml-1">IC / Passport</label>
+                  <input type="text" [(ngModel)]="studentProfile.father.ic" class="w-full bg-white border-none rounded-lg md:rounded-xl p-2.5 md:p-3 text-xs md:text-sm font-bold text-slate-700 shadow-sm">
                 </div>
                 <div class="space-y-1">
-                  <label class="text-[9px] font-black text-sky-600 uppercase tracking-widest ml-1">Phone</label>
-                  <input type="tel" [(ngModel)]="studentProfile.father.phone" placeholder="Contact Number" class="w-full bg-white border-none rounded-xl p-3 text-sm font-bold text-slate-700 shadow-sm">
+                  <label class="text-[8px] md:text-[9px] font-black text-sky-600 uppercase tracking-widest ml-1">Phone</label>
+                  <input type="tel" [(ngModel)]="studentProfile.father.phone" class="w-full bg-white border-none rounded-lg md:rounded-xl p-2.5 md:p-3 text-xs md:text-sm font-bold text-slate-700 shadow-sm">
                 </div>
                 <div class="space-y-1">
-                  <label class="text-[9px] font-black text-sky-600 uppercase tracking-widest ml-1">Email</label>
-                  <input type="email" [(ngModel)]="studentProfile.father.email" placeholder="Email Address" class="w-full bg-white border-none rounded-xl p-3 text-sm font-bold text-slate-700 shadow-sm">
+                  <label class="text-[8px] md:text-[9px] font-black text-sky-600 uppercase tracking-widest ml-1">Email</label>
+                  <input type="email" [(ngModel)]="studentProfile.father.email" class="w-full bg-white border-none rounded-lg md:rounded-xl p-2.5 md:p-3 text-xs md:text-sm font-bold text-slate-700 shadow-sm">
                 </div>
-                <div class="space-y-1 md:col-span-2">
-                  <label class="text-[9px] font-black text-sky-600 uppercase tracking-widest ml-1">Occupation</label>
-                  <input type="text" [(ngModel)]="studentProfile.father.job" placeholder="Job Title" class="w-full bg-white border-none rounded-xl p-3 text-sm font-bold text-slate-700 shadow-sm">
+                <div class="space-y-1 sm:col-span-2">
+                  <label class="text-[8px] md:text-[9px] font-black text-sky-600 uppercase tracking-widest ml-1">Occupation</label>
+                  <input type="text" [(ngModel)]="studentProfile.father.job" class="w-full bg-white border-none rounded-lg md:rounded-xl p-2.5 md:p-3 text-xs md:text-sm font-bold text-slate-700 shadow-sm">
                 </div>
               </div>
             </div>
-            <div class="bg-purple-50 p-6 rounded-[2rem] border border-purple-100 relative">
-              <span class="absolute top-0 right-0 bg-purple-200 text-purple-700 text-[9px] font-black px-4 py-1.5 rounded-bl-2xl rounded-tr-2xl uppercase tracking-wider">Mother</span>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+
+            <div class="bg-purple-50 p-4 md:p-6 rounded-[1.5rem] md:rounded-[2rem] border border-purple-100 relative">
+              <span class="absolute top-0 right-0 bg-purple-200 text-purple-700 text-[8px] md:text-[9px] font-black px-3 md:px-4 py-1 md:py-1.5 rounded-bl-xl md:rounded-bl-2xl rounded-tr-xl md:rounded-tr-2xl uppercase tracking-wider">Mother</span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 mt-3 md:mt-2">
                 <div class="space-y-1">
-                  <label class="text-[9px] font-black text-purple-600 uppercase tracking-widest ml-1">Name</label>
-                  <input type="text" [(ngModel)]="studentProfile.mother.name" placeholder="Full Name" class="w-full bg-white border-none rounded-xl p-3 text-sm font-bold text-slate-700 shadow-sm">
+                  <label class="text-[8px] md:text-[9px] font-black text-purple-600 uppercase tracking-widest ml-1">Name</label>
+                  <input type="text" translate="no" [(ngModel)]="studentProfile.mother.name" class="notranslate w-full bg-white border-none rounded-lg md:rounded-xl p-2.5 md:p-3 text-xs md:text-sm font-bold text-slate-700 shadow-sm">
                 </div>
                 <div class="space-y-1">
-                  <label class="text-[9px] font-black text-purple-600 uppercase tracking-widest ml-1">IC / Passport</label>
-                  <input type="text" [(ngModel)]="studentProfile.mother.ic" placeholder="ID Number" class="w-full bg-white border-none rounded-xl p-3 text-sm font-bold text-slate-700 shadow-sm">
+                  <label class="text-[8px] md:text-[9px] font-black text-purple-600 uppercase tracking-widest ml-1">IC / Passport</label>
+                  <input type="text" [(ngModel)]="studentProfile.mother.ic" class="w-full bg-white border-none rounded-lg md:rounded-xl p-2.5 md:p-3 text-xs md:text-sm font-bold text-slate-700 shadow-sm">
                 </div>
                 <div class="space-y-1">
-                  <label class="text-[9px] font-black text-purple-600 uppercase tracking-widest ml-1">Phone</label>
-                  <input type="tel" [(ngModel)]="studentProfile.mother.phone" placeholder="Contact Number" class="w-full bg-white border-none rounded-xl p-3 text-sm font-bold text-slate-700 shadow-sm">
+                  <label class="text-[8px] md:text-[9px] font-black text-purple-600 uppercase tracking-widest ml-1">Phone</label>
+                  <input type="tel" [(ngModel)]="studentProfile.mother.phone" class="w-full bg-white border-none rounded-lg md:rounded-xl p-2.5 md:p-3 text-xs md:text-sm font-bold text-slate-700 shadow-sm">
                 </div>
                 <div class="space-y-1">
-                  <label class="text-[9px] font-black text-purple-600 uppercase tracking-widest ml-1">Email</label>
-                  <input type="email" [(ngModel)]="studentProfile.mother.email" placeholder="Email Address" class="w-full bg-white border-none rounded-xl p-3 text-sm font-bold text-slate-700 shadow-sm">
+                  <label class="text-[8px] md:text-[9px] font-black text-purple-600 uppercase tracking-widest ml-1">Email</label>
+                  <input type="email" [(ngModel)]="studentProfile.mother.email" class="w-full bg-white border-none rounded-lg md:rounded-xl p-2.5 md:p-3 text-xs md:text-sm font-bold text-slate-700 shadow-sm">
                 </div>
-                <div class="space-y-1 md:col-span-2">
-                  <label class="text-[9px] font-black text-purple-600 uppercase tracking-widest ml-1">Occupation</label>
-                  <input type="text" [(ngModel)]="studentProfile.mother.job" placeholder="Job Title" class="w-full bg-white border-none rounded-xl p-3 text-sm font-bold text-slate-700 shadow-sm">
+                <div class="space-y-1 sm:col-span-2">
+                  <label class="text-[8px] md:text-[9px] font-black text-purple-600 uppercase tracking-widest ml-1">Occupation</label>
+                  <input type="text" [(ngModel)]="studentProfile.mother.job" class="w-full bg-white border-none rounded-lg md:rounded-xl p-2.5 md:p-3 text-xs md:text-sm font-bold text-slate-700 shadow-sm">
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section id="siblings" class="bg-white rounded-[2.5rem] shadow-sm border border-indigo-100 p-8 mb-24">
-          <div class="flex items-center gap-4 mb-8 border-b border-indigo-50 pb-4">
-            <div class="p-3 bg-indigo-100 text-indigo-600 rounded-2xl"><span translate="no" class="material-symbols-outlined notranslate text-2xl">family_restroom</span></div>
+        <section id="siblings" class="bg-white rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm border border-indigo-100 p-5 md:p-8 w-full mb-24">
+          <div class="flex items-center gap-3 md:gap-4 mb-6 md:mb-8 border-b border-indigo-50 pb-3 md:pb-4">
+            <div class="p-2.5 md:p-3 bg-indigo-100 text-indigo-600 rounded-xl md:rounded-2xl shrink-0"><span translate="no" class="material-symbols-outlined notranslate text-xl md:text-2xl">family_restroom</span></div>
             <div>
-              <h3 class="text-xl font-black text-slate-800">Sibling Information</h3>
-              <p class="text-xs font-bold text-slate-400">Details of siblings currently enrolled or applying.</p>
+              <h3 class="text-lg md:text-xl font-black text-slate-800">Sibling Information</h3>
+              <p class="text-[10px] md:text-xs font-bold text-slate-400">Details of siblings currently enrolled or applying.</p>
             </div>
           </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
             <div class="space-y-1">
-              <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Sibling Name</label>
-              <input type="text" [(ngModel)]="studentProfile.siblingName" placeholder="Enter sibling name" class="w-full bg-white border border-indigo-100 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-200 transition-all">
+              <label class="text-[9px] md:text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Sibling Name</label>
+              <input type="text" translate="no" [(ngModel)]="studentProfile.siblingName" class="notranslate w-full bg-white border border-indigo-100 rounded-xl p-3 md:p-4 text-xs md:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-200 transition-all">
             </div>
             <div class="space-y-1">
-              <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Sibling School / Grade / Class</label>
-              <input type="text" [(ngModel)]="studentProfile.siblingGrade" placeholder="e.g. SMK Sintok - Form 5" class="w-full bg-white border border-indigo-100 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-200 transition-all">
+              <label class="text-[9px] md:text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">School / Grade / Class</label>
+              <input type="text" [(ngModel)]="studentProfile.siblingGrade" class="w-full bg-white border border-indigo-100 rounded-xl p-3 md:p-4 text-xs md:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-200 transition-all">
             </div>
             <div class="space-y-1">
-              <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Sibling Phone No.</label>
-              <input type="text" [(ngModel)]="studentProfile.siblingPhone" placeholder="e.g. 0123456789" class="w-full bg-white border border-indigo-100 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-200 transition-all">
+              <label class="text-[9px] md:text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Phone Number</label>
+              <input type="text" [(ngModel)]="studentProfile.siblingPhone" class="w-full bg-white border border-indigo-100 rounded-xl p-3 md:p-4 text-xs md:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-200 transition-all">
             </div>
             <div class="space-y-1">
-              <label class="text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Sibling Email</label>
-              <input type="text" [(ngModel)]="studentProfile.siblingEmail" placeholder="e.g. sibling@email.com" class="w-full bg-white border border-indigo-100 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-200 transition-all">
+              <label class="text-[9px] md:text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-1">Email Address</label>
+              <input type="text" [(ngModel)]="studentProfile.siblingEmail" class="w-full bg-white border border-indigo-100 rounded-xl p-3 md:p-4 text-xs md:text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-200 transition-all">
             </div>
           </div>
         </section>
@@ -231,7 +293,7 @@
   </div>
 
   <div class="fixed bottom-0 left-0 w-full z-50 bg-white/95 backdrop-blur-lg border-t border-emerald-200 p-4 shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.1)] animate-fade-in-up">
-    <div class="w-full flex flex-col md:flex-row items-center justify-between gap-4 px-4 lg:px-8">
+    <div class="w-full flex flex-col md:flex-row items-center justify-between gap-4 px-4 lg:px-8 max-w-6xl mx-auto">
       <div class="flex items-center gap-3 text-sm font-bold text-slate-500 bg-slate-50/50 py-2 px-4 rounded-xl border border-slate-100 w-full md:w-auto justify-center md:justify-start">
         <span translate="no" class="material-symbols-outlined notranslate text-lg text-emerald-500">check_circle</span>
         Editing Child Profile

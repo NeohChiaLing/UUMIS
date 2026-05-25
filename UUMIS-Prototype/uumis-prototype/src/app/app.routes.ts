@@ -75,6 +75,7 @@ export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   { path: 'home', component: HomeComponent },
   { path: 'login', component: LoginComponent },
+  { path: 'dashboard/user-profile', component: UserProfileComponent, title: 'My Profile' },
 
   // Public Pages
   { path: 'about/mission', component: MissionVisionComponent },
@@ -175,6 +176,5 @@ export const routes: Routes = [
     ]
   },
 
-  // The Generic User Profile (The one you requested for Staff)
-  { path: 'dashboard/user-profile', component: UserProfileComponent, title: 'My Profile' }
+
 ];

@@ -15,6 +15,8 @@ import { catchError } from 'rxjs/operators';
 export class TeacherDashboardComponent implements OnInit {
 
   isAcademicOpen = false;
+  isMobileMenuOpen = false;
+  showDashboardContent = true;
 
   currentUser: any = null;
   teacherName: string = 'Teacher User';
@@ -70,77 +72,69 @@ export class TeacherDashboardComponent implements OnInit {
           const assignedSubjRaw = myProfile.assignedSubjects || myProfile.assigned_subjects || '';
           this.mySubjects = assignedSubjRaw ? assignedSubjRaw.split(',').map((s:string) => s.trim().toLowerCase()) : [];
 
-          const bio = myProfile.bio || '';
-          const assignedClasses = bio && bio !== 'Unassigned' ? bio.split(',').map((c: string) => c.trim()) : [];
-
-          if (assignedClasses.length > 0) {
-            const scheduleRequests = assignedClasses.map((className: string) =>
-              this.authService.getSchedule(className).pipe(catchError(err => of(null)))
-            );
-
-            forkJoin(scheduleRequests).subscribe({
-              next: (results: any) => {
-                this.todaySchedule = [];
-                const daysUpper = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY'];
-                let dayIndex = daysUpper.indexOf(todayName.toUpperCase());
-                if(dayIndex === -1) dayIndex = 0;
-
-                results.forEach((res: any, idx: number) => {
-                  if (res && res.headers) {
-                    const headers = JSON.parse(res.headers);
-                    const rows = JSON.parse(res.gridData || res.grid_data);
-                    const todayRow = rows[dayIndex];
-
-                    if(todayRow) {
-                      for(let i=0; i < todayRow.length; i++) {
-                        const subj = todayRow[i];
-                        if(subj && subj !== 'Rest / Recess' && subj !== '- Select Subject -' && subj.trim() !== '') {
-                          if(this.mySubjects.includes(subj.toLowerCase())) {
-                            this.todaySchedule.push({
-                              time: headers[i], // Looks like "08:00 AM - 09:00 AM"
-                              subject: subj,
-                              class: assignedClasses[idx]
-                            });
-                          }
-                        }
-                      }
-                    }
-                  }
-                });
-
-                // --- THE FIX: Smart Real-Time Parsing & Sorting ---
-                const now = new Date();
-                const currentMins = now.getHours() * 60 + now.getMinutes();
-
-                const parseTimeStr = (t: string) => {
-                  const match = t.match(/(\d+)[.:](\d+)\s*(AM|PM|am|pm)?/i);
-                  if (!match) return 0;
-                  let h = parseInt(match[1], 10);
-                  let m = parseInt(match[2], 10);
-                  const ampm = match[3]?.toUpperCase();
-                  if (ampm === 'PM' && h < 12) h += 12;
-                  if (ampm === 'AM' && h === 12) h = 0;
-                  return h * 60 + m;
-                };
-
-                this.todaySchedule = this.todaySchedule.map(slot => {
-                  const timeParts = slot.time.split('-');
-                  const startMins = parseTimeStr(timeParts[0]);
-                  const endMins = parseTimeStr(timeParts[1] || timeParts[0]);
-
-                  return {
-                    ...slot,
-                    isCurrent: currentMins >= startMins && currentMins < endMins,
-                    isPast: currentMins >= endMins
-                  };
-                });
-
-                this.todaySchedule.sort((a, b) => {
-                  return parseTimeStr(a.time.split('-')[0]) - parseTimeStr(b.time.split('-')[0]);
-                });
-              }
-            });
+          const schedRaw = myProfile.scheduleJson || myProfile.schedule_json;
+          let parsedSchedule: any[] = [];
+          if (schedRaw) {
+            try {
+              parsedSchedule = JSON.parse(schedRaw);
+            } catch (e) {}
           }
+
+          const daysUpper = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+          let todayUpper = todayName.toUpperCase();
+
+          // Fallback to Sunday if they login on a weekend
+          if (!['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY'].includes(todayUpper)) {
+            todayUpper = 'SUNDAY';
+            this.currentDateStr += ' (Showing Sunday)';
+          }
+
+          // THE FIX: Correctly filters customized slots based on day and valid subject entry
+          const todaySlots = parsedSchedule.filter((s: any) => (s.day || '').toUpperCase() === todayUpper && s.subject && s.subject.trim() !== '');
+
+          const now = new Date();
+          const currentMins = now.getHours() * 60 + now.getMinutes();
+
+          const parseTimeStr = (hourStr: string, ampm: string) => {
+            if (!hourStr) return 0;
+            const parts = hourStr.split(':');
+            let h = parseInt(parts[0] || '0', 10);
+            let m = parseInt(parts[1] || '0', 10);
+            const isPM = (ampm || '').toUpperCase() === 'PM';
+            if (isPM && h < 12) h += 12;
+            if (!isPM && h === 12) h = 0;
+            return h * 60 + m;
+          };
+
+          const mappedSlots = todaySlots.map((slot: any) => {
+            const startMins = parseTimeStr(slot.startHour, slot.startAmPm);
+            const endMins = parseTimeStr(slot.endHour, slot.endAmPm);
+
+            // Format for UI Display e.g. "08:00 AM - 12:00 PM"
+            const timeString = `${slot.startHour} ${slot.startAmPm} - ${slot.endHour} ${slot.endAmPm}`;
+
+            return {
+              time: timeString,
+              subject: slot.subject,
+              class: slot.class || 'TBA',
+              room: 'Room TBA',
+              teacher: myProfile.full_name || myProfile.fullName || myProfile.username,
+              startMins,
+              endMins,
+              isCurrent: false,
+              isPast: false
+            };
+          });
+
+          mappedSlots.sort((a: any, b: any) => a.startMins - b.startMins);
+
+          // THE FIX: Assigning the verified schedule to todaySchedule so HTML table maps correctly!
+          this.todaySchedule = mappedSlots;
+
+          mappedSlots.forEach((slot: any) => {
+            slot.isCurrent = currentMins >= slot.startMins && currentMins < slot.endMins;
+            slot.isPast = currentMins >= slot.endMins;
+          });
         }
         this.loadAssignments();
       }

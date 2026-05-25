@@ -90,6 +90,12 @@
           </div>
 
           <form (ngSubmit)="onLogin()" class="space-y-4 md:space-y-6 relative z-40">
+
+            <div *ngIf="errorMessage" class="flex items-start gap-2 p-3 bg-red-50 border border-red-100 rounded-xl animate-fade-in">
+              <span translate="no" class="material-symbols-outlined notranslate text-red-500 text-lg md:text-xl shrink-0">error</span>
+              <p class="text-xs md:text-sm font-bold text-red-600 leading-tight pt-0.5">{{ errorMessage }}</p>
+            </div>
+
             <div class="space-y-1.5 md:space-y-2">
               <label class="input-label">Username or ID</label>
               <div class="relative group">
@@ -126,6 +132,12 @@
           </div>
 
           <form (ngSubmit)="onVerifyEmail()" class="space-y-4 md:space-y-6 relative z-40">
+
+            <div *ngIf="errorMessage" class="flex items-start gap-2 p-3 bg-red-50 border border-red-100 rounded-xl animate-fade-in">
+              <span translate="no" class="material-symbols-outlined notranslate text-red-500 text-lg md:text-xl shrink-0">error</span>
+              <p class="text-xs md:text-sm font-bold text-red-600 leading-tight pt-0.5">{{ errorMessage }}</p>
+            </div>
+
             <div class="space-y-1.5 md:space-y-2">
               <label class="input-label">Email or Username</label>
               <div class="relative group">
@@ -155,6 +167,11 @@
           </div>
 
           <form (ngSubmit)="onResetPassword()" class="space-y-4 md:space-y-5 relative z-40">
+
+            <div *ngIf="errorMessage" class="flex items-start gap-2 p-3 bg-red-50 border border-red-100 rounded-xl animate-fade-in">
+              <span translate="no" class="material-symbols-outlined notranslate text-red-500 text-lg md:text-xl shrink-0">error</span>
+              <p class="text-xs md:text-sm font-bold text-red-600 leading-tight pt-0.5">{{ errorMessage }}</p>
+            </div>
 
             <div class="space-y-1.5 md:space-y-2">
               <label class="input-label">Verification Code</label>

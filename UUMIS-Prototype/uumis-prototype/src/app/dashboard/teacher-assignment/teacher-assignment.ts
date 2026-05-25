@@ -331,50 +331,48 @@ export class TeacherAssignmentComponent implements OnInit, OnDestroy {
     const subjectName = `${task.type}: ${task.topic}`;
     const oldSubjectName = `TASK_${task.id}`;
 
-    // 获取当前老师点击的班级，比如 "Year 1"
     const currentYearGroup = this.selectedYear;
 
     this.authService.getUsers().subscribe(users => {
-      // 1. 获取本班级档案里的正常学生
+      // 1. Get ONLY students who are actively assigned to this class
       const classStudents = users.filter(u => {
         if ((u.role || '').toLowerCase() !== 'student') return false;
         const yG = (u.bio || '').includes(' - ') ? (u.bio || '').split(' - ')[1]?.trim().toLowerCase() : (u.bio || '').trim().toLowerCase();
         return yG === currentYearGroup.toLowerCase();
+      }).map(u => {
+        // THE FIX: Unpack JSON to display full name correctly!
+        let profileData: any = {};
+        const rawJson = u.profile_json || u.profileJson;
+        if (rawJson) {
+          try { profileData = JSON.parse(rawJson); } catch(e){}
+        }
+        let displayName = u.fullName || u.username;
+        if (profileData.firstName || profileData.lastName || profileData.familyName) {
+          const lName = profileData.lastName || profileData.familyName || '';
+          displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+        }
+        return {
+          ...u,
+          fullName: displayName,
+          studentId: u.student_id || u.studentId || '123456'
+        };
       });
 
-      // 2. ⭐ 安全直连读取：同时发送 subject 和 yearGroup 给数据库，严禁跨班级读取！
       Promise.all([
         fetch(`/api/grades?subject=${encodeURIComponent(subjectName)}&yearGroup=${encodeURIComponent(currentYearGroup)}`).then(res => res.ok ? res.json() : []),
         fetch(`/api/grades?subject=${encodeURIComponent(oldSubjectName)}&yearGroup=${encodeURIComponent(currentYearGroup)}`).then(res => res.ok ? res.json() : [])
       ]).then(([newGrades, oldGrades]) => {
         const allGrades = [...(Array.isArray(newGrades) ? newGrades : []), ...(Array.isArray(oldGrades) ? oldGrades : [])];
 
-        // 3. 安全合并：只有被数据库证实是交给这个班级 (currentYearGroup) 的学生，才允许显示！
-        const allStudentsToDisplay = [...classStudents];
-        allGrades.forEach((g: any) => {
-          const exists = allStudentsToDisplay.find(s =>
-            String(s.username).toLowerCase() === String(g.studentUsername).toLowerCase() ||
-            String(s.student_id).toLowerCase() === String(g.studentUsername).toLowerCase()
-          );
-          if (!exists && g.studentUsername) {
-            allStudentsToDisplay.push({
-              student_id: g.studentUsername,
-              username: g.studentUsername,
-              fullName: g.studentName || g.studentUsername,
-              role: 'student'
-            });
-          }
-        });
-
-        if (allStudentsToDisplay.length === 0) {
+        // THE FIX: Strict Mapping. We NO LONGER append orphaned grades.
+        if (classStudents.length === 0) {
           this.taskSubmissions = [];
           this.isLoadingSubmissions = false;
           return;
         }
 
-        // 4. 匹配数据显示
-        this.taskSubmissions = allStudentsToDisplay.map(stu => {
-          const uniqueIds = [stu.student_id, stu.studentId, stu.username, stu.email, stu.fullName, stu.full_name]
+        this.taskSubmissions = classStudents.map(stu => {
+          const uniqueIds = [stu.studentId, stu.username, stu.email, stu.fullName]
             .filter(Boolean)
             .map(id => String(id).toLowerCase().trim());
 
@@ -384,7 +382,7 @@ export class TeacherAssignmentComponent implements OnInit, OnDestroy {
             return (gUname && uniqueIds.includes(gUname)) || (gName && uniqueIds.includes(gName));
           });
 
-          const displayId = stu.student_id || stu.studentId || stu.username;
+          const displayId = stu.studentId || stu.username;
 
           let statusStr = 'Pending';
           let markStr = '-';
@@ -425,6 +423,7 @@ export class TeacherAssignmentComponent implements OnInit, OnDestroy {
       });
     });
   }
+
   openGradeModal(student: any) {
     this.gradingStudent = student;
     const currentMark = String(student.mark);

@@ -28,33 +28,47 @@ export class UserProfileComponent implements OnInit {
   }
 
   loadRealUser() {
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      const storedUser = JSON.parse(userStr);
-      const rawRole = storedUser.role ? storedUser.role.toLowerCase().trim() : '';
+    // 1. 从 AuthService 获取当前已登录的用户对象，而不是直接读写 localStorage，
+    // 因为 AuthService 通常处理了登录后的最新状态同步。
+    const currentUser = this.authService.getCurrentUser();
 
-      // If a Teacher or Staff member accidentally lands here, immediately redirect them to their proper tabbed profile!
-      if (rawRole === 'teacher') {
-        this.router.navigate(['/dashboard/teacher/profile'], { replaceUrl: true });
-        return;
-      } else if (['admin', 'staff', 'financial_manager', 'register_manager'].includes(rawRole)) {
-        this.router.navigate(['/dashboard/staff/profile'], { replaceUrl: true });
-        return;
-      }
-
+    if (currentUser) {
+      const rawRole = currentUser.role ? currentUser.role.toLowerCase().trim() : '';
       this.isStudent = rawRole === 'student';
 
+      // 2. 使用 JSON Unpacking 引擎解析当前登录用户的资料
+      let profileData: any = {};
+      const rawJson = currentUser.profileJson || currentUser.profile_json;
+      if (rawJson) {
+        try {
+          profileData = typeof rawJson === 'string' ? JSON.parse(rawJson) : rawJson;
+        } catch(e) { console.error("Profile JSON 解析错误", e); }
+      }
+
+      // 3. 构建显示名：优先级为 firstName+lastName > fullName > username
+      let displayName = currentUser.fullName || currentUser.full_name || currentUser.username || 'System User';
+      if (profileData.firstName || profileData.lastName || profileData.familyName) {
+        const fName = profileData.firstName || '';
+        const mName = profileData.middleName || '';
+        const lName = profileData.lastName || profileData.familyName || '';
+        displayName = [fName, mName, lName].filter(Boolean).join(' ');
+      }
+
+      // 4. 赋值给 user 对象，确保界面渲染的是当前登录老师的信息
       this.user = {
-        id: storedUser.id,
-        name: storedUser.fullName || storedUser.username || 'System User',
-        role: storedUser.role || 'Standard',
-        email: storedUser.email || 'No email provided',
-        phone: storedUser.phone || '',
-        bio: storedUser.bio || '',
+        id: currentUser.id,
+        name: displayName,
+        role: currentUser.role || 'Standard',
+        email: currentUser.email || 'No email provided',
+        phone: currentUser.phone || '',
+        bio: currentUser.bio || '',
         location: 'UUMIS Campus',
-        initials: this.getInitials(storedUser.fullName || storedUser.username || 'U'),
-        avatarUrl: storedUser.avatar || null
+        initials: this.getInitials(displayName),
+        avatarUrl: currentUser.avatar || null
       };
+    } else {
+      // 如果没有用户信息，跳转回登录页
+      this.router.navigate(['/login']);
     }
   }
 
@@ -87,16 +101,9 @@ export class UserProfileComponent implements OnInit {
 
     this.authService.updateUser(this.user.id, payload).subscribe({
       next: (res: any) => {
-        const existingUserStr = localStorage.getItem('user');
-        let updatedUser = res.user;
-
-        if (existingUserStr) {
-          const existingUser = JSON.parse(existingUserStr);
-          updatedUser = { ...existingUser, ...res.user };
-          if (!updatedUser.role) {
-            updatedUser.role = existingUser.role;
-          }
-        }
+        // 更新本地缓存以保持同步
+        const currentUser = this.authService.getCurrentUser();
+        const updatedUser = { ...currentUser, ...res.user, fullName: this.user.name, full_name: this.user.name };
 
         localStorage.setItem('user', JSON.stringify(updatedUser));
         alert('Profile Saved Successfully!');

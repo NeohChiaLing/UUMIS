@@ -35,7 +35,7 @@
                class="size-36 rounded-[2.5rem] bg-white p-1.5 shadow-2xl transition-all">
             <div class="w-full h-full rounded-[2rem] bg-emerald-50 flex items-center justify-center overflow-hidden border-2 border-white relative">
 
-              <span *ngIf="!user.avatarUrl" class="text-4xl font-black text-emerald-300 select-none">{{ user.initials }}</span>
+              <span *ngIf="!user.avatarUrl" translate="no" class="notranslate text-4xl font-black text-emerald-300 select-none">{{ user.initials }}</span>
 
               <img *ngIf="user.avatarUrl" [src]="user.avatarUrl" class="w-full h-full object-cover">
 
@@ -48,7 +48,7 @@
         </div>
 
         <div class="flex-1 pb-2 text-center md:text-left">
-          <h2 class="text-3xl font-black text-slate-800 uppercase">{{ user.name || 'User' }}</h2>
+          <h2 translate="no" class="notranslate text-3xl font-black text-slate-800 uppercase">{{ user.name || 'User' }}</h2>
           <p class="text-emerald-500 font-bold text-sm uppercase tracking-wider mt-1">{{ user.role || 'Standard' }} Account</p>
         </div>
       </div>
@@ -57,7 +57,7 @@
 
         <div class="space-y-1">
           <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
-          <input [(ngModel)]="user.name" [readonly]="!isEditMode" class="w-full bg-slate-50 border border-emerald-50 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all focus:bg-white">
+          <input translate="no" [(ngModel)]="user.name" [readonly]="!isEditMode" class="notranslate w-full bg-slate-50 border border-emerald-50 rounded-2xl p-4 text-sm font-bold text-slate-700 outline-none focus:ring-2 focus:ring-emerald-200 transition-all focus:bg-white">
         </div>
 
         <div class="space-y-1">

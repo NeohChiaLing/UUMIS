@@ -36,7 +36,28 @@ export class RefundComponent implements OnInit {
     if (this.currentUser && this.currentUser.role.toLowerCase() === 'parent') {
       this.authService.getStudents().subscribe({
         next: (students: any[]) => {
-          this.myChildren = students.filter(s => s.parentId === this.currentUser.id);
+          this.myChildren = students
+            .filter(s => s.parentId === this.currentUser.id || s.parent_id === this.currentUser.id)
+            .map(child => {
+              let profileData: any = {};
+              const rawProfileJson = child.profile_json || child.profileJson;
+              if (rawProfileJson) {
+                try { profileData = JSON.parse(rawProfileJson); } catch (e) {}
+              }
+
+              let displayName = child.fullName || child.username || 'No Name';
+              if (profileData.firstName || profileData.lastName || profileData.familyName) {
+                const lName = profileData.lastName || profileData.familyName || '';
+                displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+              }
+
+              return {
+                ...child,
+                displayName: displayName,
+                fullName: displayName,
+                name: displayName
+              };
+            });
         }
       });
     }

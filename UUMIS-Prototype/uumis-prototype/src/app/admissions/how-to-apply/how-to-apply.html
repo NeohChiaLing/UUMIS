@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-transparent font-display text-slate-900 relative flex flex-col overflow-x-hidden pb-32">
+<div class="min-h-screen bg-transparent font-display text-slate-900 relative flex flex-col overflow-x-hidden pb-10">
   <div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
     <div class="absolute -top-40 -right-40 w-[800px] h-[800px] bg-sky-200/40 rounded-full blur-[120px] bubble-float"></div>
     <div class="absolute top-1/4 -left-48 w-[600px] h-[600px] bg-blue-400/20 rounded-full blur-[100px] bubble-float-alt" style="animation-delay: -5s;"></div>
@@ -91,6 +91,68 @@
       </div>
     </section>
 
+    <div class="h-24 md:h-32 w-full shrink-0 block mt-8"></div>
+
   </main>
   <app-footer></app-footer>
+
+  <div *ngIf="editMode" class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-5 sm:p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 shrink-0">
+        <h2 class="text-lg sm:text-xl font-black text-slate-800 uppercase tracking-tight">Edit Section</h2>
+        <button (click)="closeEditModal()" class="text-slate-400 hover:text-red-500 transition-colors"><span translate="no" class="material-symbols-outlined notranslate text-xl sm:text-2xl">close</span></button>
+      </div>
+
+      <div class="p-5 sm:p-6 flex flex-col gap-4 overflow-y-auto custom-scrollbar">
+
+        <ng-container *ngIf="editMode === 'header'">
+          <div><label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1">Title Start</label><input type="text" [(ngModel)]="editData.titleStart" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500 text-sm"></div>
+          <div><label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1">Title Highlight</label><input type="text" [(ngModel)]="editData.titleHighlight" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500 text-sm"></div>
+          <div>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1 mt-2">Background Image</label>
+            <div class="flex items-center gap-3 sm:gap-4">
+              <input type="file" #bgInput (change)="onFileSelected($event, 'bgImage')" accept="image/*" class="hidden">
+              <button (click)="bgInput.click()" class="px-3 sm:px-4 py-2 bg-sky-100 text-sky-700 font-bold rounded-lg hover:bg-sky-200 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm"><span translate="no" class="material-symbols-outlined notranslate text-[16px] sm:text-[18px]">upload_file</span> <span class="whitespace-nowrap">Choose Image</span></button>
+              <div *ngIf="editData.bgImage" class="h-10 w-16 rounded bg-cover bg-center border border-slate-200 shadow-inner shrink-0" [style.background-image]="'url(' + editData.bgImage + ')'"></div>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="editMode === 'info'">
+          <div><label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1">Find Out Title</label><input type="text" [(ngModel)]="editData.findOutTitle" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500 text-sm"></div>
+          <div><label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1">Find Out Description</label><textarea [(ngModel)]="editData.findOutDesc" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500 text-sm resize-none"></textarea></div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div><label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1">Semester 1 Timeline</label><input type="text" [(ngModel)]="editData.sem1" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500 text-sm"></div>
+            <div><label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1">Semester 2 Timeline</label><input type="text" [(ngModel)]="editData.sem2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500 text-sm"></div>
+          </div>
+          <div><label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1">Contact Phone</label><input type="text" [(ngModel)]="editData.phone" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500 text-sm"></div>
+        </ng-container>
+
+        <ng-container *ngIf="editMode === 'brochure'">
+          <div>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1">Brochure Preview Image</label>
+            <div class="flex items-center gap-3 sm:gap-4 mb-4">
+              <input type="file" #brochureImg (change)="onFileSelected($event, 'brochureImage')" accept="image/*" class="hidden">
+              <button (click)="brochureImg.click()" class="px-3 sm:px-4 py-2 bg-sky-100 text-sky-700 font-bold rounded-lg hover:bg-sky-200 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm"><span translate="no" class="material-symbols-outlined notranslate text-[16px] sm:text-[18px]">add_photo_alternate</span> <span class="whitespace-nowrap">Choose Image</span></button>
+              <div *ngIf="editData.brochureImage" class="h-10 w-16 rounded bg-cover bg-center border border-slate-200 shadow-inner shrink-0" [style.background-image]="'url(' + editData.brochureImage + ')'"></div>
+            </div>
+          </div>
+          <div>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1">Brochure PDF Document</label>
+            <div class="flex items-center gap-3 sm:gap-4">
+              <input type="file" #brochurePdf (change)="onFileSelected($event, 'brochurePdf')" accept="application/pdf" class="hidden">
+              <button (click)="brochurePdf.click()" class="px-3 sm:px-4 py-2 bg-purple-100 text-purple-700 font-bold rounded-lg hover:bg-purple-200 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm"><span translate="no" class="material-symbols-outlined notranslate text-[16px] sm:text-[18px]">picture_as_pdf</span> <span class="whitespace-nowrap">Choose PDF</span></button>
+              <div *ngIf="editData.brochurePdf" class="flex items-center text-[10px] sm:text-xs text-emerald-600 font-black uppercase tracking-widest"><span translate="no" class="material-symbols-outlined text-sm mr-1">check_circle</span> Attached</div>
+            </div>
+          </div>
+        </ng-container>
+
+      </div>
+
+      <div class="p-5 sm:p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/50 mt-auto shrink-0">
+        <button (click)="closeEditModal()" class="px-5 sm:px-6 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-slate-200 transition-colors text-xs sm:text-sm">Cancel</button>
+        <button (click)="saveEdits()" class="px-5 sm:px-6 py-2.5 rounded-xl font-bold bg-slate-900 text-white hover:bg-sky-500 shadow-lg transition-all flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm"><span translate="no" class="material-symbols-outlined text-[16px] sm:text-[18px] notranslate">save</span> Save</button>
+      </div>
+    </div>
+  </div>
 </div>

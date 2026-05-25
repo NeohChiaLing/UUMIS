@@ -5,7 +5,6 @@ import { Router, RouterModule } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-import autoTable from 'jspdf-autotable';
 import { AuthService } from '../../../services/auth.service';
 
 @Component({
@@ -19,7 +18,7 @@ export class AttendanceComponent implements OnInit {
   years = ['Pre-Kindergarten', 'Kindergarten', 'Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6', 'Year 7', 'Year 8', 'Year 9', 'Year 10', 'Year 11'];
   timePeriods = ['Day', 'Month', 'Year'];
 
-  selectedYear: string = 'Year 1'; // THE FIX: Changed default to Year 1 based on your screenshots
+  selectedYear: string = 'Year 1';
   selectedPeriod: string = 'Day';
   selectedDate: string = new Date().toISOString().split('T')[0];
   selectedMonth: string = new Date().toISOString().slice(0, 7);
@@ -68,7 +67,6 @@ export class AttendanceComponent implements OnInit {
         const yearStudents = users.filter((u: any) => {
           if ((u.role || '').toLowerCase() !== 'student' || !u.bio || u.bio === 'Unassigned') return false;
 
-          // THE FIX: Bulletproof fuzzy logic for matching class years!
           const bioSafe = u.bio.toLowerCase();
           const targetSafe = this.selectedYear.toLowerCase();
 
@@ -82,15 +80,28 @@ export class AttendanceComponent implements OnInit {
               const uniqueId = stu.student_id || stu.studentId || stu.username || stu.email || stu.id.toString();
               const record = attendanceRecords.find(r => r.student_id === uniqueId || r.studentId === uniqueId);
 
+              // THE FIX: Added JSON Unpacking Engine
+              let profileData: any = {};
+              const rawProfileJson = stu.profile_json || stu.profileJson;
+              if (rawProfileJson) {
+                try { profileData = JSON.parse(rawProfileJson); } catch (e) {}
+              }
+              let displayName = stu.fullName || stu.username || 'Unknown Student';
+              if (profileData.firstName || profileData.lastName || profileData.familyName) {
+                const lName = profileData.lastName || profileData.familyName || '';
+                displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+              }
+
               return {
                 dbId: record ? record.id : null,
                 id: uniqueId,
-                name: stu.fullName || stu.username || 'Unknown Student',
+                name: displayName,
                 class: this.selectedYear,
                 timeIn: record ? (record.time_in || record.timeIn || '--:--') : '--:--',
                 status: record ? String(record.status).toUpperCase() : 'ABSENT',
                 mcFile: record ? (record.mc_file || record.mcFile) : null,
-                mcUrl: record ? (record.mc_url || record.mcUrl) : null
+                mcUrl: record ? (record.mc_url || record.mcUrl) : null,
+                mcStatus: record ? (record.mcStatus || 'Pending Review') : null
               };
             });
 
@@ -109,7 +120,7 @@ export class AttendanceComponent implements OnInit {
   }
 
   toggleStatus(student: any) {
-    const statuses = ['PRESENT', 'ABSENT', 'LATE'];
+    const statuses = ['PRESENT', 'ABSENT', 'LATE', 'EXCUSED'];
     let idx = statuses.indexOf(student.status.toUpperCase());
     student.status = statuses[(idx + 1) % statuses.length];
 
@@ -142,11 +153,23 @@ export class AttendanceComponent implements OnInit {
         reader.onload = (event: any) => {
           student.mcUrl = event.target.result;
           student.status = 'ABSENT';
+          student.mcStatus = 'Pending Review';
         };
         reader.readAsDataURL(file);
       }
     };
     input.click();
+  }
+
+  downloadMC(student: any) {
+    if (student.mcUrl) {
+      const a = document.createElement('a');
+      a.href = student.mcUrl as string;
+      a.download = student.mcFile || `MC_${student.name}.pdf`;
+      a.click();
+    } else {
+      alert('No MC file attached.');
+    }
   }
 
   previewMC() {
@@ -156,14 +179,14 @@ export class AttendanceComponent implements OnInit {
     }
   }
 
-  downloadMC() {
-    if (this.currentMCUrl) {
-      const a = document.createElement('a');
-      a.href = this.currentMCUrl as string;
-      a.download = `MC_${this.clickedStudent.name}.pdf`;
-      a.click();
-      this.showMCConfirm = false;
-    }
+  approveMC(student: any) {
+    student.mcStatus = 'Approved';
+    student.status = 'EXCUSED';
+  }
+
+  rejectMC(student: any) {
+    student.mcStatus = 'Rejected';
+    student.status = 'ABSENT';
   }
 
   toggleAddStudent() {
@@ -180,7 +203,8 @@ export class AttendanceComponent implements OnInit {
       timeIn: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
       status: 'PRESENT',
       mcFile: null,
-      mcUrl: null
+      mcUrl: null,
+      mcStatus: null
     });
     this.filterStudents();
     this.toggleAddStudent();
@@ -209,7 +233,8 @@ export class AttendanceComponent implements OnInit {
       timeIn: s.timeIn,
       status: s.status,
       mcFile: s.mcFile,
-      mcUrl: s.mcUrl
+      mcUrl: s.mcUrl,
+      mcStatus: s.mcStatus
     }));
 
     this.authService.saveAttendance(payload).subscribe({

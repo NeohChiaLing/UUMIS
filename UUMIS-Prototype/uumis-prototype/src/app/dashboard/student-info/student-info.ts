@@ -28,6 +28,11 @@ export class StudentInfoComponent implements OnInit {
 
   academicLevels = ['Kindergarten', 'Primary', 'Lower Secondary', 'Upper Secondary'];
 
+  isFatherDropdownOpen: boolean = false;
+  fatherSearchQuery: string = '';
+  isMotherDropdownOpen: boolean = false;
+  motherSearchQuery: string = '';
+
   getYearsForLevel(level: string): string[] {
     if (level === 'Kindergarten') return ['Pre-Kindergarten', 'Kindergarten'];
     if (level === 'Primary') return ['Year 1', 'Year 2', 'Year 3', 'Year 4', 'Year 5', 'Year 6'];
@@ -38,31 +43,21 @@ export class StudentInfoComponent implements OnInit {
 
   emptyStudent = {
     name: '', id: '', grade: '', level: '', year: '', email: '', status: 'Pending',
-    parentId: '', profileStatus: 'PENDING', admissionDate: new Date().toISOString().split('T')[0],
+    profileStatus: 'PENDING', admissionDate: new Date().toISOString().split('T')[0],
     teacher: '', completion: 0, avatarColor: 'bg-gray-100 text-gray-600',
     dob: '', gender: 'Male', address: '', passport: '', phone: '',
     bloodGroup: 'O+', allergies: '', medicalConditions: '',
+    fatherAccountId: null, motherAccountId: null,
     father: { name: '', ic: '', phone: '', email: '', job: '' },
     mother: { name: '', ic: '', phone: '', email: '', job: '' },
-    siblingName: '', siblingGrade: '', siblingPhone: '', siblingEmail: ''
+    siblingName: '', siblingGrade: '', siblingPhone: '', siblingEmail: '',
+    firstName: '', middleName: '', lastName: '', age: '', pob: '', nationality: '', religion: '', doi: '', doe: '', lang1: '', lang2: '', studentMobile: '', primaryEmail: '', altEmail: '', homePhone: ''
   };
 
-  fullProfileTemplate = {
-    level: '', year: '', parentId: '', dob: '', gender: 'Male', address: '',
-    passport: '', phone: '', bloodGroup: 'O+', allergies: '', profileStatus: 'PENDING',
-    medicalConditions: '', father: { name: '', ic: '', phone: '', email: '', job: '' },
-    mother: { name: '', ic: '', phone: '', email: '', job: '' },
-    siblingName: '', siblingGrade: '', siblingPhone: '', siblingEmail: ''
-  };
 
-  isParentDropdownOpen: boolean = false;
-  parentSearchQuery: string = '';
+  fullProfileTemplate = { ...this.emptyStudent };
 
-  constructor(
-    private authService: AuthService,
-    private router: Router,
-    private location: Location
-  ) {}
+  constructor(private authService: AuthService, private router: Router, private location: Location) {}
 
   ngOnInit() {
     const userStr = typeof localStorage !== 'undefined' ? localStorage.getItem('user') : null;
@@ -98,24 +93,48 @@ export class StudentInfoComponent implements OnInit {
     });
   }
 
-  toggleParentDropdown() {
-    this.isParentDropdownOpen = !this.isParentDropdownOpen;
-    if (this.isParentDropdownOpen) this.parentSearchQuery = '';
+  toggleFatherDropdown() {
+    this.isFatherDropdownOpen = !this.isFatherDropdownOpen;
+    if (this.isFatherDropdownOpen) this.fatherSearchQuery = '';
   }
 
-  get filteredParents() {
-    if (!this.parentSearchQuery) return this.parents;
-    const q = this.parentSearchQuery.toLowerCase();
-    return this.parents.filter(p =>
-      (p.fullName || p.username || '').toLowerCase().includes(q) ||
-      (p.email || '').toLowerCase().includes(q)
-    );
+  get filteredFathers() {
+    if (!this.fatherSearchQuery) return this.parents;
+    const q = this.fatherSearchQuery.toLowerCase();
+    return this.parents.filter(p => (p.fullName || p.username || '').toLowerCase().includes(q) || (p.email || '').toLowerCase().includes(q));
   }
 
-  get selectedParentName() {
-    if (!this.selectedStudent?.parentId) return '-- Select a Parent Account to Link --';
-    const p = this.parents.find(x => x.id === this.selectedStudent.parentId);
-    return p ? `${p.fullName || p.username} (${p.email})` : '-- Select a Parent Account to Link --';
+  get selectedFatherName() {
+    if (!this.selectedStudent?.fatherAccountId) return '-- Select Father Account --';
+    const p = this.parents.find(x => x.id === this.selectedStudent.fatherAccountId);
+    return p ? `${p.fullName || p.username} (${p.email})` : '-- Select Father Account --';
+  }
+
+  selectFather(id: any) {
+    this.selectedStudent.fatherAccountId = id;
+    this.isFatherDropdownOpen = false;
+  }
+
+  toggleMotherDropdown() {
+    this.isMotherDropdownOpen = !this.isMotherDropdownOpen;
+    if (this.isMotherDropdownOpen) this.motherSearchQuery = '';
+  }
+
+  get filteredMothers() {
+    if (!this.motherSearchQuery) return this.parents;
+    const q = this.motherSearchQuery.toLowerCase();
+    return this.parents.filter(p => (p.fullName || p.username || '').toLowerCase().includes(q) || (p.email || '').toLowerCase().includes(q));
+  }
+
+  get selectedMotherName() {
+    if (!this.selectedStudent?.motherAccountId) return '-- Select Mother Account --';
+    const p = this.parents.find(x => x.id === this.selectedStudent.motherAccountId);
+    return p ? `${p.fullName || p.username} (${p.email})` : '-- Select Mother Account --';
+  }
+
+  selectMother(id: any) {
+    this.selectedStudent.motherAccountId = id;
+    this.isMotherDropdownOpen = false;
   }
 
   get completionPercentage(): number {
@@ -131,31 +150,37 @@ export class StudentInfoComponent implements OnInit {
     checkValue(this.selectedStudent.dob); checkValue(this.selectedStudent.gender);
     checkValue(this.selectedStudent.address); checkValue(this.selectedStudent.passport);
     checkValue(this.selectedStudent.phone); checkValue(this.selectedStudent.bloodGroup);
-    checkValue(this.selectedStudent.allergies); checkValue(this.selectedStudent.medicalConditions);
-
-    if (this.selectedStudent.father) {
-      checkValue(this.selectedStudent.father.name); checkValue(this.selectedStudent.father.ic);
-      checkValue(this.selectedStudent.father.phone); checkValue(this.selectedStudent.father.email);
-      checkValue(this.selectedStudent.father.job);
-    }
-    if (this.selectedStudent.mother) {
-      checkValue(this.selectedStudent.mother.name); checkValue(this.selectedStudent.mother.ic);
-      checkValue(this.selectedStudent.mother.phone); checkValue(this.selectedStudent.mother.email);
-      checkValue(this.selectedStudent.mother.job);
-    }
 
     if (totalFields === 0) return 0;
     return Math.round((filledFields / totalFields) * 100);
   }
 
-  selectParent(parentId: any) {
-    this.selectedStudent.parentId = parentId;
-    this.isParentDropdownOpen = false;
-  }
-
   loadParents() {
     this.authService.getParents().subscribe({
-      next: (data: any[]) => this.parents = data,
+      next: (data: any[]) => {
+        this.parents = data.map(parent => {
+          let profileData: any = {};
+          const rawProfileJson = parent.profile_json || parent.profileJson;
+          if (rawProfileJson) {
+            try {
+              profileData = typeof rawProfileJson === 'string' ? JSON.parse(rawProfileJson) : rawProfileJson;
+            } catch(e){}
+          }
+
+          let displayName = parent.fullName || parent.full_name || parent.username || 'No Name';
+          if (profileData.firstName || profileData.lastName || profileData.familyName) {
+            const fName = profileData.firstName || '';
+            const mName = profileData.middleName || '';
+            const lName = profileData.lastName || profileData.familyName || '';
+            displayName = [fName, mName, lName].filter(Boolean).join(' ');
+          }
+
+          return {
+            ...parent,
+            fullName: displayName
+          };
+        });
+      },
       error: () => console.log('Failed to load parents')
     });
   }
@@ -171,23 +196,32 @@ export class StudentInfoComponent implements OnInit {
         if (!data || !Array.isArray(data)) return;
 
         this.students = data.map(user => {
-          let profileData = {};
-          if (user.profileJson) {
-            try { profileData = JSON.parse(user.profileJson); } catch (e) {}
+          let profileData: any = {};
+          const rawProfileJson = user.profile_json || user.profileJson;
+
+          if (rawProfileJson) {
+            try { profileData = JSON.parse(rawProfileJson); } catch (e) {}
+          }
+
+          let displayName = user.fullName || user.username || 'No Name';
+          if (profileData.firstName || profileData.lastName || profileData.familyName) {
+            const lName = profileData.lastName || profileData.familyName || '';
+            profileData.lastName = lName;
+            displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
           }
 
           return {
             ...this.fullProfileTemplate,
             ...profileData,
             dbId: user.id,
-            // THE FIX: Safely check for student_id (snake_case from database) BEFORE falling back to username!
             id: user.student_id || user.studentId || user.verificationCode || user.username || '---',
-            name: user.fullName || user.username || 'No Name',
+            name: displayName,
             grade: user.bio || 'Unassigned',
-            parentId: user.parentId,
-            profileStatus: user.profileStatus || 'PENDING',
+            fatherAccountId: profileData.fatherAccountId || '',
+            motherAccountId: profileData.motherAccountId || '',
+            profileStatus: user.profileStatus || user.profile_status || 'PENDING',
             email: user.email || '',
-            status: (user.enabled === true || user.isEnabled === true) ? 'Active' : 'Pending',
+            status: (user.enabled === true || user.isEnabled === true || user.is_enabled === true || user.is_enabled === 1) ? 'Active' : 'Pending',
             admissionDate: '2023-01-01',
             teacher: 'Unassigned',
             avatarColor: 'bg-emerald-100 text-emerald-600',
@@ -207,13 +241,14 @@ export class StudentInfoComponent implements OnInit {
 
   viewStudent(student: any) {
     this.isAddingMode = false;
-    this.selectedStudent = { ...this.fullProfileTemplate, ...student };
+    this.selectedStudent = {
+      ...JSON.parse(JSON.stringify(this.fullProfileTemplate)),
+      ...JSON.parse(JSON.stringify(student))
+    };
 
     const parts = (student.grade || '').split(' - ');
     this.selectedStudent.level = this.academicLevels.includes(parts[0]) ? parts[0] : '';
     this.selectedStudent.year = parts[1] || '';
-
-    this.selectedStudent.parentId = student.parentId || '';
     window.scrollTo(0,0);
   }
 
@@ -228,38 +263,63 @@ export class StudentInfoComponent implements OnInit {
 
     const isFirstTimeApproval = student.status === 'Pending';
     const confirmMsg = isFirstTimeApproval
-      ? `Approve ${student.name}'s new admission, generate their Student ID, and send welcome emails?`
-      : `Approve ${student.name}'s recent profile updates? (No email will be sent)`;
+      ? `Approve ${student.name}'s admission? Parent accounts will remain unlinked until manually selected.`
+      : `Approve ${student.name}'s profile updates?`;
 
-    if(confirm(confirmMsg)) {
+    if (confirm(confirmMsg)) {
       student.profileStatus = 'APPROVED';
       student.status = 'Active';
 
-      if (isFirstTimeApproval) {
-        this.authService.approveStudent(student.dbId).subscribe({
-          next: (approveRes: any) => {
-            this.authService.adminUpdateStudent(student.dbId, { profileStatus: 'APPROVED', enabled: true }).subscribe();
+      const approvalPayload = {
+        profileStatus: 'APPROVED',
+        enabled: true,
+        fatherAccountId: student.fatherAccountId,
+        motherAccountId: student.motherAccountId
+      };
 
-            const emailPayload = {
-              studentName: student.name,
-              studentEmail: student.email,
-              fatherEmail: student.father?.email || '',
-              motherEmail: student.mother?.email || ''
-            };
-            this.authService.sendApprovalEmail(emailPayload).subscribe();
+      const emailPayload = {
+        studentId: student.dbId,
+        studentName: student.name,
+        studentEmail: student.email,
+        fatherName: student.father?.name || '',
+        fatherEmail: student.father?.email || '',
+        motherName: student.mother?.name || '',
+        motherEmail: student.mother?.email || ''
+      };
 
-            alert(`Student ${student.name} has been officially enrolled, ID generated, and welcome emails dispatched!`);
+      const sendApprovalEmail = () => {
+        this.authService.sendApprovalEmail(emailPayload).subscribe({
+          next: () => {
+            alert(isFirstTimeApproval ? `Student ${student.name} enrolled successfully. Parent accounts remain unlinked until manually selected.` : `Student ${student.name}'s profile updates approved!`);
             this.loadStudents();
+          }
+        });
+      };
+
+      if (isFirstTimeApproval) {
+        // Force unlinked status initially
+        const unlinkedApprovalPayload = {
+          ...approvalPayload,
+          fatherAccountId: null,
+          motherAccountId: null
+        };
+
+        this.authService.approveStudent(student.dbId).subscribe({
+          next: () => {
+            student.fatherAccountId = null;
+            student.motherAccountId = null;
+
+            this.authService.adminUpdateStudent(student.dbId, unlinkedApprovalPayload).subscribe({
+              next: () => sendApprovalEmail(),
+              error: () => alert('Student was approved, but parent links could not be cleared.')
+            });
           },
           error: () => alert('Failed to approve student admission.')
         });
 
       } else {
-        this.authService.adminUpdateStudent(student.dbId, {
-          profileStatus: 'APPROVED',
-          enabled: true
-        }).subscribe({
-          next: () => alert(`Student ${student.name}'s profile updates have been approved successfully!`),
+        this.authService.adminUpdateStudent(student.dbId, approvalPayload).subscribe({
+          next: () => alert(`Student ${student.name}'s profile updates approved!`),
           error: () => alert('Failed to approve profile update.')
         });
       }
@@ -278,9 +338,7 @@ export class StudentInfoComponent implements OnInit {
         profileStatus: 'REJECTED',
         enabled: false
       }).subscribe({
-        next: () => {
-          alert(`Student ${student.name} rejected.`);
-        },
+        next: () => { alert(`Student ${student.name} rejected.`); },
         error: () => alert('Failed to reject student.')
       });
     }
@@ -316,17 +374,13 @@ export class StudentInfoComponent implements OnInit {
     }
   }
 
-  triggerFileInput() {
-    document.getElementById('adminStudentAvatarInput')?.click();
-  }
+  triggerFileInput() { document.getElementById('adminStudentAvatarInput')?.click(); }
 
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.selectedStudent.avatarUrl = e.target.result;
-      };
+      reader.onload = (e: any) => { this.selectedStudent.avatarUrl = e.target.result; };
       reader.readAsDataURL(file);
     }
   }
@@ -343,14 +397,36 @@ export class StudentInfoComponent implements OnInit {
       combinedGrade = `${this.selectedStudent.level} - ${this.selectedStudent.year}`;
     }
 
+    const updatedName = [this.selectedStudent.firstName, this.selectedStudent.middleName, this.selectedStudent.lastName].filter(Boolean).join(' ');
+    if (updatedName) {
+      this.selectedStudent.name = updatedName;
+    }
+
     const cleanProfile = {
+      firstName: this.selectedStudent.firstName,
+      middleName: this.selectedStudent.middleName,
+      lastName: this.selectedStudent.lastName || '',
       dob: this.selectedStudent.dob || '',
+      age: this.selectedStudent.age || '',
       gender: this.selectedStudent.gender || 'Male',
-      address: this.selectedStudent.address || '',
+      pob: this.selectedStudent.pob || '',
+      nationality: this.selectedStudent.nationality || '',
+      religion: this.selectedStudent.religion || '',
       passport: this.selectedStudent.passport || '',
+      doi: this.selectedStudent.doi || '',
+      doe: this.selectedStudent.doe || '',
+      lang1: this.selectedStudent.lang1 || '',
+      lang2: this.selectedStudent.lang2 || '',
+      studentMobile: this.selectedStudent.studentMobile || '',
+      primaryEmail: this.selectedStudent.primaryEmail || '',
+      altEmail: this.selectedStudent.altEmail || '',
+      homePhone: this.selectedStudent.homePhone || '',
+      address: this.selectedStudent.address || '',
       bloodGroup: this.selectedStudent.bloodGroup || 'O+',
       allergies: this.selectedStudent.allergies || 'None',
       medicalConditions: this.selectedStudent.medicalConditions || 'None',
+      fatherAccountId: this.selectedStudent.fatherAccountId || null,
+      motherAccountId: this.selectedStudent.motherAccountId || null,
       father: this.selectedStudent.father || { name: '', ic: '', phone: '', email: '', job: '' },
       mother: this.selectedStudent.mother || { name: '', ic: '', phone: '', email: '', job: '' },
       siblingName: this.selectedStudent.siblingName || '',
@@ -364,9 +440,10 @@ export class StudentInfoComponent implements OnInit {
       verificationCode: this.selectedStudent.id,
       fullName: this.selectedStudent.name,
       bio: combinedGrade,
-      phone: this.selectedStudent.phone,
+      phone: this.selectedStudent.studentMobile || this.selectedStudent.homePhone || this.selectedStudent.phone,
       enabled: this.selectedStudent.status === 'Active',
-      parentId: this.selectedStudent.parentId,
+      fatherAccountId: this.selectedStudent.fatherAccountId || null,
+      motherAccountId: this.selectedStudent.motherAccountId || null,
       profileJson: JSON.stringify(cleanProfile),
       avatar: this.selectedStudent.avatarUrl
     };
@@ -380,7 +457,8 @@ export class StudentInfoComponent implements OnInit {
       },
       error: (err: any) => {
         console.error(err);
-        alert('Failed to update student.');
+        const errorMsg = err.error?.message || err.message || 'Failed to update student profile.';
+        alert('Database Update Error:\n\n' + errorMsg);
         this.isLoading = false;
       }
     });

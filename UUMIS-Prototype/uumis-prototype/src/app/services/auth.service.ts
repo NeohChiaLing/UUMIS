@@ -355,4 +355,9 @@ export class AuthService {
   inviteUser(email: string, role: string) {
     return this.http.post(`${this.apiUrl}/users/invite`, { email, role });
   }
+
+  // Add this inside auth.service.ts
+  getPersonalGrades(studentId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/student-grades/personal-records/${studentId}`);
+  }
 }

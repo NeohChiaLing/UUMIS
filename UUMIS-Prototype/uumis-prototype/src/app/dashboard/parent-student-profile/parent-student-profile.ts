@@ -13,26 +13,14 @@ import { AuthService } from '../../services/auth.service';
 export class ParentStudentProfileComponent implements OnInit {
 
   studentProfile: any = {
-    name: 'Loading...',
-    id: '',
-    grade: '',
-    admissionDate: '2023-01-01',
-    teacher: 'Unassigned',
-    dob: '',
-    gender: 'Male',
-    address: '',
-    passport: '',
-    phone: '',
-    bloodGroup: 'O+',
-    allergies: 'None',
-    medicalConditions: 'None',
+    name: 'Loading...', id: '', grade: '', level: '', year: '', email: '', status: 'Pending',
+    profileStatus: 'PENDING', admissionDate: '2023-01-01', teacher: 'Unassigned', completion: 0,
+    dob: '', gender: 'Male', address: '', passport: '', phone: '',
+    bloodGroup: 'O+', allergies: 'None', medicalConditions: 'None',
     father: { name: '', ic: '', phone: '', email: '', job: '' },
     mother: { name: '', ic: '', phone: '', email: '', job: '' },
-    // ⭐ THE FIX: Added Sibling fields to data structure
-    siblingName: '',
-    siblingGrade: '',
-    siblingPhone: '',
-    siblingEmail: '',
+    siblingName: '', siblingGrade: '', siblingPhone: '', siblingEmail: '',
+    firstName: '', middleName: '', lastName: '', age: '', pob: '', nationality: '', religion: '', doi: '', doe: '', lang1: '', lang2: '', studentMobile: '', primaryEmail: '', altEmail: '', homePhone: '',
     avatarUrl: null
   };
 
@@ -48,18 +36,31 @@ export class ParentStudentProfileComponent implements OnInit {
     if (this.currentUser && this.activeChildId) {
       this.authService.getStudentDashboardData(this.activeChildId).subscribe({
         next: (childData: any) => {
-          if (childData.profileJson) {
+          let parsedData: any = {};
+          if (childData.profileJson || childData.profile_json) {
             try {
-              const savedData = JSON.parse(childData.profileJson);
-              this.studentProfile = { ...this.studentProfile, ...savedData };
+              parsedData = JSON.parse(childData.profileJson || childData.profile_json);
+              this.studentProfile = { ...this.studentProfile, ...parsedData };
             } catch(e) {}
           }
 
-          // Override with guaranteed database values
-          this.studentProfile.name = childData.fullName || childData.username || 'No Name';
-          this.studentProfile.id = childData.studentId || childData.verificationCode || '---';
+          let displayName = childData.fullName || childData.username || 'No Name';
+          if (parsedData.firstName || parsedData.lastName || parsedData.familyName) {
+            const lName = parsedData.lastName || parsedData.familyName || '';
+            displayName = [parsedData.firstName, parsedData.middleName, lName].filter(Boolean).join(' ');
+          }
+
+          this.studentProfile.name = displayName;
+          this.studentProfile.id = childData.studentId || childData.verificationCode || '123456';
           this.studentProfile.grade = childData.bio || 'Unassigned';
-          this.studentProfile.phone = childData.phone || this.studentProfile.phone || '';
+
+          if (this.studentProfile.grade !== 'Unassigned') {
+            const parts = this.studentProfile.grade.split(' - ');
+            this.studentProfile.level = parts[0] || 'Unassigned';
+            this.studentProfile.year = parts[1] || 'Unassigned';
+          }
+
+          this.studentProfile.phone = this.studentProfile.phone || childData.phone || '';
           this.studentProfile.avatarUrl = childData.avatar || null;
         },
         error: (err: any) => console.error('Failed to load child profile', err)
@@ -82,9 +83,8 @@ export class ParentStudentProfileComponent implements OnInit {
 
     checkValue(this.studentProfile.name);
     checkValue(this.studentProfile.id);
-    checkValue(this.studentProfile.grade);
-    checkValue(this.studentProfile.admissionDate);
-    checkValue(this.studentProfile.teacher);
+    checkValue(this.studentProfile.level);
+    checkValue(this.studentProfile.year);
     checkValue(this.studentProfile.dob);
     checkValue(this.studentProfile.gender);
     checkValue(this.studentProfile.address);
@@ -151,14 +151,48 @@ export class ParentStudentProfileComponent implements OnInit {
       return;
     }
 
+    const cleanProfile = {
+      firstName: this.studentProfile.firstName || '',
+      middleName: this.studentProfile.middleName || '',
+      lastName: this.studentProfile.lastName || '',
+      dob: this.studentProfile.dob || '',
+      age: this.studentProfile.age || '',
+      gender: this.studentProfile.gender || 'Male',
+      pob: this.studentProfile.pob || '',
+      nationality: this.studentProfile.nationality || '',
+      religion: this.studentProfile.religion || '',
+      passport: this.studentProfile.passport || '',
+      doi: this.studentProfile.doi || '',
+      doe: this.studentProfile.doe || '',
+      lang1: this.studentProfile.lang1 || '',
+      lang2: this.studentProfile.lang2 || '',
+      studentMobile: this.studentProfile.studentMobile || '',
+      primaryEmail: this.studentProfile.primaryEmail || '',
+      altEmail: this.studentProfile.altEmail || '',
+      homePhone: this.studentProfile.homePhone || '',
+      address: this.studentProfile.address || '',
+      bloodGroup: this.studentProfile.bloodGroup || 'O+',
+      allergies: this.studentProfile.allergies || 'None',
+      medicalConditions: this.studentProfile.medicalConditions || 'None',
+      father: this.studentProfile.father || { name: '', ic: '', phone: '', email: '', job: '' },
+      mother: this.studentProfile.mother || { name: '', ic: '', phone: '', email: '', job: '' },
+      siblingName: this.studentProfile.siblingName || '',
+      siblingGrade: this.studentProfile.siblingGrade || '',
+      siblingPhone: this.studentProfile.siblingPhone || '',
+      siblingEmail: this.studentProfile.siblingEmail || ''
+    };
+
     const payload = {
       profileStatus: 'PENDING',
-      profileJson: JSON.stringify(this.studentProfile),
+      profileJson: JSON.stringify(cleanProfile),
       avatar: this.studentProfile.avatarUrl
     };
 
     this.authService.adminUpdateStudent(this.activeChildId, payload).subscribe({
-      next: () => alert('Child profile details submitted to school admin for approval.'),
+      next: () => {
+        alert('Child profile details submitted to school admin for approval.');
+        this.goBack();
+      },
       error: () => alert('Failed to submit updates.')
     });
   }

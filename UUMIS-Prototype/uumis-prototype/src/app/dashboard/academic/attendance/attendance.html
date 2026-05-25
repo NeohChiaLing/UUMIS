@@ -6,7 +6,7 @@
       <p class="text-xs md:text-sm text-gray-500">Selected: MC for {{clickedStudent?.name}}</p>
       <div class="flex gap-2 md:gap-3">
         <button (click)="previewMC()" class="flex-1 py-2.5 md:py-3 bg-blue-50 border border-blue-100 text-blue-600 font-bold rounded-lg md:rounded-xl hover:bg-blue-100 text-xs md:text-sm">Preview</button>
-        <button (click)="downloadMC()" class="flex-1 py-2.5 md:py-3 bg-emerald-500 text-white font-bold rounded-lg md:rounded-xl shadow-lg hover:bg-emerald-600 text-xs md:text-sm">Download</button>
+        <button (click)="downloadMC(clickedStudent)" class="flex-1 py-2.5 md:py-3 bg-emerald-500 text-white font-bold rounded-lg md:rounded-xl shadow-lg hover:bg-emerald-600 text-xs md:text-sm">Download</button>
       </div>
       <button (click)="showMCConfirm = false" class="text-[10px] md:text-xs text-gray-400 font-bold uppercase mt-2 md:mt-4 p-2 hover:text-gray-600 transition-colors">Cancel</button>
     </div>
@@ -100,7 +100,7 @@
     <p class="text-[10px] text-slate-400 font-bold text-center mb-2 md:hidden flex items-center justify-center gap-1"><span translate="no" class="material-symbols-outlined notranslate text-[14px]">swipe</span> Swipe table left/right</p>
 
     <div class="bg-white rounded-[1.5rem] md:rounded-[2rem] border border-[#e7f3ec] shadow-sm overflow-x-auto w-full custom-scrollbar" style="-webkit-overflow-scrolling: touch;">
-      <table class="w-full text-left border-collapse min-w-[700px]">
+      <table class="w-full text-left border-collapse min-w-[900px]">
         <thead class="bg-[#f8fcfa] border-b border-[#e7f3ec]">
         <tr>
           <th class="py-4 md:py-5 px-4 md:px-6 text-[10px] md:text-xs font-black text-[#4e976b] uppercase tracking-widest w-12 md:w-16 text-center shrink-0">No.</th>
@@ -129,18 +129,49 @@
           </td>
 
           <td class="py-3 md:py-5 px-4 md:px-6 text-center">
-            <button (click)="toggleStatus(s)" [ngClass]="{'bg-green-100 text-green-700 border-green-200': s.status === 'PRESENT', 'bg-pink-100 text-pink-700 border-pink-200': s.status === 'ABSENT', 'bg-blue-100 text-blue-700 border-blue-200': s.status === 'LATE'}" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg md:rounded-full text-[9px] md:text-[10px] font-black uppercase border shadow-sm w-24 transition-transform active:scale-95 cursor-pointer hover:brightness-95">
-              <span class="size-1.5 rounded-full" [ngClass]="{'bg-green-600': s.status === 'PRESENT', 'bg-pink-600': s.status === 'ABSENT', 'bg-blue-600': s.status === 'LATE'}"></span> {{s.status}}
-            </button>
+            <div class="flex flex-col items-center gap-1.5">
+              <button (click)="toggleStatus(s)" [ngClass]="{'bg-green-100 text-green-700 border-green-200': s.status === 'PRESENT', 'bg-pink-100 text-pink-700 border-pink-200': s.status === 'ABSENT', 'bg-blue-100 text-blue-700 border-blue-200': s.status === 'LATE', 'bg-purple-100 text-purple-700 border-purple-200': s.status === 'EXCUSED'}" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg md:rounded-full text-[9px] md:text-[10px] font-black uppercase border shadow-sm w-24 transition-transform active:scale-95 cursor-pointer hover:brightness-95">
+                <span class="size-1.5 rounded-full" [ngClass]="{'bg-green-600': s.status === 'PRESENT', 'bg-pink-600': s.status === 'ABSENT', 'bg-blue-600': s.status === 'LATE', 'bg-purple-600': s.status === 'EXCUSED'}"></span> {{s.status}}
+              </button>
+
+              <div *ngIf="s.mcFile" class="text-center w-full flex justify-center mt-1.5">
+                  <span class="text-[8px] md:text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded border"
+                        [ngClass]="{'bg-blue-50 text-blue-600 border-blue-200': s.mcStatus === 'Pending Review', 'bg-emerald-50 text-emerald-600 border-emerald-200': s.mcStatus === 'Approved', 'bg-rose-50 text-rose-500 border-rose-200': s.mcStatus === 'Rejected'}">
+                     MC: {{ s.mcStatus || 'Pending' }}
+                  </span>
+              </div>
+            </div>
           </td>
 
           <td class="py-3 md:py-5 px-4 md:px-6 text-right shrink-0">
-            <div class="flex items-center justify-end gap-1 md:gap-2 opacity-100 md:opacity-20 md:group-hover:opacity-100 transition-opacity">
-              <button (click)="handleMC(s)" [class]="s.mcFile || s.mcUrl ? 'text-emerald-600 bg-emerald-100 border-emerald-200 shadow-sm' : 'text-blue-500 bg-white border-blue-100 hover:bg-blue-50'" class="p-1.5 md:p-2 rounded-lg md:rounded-xl transition-all border" [title]="s.mcFile || s.mcUrl ? 'View/Download MC' : 'Upload MC'">
-                <span translate="no" class="material-symbols-outlined notranslate text-[16px] md:text-[20px]">{{ s.mcFile || s.mcUrl ? 'visibility' : 'upload_file' }}</span>
+            <div class="flex items-center justify-end gap-1.5 md:gap-2 shrink-0">
+
+              <button (click)="uploadMC(s)" class="p-1.5 md:p-2 bg-blue-50 border border-blue-100 text-blue-600 rounded-lg md:rounded-xl hover:bg-blue-500 hover:text-white transition-all shadow-sm" title="Upload MC">
+                <span translate="no" class="material-symbols-outlined notranslate text-[16px] md:text-[20px]">upload_file</span>
               </button>
 
-              <button (click)="deleteStudent(s)" class="p-1.5 md:p-2 text-rose-400 bg-white border border-rose-100 hover:bg-rose-50 hover:text-rose-600 rounded-lg md:rounded-xl transition-all shadow-sm" title="Delete Temp Student">
+              <button (click)="downloadMC(s)"
+                      [disabled]="!s.mcFile && !s.mcUrl"
+                      [ngClass]="(s.mcFile || s.mcUrl) ? 'bg-white border-slate-200 text-slate-600 hover:bg-slate-700 hover:text-white hover:border-slate-700 shadow-sm' : 'bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed'"
+                      class="p-1.5 md:p-2 border rounded-lg md:rounded-xl transition-all" title="Download MC">
+                <span translate="no" class="material-symbols-outlined notranslate text-[16px] md:text-[20px]">download</span>
+              </button>
+
+              <button (click)="approveMC(s)"
+                      [disabled]="(!s.mcFile && !s.mcUrl) || s.mcStatus === 'Approved'"
+                      [ngClass]="(!s.mcFile && !s.mcUrl) || s.mcStatus === 'Approved' ? 'bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed shadow-none' : 'bg-white border-emerald-100 text-emerald-600 hover:bg-emerald-500 hover:text-white shadow-sm'"
+                      class="p-1.5 md:p-2 border rounded-lg md:rounded-xl transition-all" title="Approve MC">
+                <span translate="no" class="material-symbols-outlined notranslate text-[16px] md:text-[20px]">check_circle</span>
+              </button>
+
+              <button (click)="rejectMC(s)"
+                      [disabled]="(!s.mcFile && !s.mcUrl) || s.mcStatus === 'Rejected'"
+                      [ngClass]="(!s.mcFile && !s.mcUrl) || s.mcStatus === 'Rejected' ? 'bg-slate-50 border-slate-100 text-slate-300 cursor-not-allowed shadow-none' : 'bg-white border-rose-100 text-rose-500 hover:bg-rose-500 hover:text-white shadow-sm'"
+                      class="p-1.5 md:p-2 border rounded-lg md:rounded-xl transition-all" title="Reject MC">
+                <span translate="no" class="material-symbols-outlined notranslate text-[16px] md:text-[20px]">cancel</span>
+              </button>
+
+              <button (click)="deleteStudent(s)" class="p-1.5 md:p-2 bg-white border border-rose-100 text-rose-400 hover:bg-rose-50 hover:text-rose-600 rounded-lg md:rounded-xl transition-all shadow-sm" title="Delete Temp Student">
                 <span translate="no" class="material-symbols-outlined notranslate text-[16px] md:text-[20px]">delete</span>
               </button>
             </div>
@@ -159,6 +190,48 @@
         <span translate="no" class="material-symbols-outlined notranslate text-base md:text-lg">save</span> Submit Records
       </button>
     </div>
-  </div>
 
+    <div id="formal-attendance-pdf" class="absolute -left-[9999px] -top-[9999px] w-[800px] bg-white text-black p-12 font-sans z-[-50]">
+      <div class="flex items-start justify-between pb-4 mb-6 border-b-2 border-[#1f4e3d]">
+        <div class="flex items-center gap-4">
+          <div class="w-20 h-20 flex-shrink-0 bg-white p-2 border border-[#1f4e3d] rounded-lg flex items-center justify-center">
+            <img src="assets/UUMIS-Logo.jpg" alt="UUMIS Logo" class="w-full h-full object-contain">
+          </div>
+          <div>
+            <h1 class="text-2xl font-black uppercase tracking-widest text-[#1f4e3d] leading-tight m-0">UUMIS<br>INTERNATIONAL<br>SCHOOL</h1>
+            <p class="text-[10px] font-bold text-gray-800 mt-2">Universiti Utara Malaysia, 06010 UUM Sintok, Kedah<br>Darul Aman.</p>
+          </div>
+        </div>
+        <div class="text-right border-l border-gray-300 pl-4 mt-2">
+          <p class="text-lg font-black text-gray-800 uppercase tracking-widest m-0">ATTENDANCE RECORD</p>
+          <p class="text-[10px] text-gray-500 font-bold mt-1 uppercase tracking-widest">{{ selectedYear }} - {{ selectedDate || selectedMonth || selectedYearVal }}</p>
+        </div>
+      </div>
+
+      <table class="w-full text-xs border-collapse mb-8 border border-gray-200">
+        <thead class="bg-emerald-50/50 border-b border-[#e7f3ec]">
+        <tr>
+          <th class="py-3 px-5 text-[9px] font-black text-[#4e976b] uppercase tracking-widest text-left">Student</th>
+          <th class="py-3 px-5 text-[9px] font-black text-[#4e976b] uppercase tracking-widest text-left">ID</th>
+          <th class="py-3 px-5 text-[9px] font-black text-[#4e976b] uppercase tracking-widest text-center">Time In</th>
+          <th class="py-3 px-5 text-[9px] font-black text-[#4e976b] uppercase tracking-widest text-center">Status</th>
+        </tr>
+        </thead>
+        <tbody class="divide-y divide-[#e7f3ec]">
+        <tr *ngFor="let s of filteredStudents">
+          <td class="py-3 px-5 font-bold text-xs text-[#0e1b13] uppercase">{{s.name}}</td>
+          <td class="py-3 px-5 font-mono text-xs text-gray-500">{{s.id}}</td>
+          <td class="py-3 px-5 text-center font-bold text-gray-700">{{s.timeIn}}</td>
+          <td class="py-3 px-5 text-center">
+              <span class="px-2 py-1 rounded-md text-[10px] font-black inline-block min-w-[30px] border border-white"
+                    [ngClass]="{'bg-green-100 text-green-700': s.status === 'PRESENT', 'bg-red-100 text-red-700': s.status === 'ABSENT', 'bg-blue-100 text-blue-700': s.status === 'LATE' || s.status === 'EXCUSED'}">
+                {{s.status}}
+              </span>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
 </div>

@@ -64,9 +64,21 @@ export class TeacherProfileComponent implements OnInit {
             }));
           }
 
+          // THE FIX: Unpack JSON so Teachers see their real name if populated
+          let profileData: any = {};
+          const rawJson = myFreshProfile.profile_json || myFreshProfile.profileJson;
+          if (rawJson) {
+            try { profileData = JSON.parse(rawJson); } catch(e){}
+          }
+          let displayName = myFreshProfile.full_name || myFreshProfile.fullName || myFreshProfile.username;
+          if (profileData.firstName || profileData.lastName || profileData.familyName) {
+            const lName = profileData.lastName || profileData.familyName || '';
+            displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+          }
+
           this.selectedTeacher = {
             dbId: myFreshProfile.id,
-            name: myFreshProfile.full_name || myFreshProfile.fullName || myFreshProfile.username,
+            name: displayName,
             email: myFreshProfile.email || '',
             phone: myFreshProfile.phone || '',
             assignedSubjectsArray: assignedSubjRaw ? assignedSubjRaw.split(',').map((s: string) => s.trim()) : [],
@@ -157,6 +169,11 @@ export class TeacherProfileComponent implements OnInit {
     this.authService.adminUpdateTeacher(this.selectedTeacher.dbId, payload).subscribe({
       next: () => {
         alert('Your Profile Updates have been saved!');
+
+        let lsUser = JSON.parse(localStorage.getItem('user') || '{}');
+        lsUser.fullName = this.selectedTeacher.name;
+        localStorage.setItem('user', JSON.stringify(lsUser));
+
         this.isEditMode = false;
       },
       error: () => alert('Failed to save profile details. Check connection.')

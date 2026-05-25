@@ -55,14 +55,26 @@ export class WalletComponent implements OnInit {
       next: (data: any[]) => {
         this.allStudents = data.map(user => {
           const grade = user.bio || 'Unassigned - Unassigned';
-          // FIX: Split by space-dash-space so "Pre-Kindergarten" doesn't get broken in half!
+          // Split by space-dash-space so "Pre-Kindergarten" doesn't get broken in half!
           const parts = grade.split(' - ');
           const yearStr = parts.length > 1 ? parts[1].trim() : 'Unassigned';
+
+          // THE FIX: Unpack the JSON to get the real First/Last name for the admin wallet list!
+          let profileData: any = {};
+          const rawJson = user.profile_json || user.profileJson;
+          if (rawJson) {
+            try { profileData = JSON.parse(rawJson); } catch(e){}
+          }
+          let displayName = user.fullName || user.username;
+          if (profileData.firstName || profileData.lastName || profileData.familyName) {
+            const lName = profileData.lastName || profileData.familyName || '';
+            displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+          }
 
           return {
             dbId: user.id,
             id: user.studentId || user.verificationCode || user.username || '---',
-            name: user.fullName || user.username || 'No Name',
+            name: displayName || 'No Name', // Override applied here
             class: yearStr,
             year: yearStr,
             balance: user.walletBalance || 0.00,

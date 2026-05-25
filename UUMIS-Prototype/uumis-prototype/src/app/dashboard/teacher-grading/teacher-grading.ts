@@ -30,7 +30,6 @@ export class TeacherGradingComponent implements OnInit {
   showReportModal: boolean = false;
   selectedStudentForReport: any = null;
 
-  // THE FIX: Split grades into main subjects and tasks
   modalMainGrades: any[] = [];
   modalTaskGrades: any[] = [];
   isFetchingReport: boolean = false;
@@ -108,6 +107,23 @@ export class TeacherGradingComponent implements OnInit {
           const targetYear = this.selectedYear.toLowerCase();
 
           return stuYear === targetYear || stuLevel === targetYear;
+        }).map(u => {
+          // THE FIX: Unpack the JSON to get the real First/Last name for the Teacher grading table!
+          let profileData: any = {};
+          const rawJson = u.profile_json || u.profileJson;
+          if (rawJson) {
+            try { profileData = JSON.parse(rawJson); } catch(e){}
+          }
+          let displayName = u.fullName || u.username;
+          if (profileData.firstName || profileData.lastName || profileData.familyName) {
+            const lName = profileData.lastName || profileData.familyName || '';
+            displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+          }
+          return {
+            ...u,
+            fullName: displayName,
+            studentId: u.student_id || u.studentId || '123456'
+          };
         });
 
         const subjectsToFetch = this.selectedSubject === 'All Subjects'
@@ -135,10 +151,16 @@ export class TeacherGradingComponent implements OnInit {
 
               subjectsToFetch.forEach((sub, index) => {
                 const gradesForThisSubject = results[index];
-                const existingGrade = gradesForThisSubject.find(g => g.studentUsername === uniqueId);
+
+                const existingGrade = gradesForThisSubject.find(g => {
+                  const matchID = (g.studentUsername === uniqueId && uniqueId !== '');
+                  const matchName = (g.studentName || '').toLowerCase() === (stu.fullName || '').toLowerCase();
+                  return matchID || matchName;
+                });
 
                 this.students.push({
                   studentUsername: uniqueId,
+                  studentId: stu.studentId || stu.student_id || '123456',
                   name: name,
                   subject: sub,
                   mark: existingGrade ? existingGrade.mark : 0,
@@ -191,12 +213,10 @@ export class TeacherGradingComponent implements OnInit {
 
     this.authService.getStudentGrades(student.studentUsername).subscribe({
       next: (grades: any[]) => {
-        // THE FIX: Filter strictly to the selected Year so old kindergarten grades are hidden!
         const yearGrades = grades.filter(g =>
           (g.yearGroup || '').trim().toLowerCase() === this.selectedYear.trim().toLowerCase()
         );
 
-        // THE FIX: Split Core Subjects from Assignments/Quizzes
         this.modalMainGrades = yearGrades.filter(g =>
           !g.subject.startsWith('TASK_') &&
           !g.subject.startsWith('Assignment:') &&

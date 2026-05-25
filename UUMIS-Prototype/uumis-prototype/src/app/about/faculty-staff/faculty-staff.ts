@@ -1,3 +1,4 @@
+// about/faculty-staff.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
@@ -32,7 +33,6 @@ export class FacultyStaffComponent implements OnInit {
   selectedCV: any = null;
   isLoadingCV: boolean = false;
 
-  // 👉 修复报错：添加翻译相关的变量
   showLangModal: boolean = false;
 
   constructor(
@@ -182,7 +182,6 @@ export class FacultyStaffComponent implements OnInit {
     }
   }
 
-  // 👉 修复报错：添加翻译相关的方法
   toggleLangModal() {
     this.showLangModal = !this.showLangModal;
   }

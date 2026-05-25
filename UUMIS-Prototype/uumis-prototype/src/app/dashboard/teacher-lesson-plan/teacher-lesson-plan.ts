@@ -50,8 +50,14 @@ export class TeacherLessonPlanComponent implements OnInit {
 
   loadPlans() {
     this.authService.getLessonPlans().subscribe({
-      next: (data) => {
-        this.lessonPlans = data.filter(p => p.teacher.includes(this.newPlanForm.teacherName.toUpperCase()));
+      next: (data: any[]) => {
+        // THE FIX: Enforced robust mapping on load to grab the DB's snake_case properties
+        this.lessonPlans = (data || []).map(p => ({
+          ...p,
+          teacherId: p.teacher_id || p.teacherId,
+          pdfUrl: p.pdf_url || p.pdfUrl,
+          fileName: p.file_name || p.fileName
+        })).filter(p => p.teacher && p.teacher.toUpperCase().includes(this.newPlanForm.teacherName.toUpperCase()));
       },
       error: () => console.error("Failed to load lesson plans")
     });
@@ -88,17 +94,22 @@ export class TeacherLessonPlanComponent implements OnInit {
     }
 
     const combinedGrade = `${this.newPlanForm.level} - ${this.newPlanForm.year}`;
+    const generatedId = '#T-' + Math.floor(1000 + Math.random() * 9000);
 
+    // THE FIX: Pass both naming conventions to prevent backend NULL inserts
     const newEntry = {
       teacher: this.newPlanForm.teacherName.toUpperCase(),
-      teacherId: '#T-' + Math.floor(1000 + Math.random() * 9000),
+      teacherId: generatedId,
+      teacher_id: generatedId,
       subject: this.newPlanForm.subjectName.toUpperCase(),
       topic: this.newPlanForm.topic.toUpperCase(),
       grade: combinedGrade.toUpperCase(),
       status: 'Pending Review',
       avatar: this.newPlanForm.teacherName.substring(0, 2).toUpperCase(),
       pdfUrl: this.newPlanForm.fileBlobUrl,
-      fileName: this.newPlanForm.fileName
+      pdf_url: this.newPlanForm.fileBlobUrl,
+      fileName: this.newPlanForm.fileName,
+      file_name: this.newPlanForm.fileName
     };
 
     this.authService.submitLessonPlan(newEntry).subscribe({
@@ -111,7 +122,6 @@ export class TeacherLessonPlanComponent implements OnInit {
     });
   }
 
-  // --- NEW: Delete Plan Logic ---
   deletePlan(plan: any) {
     const confirmDelete = confirm(`Are you sure you want to delete the lesson plan for ${plan.subject}?`);
     if (confirmDelete) {
@@ -119,7 +129,7 @@ export class TeacherLessonPlanComponent implements OnInit {
         this.authService.deleteLessonPlan(plan.id).subscribe({
           next: () => {
             alert("Lesson Plan deleted successfully!");
-            this.loadPlans(); // Refresh the list
+            this.loadPlans();
           },
           error: () => alert("Failed to delete lesson plan.")
         });
@@ -128,8 +138,11 @@ export class TeacherLessonPlanComponent implements OnInit {
   }
 
   viewPDF(plan: any) {
-    if (plan.pdfUrl) {
-      this.currentPdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(plan.pdfUrl);
+    // Check both potential locations
+    const pdfData = plan.pdfUrl || plan.pdf_url;
+
+    if (pdfData) {
+      this.currentPdfUrl = this.sanitizer.bypassSecurityTrustResourceUrl(pdfData);
       this.isViewingPDF = true;
     } else {
       alert('This record was created without a PDF file for preview.');
@@ -141,12 +154,44 @@ export class TeacherLessonPlanComponent implements OnInit {
     this.currentPdfUrl = null;
   }
 
+  // THE FIX: Integrated secure Base64 downloading
   downloadPDF(plan: any) {
-    if (plan.pdfUrl) {
-      const link = document.createElement('a');
-      link.href = plan.pdfUrl;
-      link.download = `${plan.subject}_Plan.pdf`;
-      link.click();
+    const pdfData = plan.pdfUrl || plan.pdf_url;
+    const fName = plan.fileName || plan.file_name || `${plan.subject}_Plan.pdf`;
+
+    if (!pdfData) {
+      alert('No PDF file attached to this record.');
+      return;
+    }
+
+    try {
+      if (pdfData.startsWith('data:')) {
+        const arr = pdfData.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        const blob = new Blob([u8arr], { type: mime });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fName;
+        link.click();
+
+        setTimeout(() => URL.revokeObjectURL(url), 100);
+      } else {
+        const link = document.createElement('a');
+        link.href = pdfData;
+        link.download = fName;
+        link.click();
+      }
+    } catch (e) {
+      console.error('Error downloading file', e);
+      alert('Failed to download the file. The data format may be invalid.');
     }
   }
 }

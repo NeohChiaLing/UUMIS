@@ -20,7 +20,6 @@ export class ParentAttendanceComponent implements OnInit {
   attendanceRecords: any[] = [];
   isLoading: boolean = false;
 
-  // Dynamic calculations
   presentPercentage: number = 100;
   absentDays: number = 0;
 
@@ -32,7 +31,28 @@ export class ParentAttendanceComponent implements OnInit {
     if (this.currentUser && this.currentUser.role.toLowerCase() === 'parent') {
       this.authService.getStudents().subscribe({
         next: (students: any[]) => {
-          this.myChildren = students.filter(s => s.parentId === this.currentUser.id);
+          this.myChildren = students
+            .filter(s => s.parentId === this.currentUser.id || s.parent_id === this.currentUser.id)
+            .map(child => {
+              let profileData: any = {};
+              const rawProfileJson = child.profile_json || child.profileJson;
+              if (rawProfileJson) {
+                try { profileData = JSON.parse(rawProfileJson); } catch (e) {}
+              }
+
+              let displayName = child.fullName || child.username || 'No Name';
+              if (profileData.firstName || profileData.lastName || profileData.familyName) {
+                const lName = profileData.lastName || profileData.familyName || '';
+                displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+              }
+
+              return {
+                ...child,
+                displayName: displayName,
+                fullName: displayName,
+                name: displayName
+              };
+            });
         }
       });
     }
@@ -51,8 +71,6 @@ export class ParentAttendanceComponent implements OnInit {
 
   loadAttendance() {
     this.isLoading = true;
-
-    // Use the bulletproof identifier fallback!
     const targetUsername = this.selectedChild.username || this.selectedChild.email || this.selectedChild.id.toString();
 
     if (!targetUsername) {
@@ -62,11 +80,25 @@ export class ParentAttendanceComponent implements OnInit {
       return;
     }
 
-    // Assuming your authService has a method to get attendance by username (similar to grades)
-    // If your method is named differently (e.g., getStudentAttendance), update it here.
     this.authService.getMyAttendance(targetUsername).subscribe({
       next: (res: any[]) => {
-        this.attendanceRecords = res || [];
+        this.attendanceRecords = (res || []).map(log => {
+          let derivedMcStatus = log.mc_status || log.mcStatus;
+          if (!derivedMcStatus && (log.mc_file || log.mcFile)) {
+            if (log.status === 'EXCUSED') derivedMcStatus = 'Approved';
+            else derivedMcStatus = 'Pending Review';
+          }
+
+          return {
+            ...log,
+            id: log.id,
+            timeIn: log.time_in || log.timeIn || '--:--',
+            mcFile: log.mc_file || log.mcFile || null,
+            mcUrl: log.mc_url || log.mcUrl || null,
+            mcStatus: derivedMcStatus
+          };
+        });
+
         this.calculateStats();
         this.isLoading = false;
       },
@@ -79,23 +111,74 @@ export class ParentAttendanceComponent implements OnInit {
     });
   }
 
+  uploadMC(log: any) {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'application/pdf, image/*';
+    input.onchange = (e: any) => {
+      const file = e.target.files[0];
+      if (file) {
+        log.mcFile = file.name;
+        const reader = new FileReader();
+        reader.onload = (event: any) => {
+          log.mcUrl = event.target.result;
+          log.mcStatus = 'Pending Review';
+          log.status = 'ABSENT';
+
+          const payload = [{
+            id: log.id,
+            studentId: log.student_id || log.studentId || this.selectedChild.studentId || this.selectedChild.student_id || this.selectedChild.username,
+            student_id: log.student_id || log.studentId || this.selectedChild.studentId || this.selectedChild.student_id || this.selectedChild.username,
+            studentName: log.student_name || log.studentName || this.selectedChild.fullName || this.selectedChild.username,
+            student_name: log.student_name || log.studentName || this.selectedChild.fullName || this.selectedChild.username,
+            yearGroup: log.year_group || log.yearGroup || this.selectedChild.bio || 'Unassigned',
+            year_group: log.year_group || log.yearGroup || this.selectedChild.bio || 'Unassigned',
+            date: log.date,
+            timeIn: log.timeIn,
+            time_in: log.timeIn,
+            status: log.status,
+            mcFile: log.mcFile,
+            mc_file: log.mcFile,
+            mcUrl: log.mcUrl,
+            mc_url: log.mcUrl,
+            mcStatus: log.mcStatus,
+            mc_status: log.mcStatus
+          }];
+
+          this.authService.saveAttendance(payload).subscribe({
+            next: () => alert('MC Uploaded successfully. Awaiting Admin review!'),
+            error: () => alert('Failed to sync upload with server.')
+          });
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
+  }
+
+  downloadMC(log: any) {
+    if (log.mcUrl) {
+      const a = document.createElement('a');
+      a.href = log.mcUrl;
+      a.download = log.mcFile || 'MC_Document.pdf';
+      a.click();
+    }
+  }
+
   calculateStats() {
     if (this.attendanceRecords.length === 0) {
-      this.presentPercentage = 0; // Or 100, depending on how you want to show a blank slate
+      this.presentPercentage = 0;
       this.absentDays = 0;
       return;
     }
 
     const totalDays = this.attendanceRecords.length;
 
-    // Count exactly how many days the status was "Absent"
     this.absentDays = this.attendanceRecords.filter(r =>
       r.status && r.status.toLowerCase() === 'absent'
     ).length;
 
     const presentDays = totalDays - this.absentDays;
-
-    // Calculate percentage and round to nearest whole number
     this.presentPercentage = Math.round((presentDays / totalDays) * 100);
   }
 

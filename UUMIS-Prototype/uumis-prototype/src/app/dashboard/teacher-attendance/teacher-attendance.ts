@@ -48,7 +48,6 @@ export class TeacherAttendanceComponent implements OnInit {
     this.authService.getUsers().subscribe({
       next: (users: any[]) => {
 
-        // THE FIX: Correctly search the 'users' array instead of the undefined 'teachers' variable!
         const myFreshProfile = users.find(u =>
           u.id === localUser.id ||
           (u.email && u.email === localUser.email) ||
@@ -64,7 +63,6 @@ export class TeacherAttendanceComponent implements OnInit {
             return parts.length > 1 ? parts[1].trim() : parts[0].trim();
           }).filter((y: string) => y !== 'Unassigned' && y !== '');
 
-          // Fallback just in case
           if (this.years.length === 0) this.years = ['Year 1', 'Year 2', 'Year 3'];
 
           if (this.years.length > 0) {
@@ -106,10 +104,22 @@ export class TeacherAttendanceComponent implements OnInit {
               const uniqueId = stu.student_id || stu.studentId || stu.username || stu.email || stu.id.toString();
               const record = attendanceRecords.find(r => r.student_id === uniqueId || r.studentId === uniqueId);
 
+              // THE FIX: Added JSON Unpacking Engine
+              let profileData: any = {};
+              const rawProfileJson = stu.profile_json || stu.profileJson;
+              if (rawProfileJson) {
+                try { profileData = JSON.parse(rawProfileJson); } catch (e) {}
+              }
+              let displayName = stu.fullName || stu.username || 'Unknown Student';
+              if (profileData.firstName || profileData.lastName || profileData.familyName) {
+                const lName = profileData.lastName || profileData.familyName || '';
+                displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+              }
+
               return {
                 dbId: record ? record.id : null,
                 id: uniqueId,
-                name: stu.fullName || stu.username || 'Unknown Student',
+                name: displayName,
                 class: this.selectedYear,
                 timeIn: record ? (record.time_in || record.timeIn || '--:--') : '--:--',
                 status: record ? String(record.status).toUpperCase() : 'ABSENT',

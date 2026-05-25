@@ -39,10 +39,22 @@ export class RefundComponent implements OnInit {
           const parts = grade.includes(' - ') ? grade.split(' - ') : grade.split('-');
           const yearStr = parts.length > 1 ? parts[1].trim() : 'Unassigned';
 
+          // THE FIX: Unpack the JSON to get the real First/Last name for the admin refund list!
+          let profileData: any = {};
+          const rawJson = user.profile_json || user.profileJson;
+          if (rawJson) {
+            try { profileData = JSON.parse(rawJson); } catch(e){}
+          }
+          let displayName = user.fullName || user.username;
+          if (profileData.firstName || profileData.lastName || profileData.familyName) {
+            const lName = profileData.lastName || profileData.familyName || '';
+            displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+          }
+
           return {
             dbId: user.id,
             id: user.studentId || user.verificationCode || user.username || '---',
-            name: user.fullName || user.username || 'No Name',
+            name: displayName || 'No Name', // Override applied here
             class: yearStr,
             year: yearStr
           };

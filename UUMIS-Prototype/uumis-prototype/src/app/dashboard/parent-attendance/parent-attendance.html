@@ -1,107 +1,144 @@
 <div class="min-h-screen bg-[#f0fdf4] font-display text-slate-800 flex flex-col relative">
 
-  <div *ngIf="viewState === 'children'" class="flex-1 flex flex-col h-full animate-fade-in p-8 lg:p-12">
+  <div *ngIf="viewState === 'children'" class="flex-1 flex flex-col h-full animate-fade-in p-4 sm:p-8 lg:p-12 overflow-y-auto">
     <div class="max-w-6xl mx-auto w-full">
-      <header class="flex items-center gap-6 mb-10">
-        <button (click)="goBack()" class="size-11 flex items-center justify-center rounded-full bg-white border border-emerald-100 text-slate-400 hover:text-emerald-500 shadow-sm transition-all">
-          <span translate="no" class="material-symbols-outlined notranslate font-bold">arrow_back</span>
+      <header class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-6 sm:mb-10">
+        <button (click)="goBack()" class="size-9 sm:size-11 flex-none flex items-center justify-center rounded-full bg-white border border-emerald-100 text-slate-400 hover:text-emerald-500 shadow-sm transition-all">
+          <span translate="no" class="material-symbols-outlined notranslate font-bold text-[20px] sm:text-[24px]">arrow_back</span>
         </button>
         <div>
-          <h1 class="text-3xl font-black text-emerald-900 uppercase">My <span class="text-emerald-500">Children</span></h1>
-          <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-1">Select a child to view their attendance</p>
+          <h1 class="text-2xl sm:text-3xl font-black text-emerald-900 uppercase tracking-tight">My <span class="text-emerald-500">Children</span></h1>
+          <p class="text-[9px] sm:text-[10px] text-slate-400 font-black uppercase tracking-[0.1em] sm:tracking-[0.2em] mt-1">Select a child to view their attendance</p>
         </div>
       </header>
 
-      <div *ngIf="myChildren.length === 0" class="h-64 flex flex-col items-center justify-center text-slate-400 opacity-60 bg-white rounded-[3rem] border border-emerald-50 shadow-sm">
-        <span translate="no" class="material-symbols-outlined notranslate text-6xl mb-4">link_off</span>
-        <p class="text-sm font-black uppercase tracking-widest">No Children Linked</p>
+      <div *ngIf="myChildren.length === 0" class="h-48 sm:h-64 flex flex-col items-center justify-center text-slate-400 opacity-60 bg-white rounded-[2rem] sm:rounded-[3rem] border border-emerald-50 shadow-sm">
+        <span translate="no" class="material-symbols-outlined notranslate text-5xl sm:text-6xl mb-3 sm:mb-4">link_off</span>
+        <p class="text-xs sm:text-sm font-black uppercase tracking-widest">No Children Linked</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div *ngFor="let child of myChildren" (click)="selectChild(child)" class="bg-white p-8 rounded-[2.5rem] border border-emerald-50 shadow-sm hover:shadow-xl hover:border-emerald-300 hover:scale-[1.02] transition-all cursor-pointer group flex flex-col items-center text-center gap-4 relative overflow-hidden">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        <div *ngFor="let child of myChildren" (click)="selectChild(child)" class="bg-white p-6 sm:p-8 rounded-[2rem] sm:rounded-[2.5rem] border border-emerald-50 shadow-sm hover:shadow-xl hover:border-emerald-300 hover:scale-[1.02] transition-all cursor-pointer group flex flex-col items-center text-center gap-3 sm:gap-4 relative overflow-hidden">
           <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-            <span translate="no" class="material-symbols-outlined notranslate text-8xl text-emerald-600">face</span>
+            <span translate="no" class="material-symbols-outlined notranslate text-6xl sm:text-8xl text-emerald-600">face</span>
           </div>
 
-          <div class="size-24 rounded-full bg-emerald-50 p-1 shadow-inner group-hover:scale-105 transition-transform relative z-10">
+          <div class="size-20 sm:size-24 rounded-full bg-emerald-50 p-1 shadow-inner group-hover:scale-105 transition-transform relative z-10">
             <div class="w-full h-full rounded-full bg-emerald-100 flex items-center justify-center overflow-hidden border-2 border-white">
               <img *ngIf="child.avatar" [src]="child.avatar" class="w-full h-full object-cover">
-              <span *ngIf="!child.avatar" class="text-2xl font-black text-emerald-600">{{ getInitials(child.fullName || child.username) }}</span>
+              <span *ngIf="!child.avatar" class="text-xl sm:text-2xl font-black text-emerald-600">{{ getInitials(child.fullName || child.username) }}</span>
             </div>
           </div>
           <div class="relative z-10">
-            <h3 class="text-xl font-black text-slate-800">{{ child.fullName || child.username || 'No Name' }}</h3>
-            <p class="text-[10px] font-black text-emerald-500 uppercase tracking-widest mt-1">Class: {{ child.bio || 'Unassigned' }}</p>
+            <h3 class="text-lg sm:text-xl font-black text-slate-800">{{ child.fullName || child.username || 'No Name' }}</h3>
+            <p class="text-[9px] sm:text-[10px] font-black text-emerald-500 uppercase tracking-widest mt-1">Class: {{ child.bio || 'Unassigned' }}</p>
           </div>
-          <button class="mt-4 w-full py-3 rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white font-black text-[10px] uppercase tracking-widest transition-all relative z-10">
+          <button class="mt-2 sm:mt-4 w-full py-2.5 sm:py-3 rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-500 group-hover:text-white font-black text-[9px] sm:text-[10px] uppercase tracking-widest transition-all relative z-10">
             View Attendance
           </button>
         </div>
       </div>
+
+      <div class="h-24 md:h-32 w-full shrink-0"></div>
     </div>
   </div>
 
 
-  <div *ngIf="viewState === 'attendance'" class="flex-1 flex flex-col h-full animate-fade-in p-6 lg:p-10">
-    <div class="max-w-5xl mx-auto w-full space-y-8">
+  <div *ngIf="viewState === 'attendance'" class="flex-1 flex flex-col h-full animate-fade-in p-4 sm:p-6 lg:p-10 overflow-y-auto">
+    <div class="max-w-5xl mx-auto w-full space-y-6 sm:space-y-8">
 
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div class="flex items-center gap-5">
-          <button (click)="goBack()" class="size-11 flex items-center justify-center rounded-full bg-white border border-emerald-100 text-slate-400 hover:text-emerald-500 shadow-sm transition-all">
-            <span translate="no" class="material-symbols-outlined notranslate font-bold">arrow_back</span>
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 sm:gap-6">
+        <div class="flex items-center gap-3 sm:gap-5 w-full md:w-auto">
+          <button (click)="goBack()" class="size-9 sm:size-11 flex-none flex items-center justify-center rounded-full bg-white border border-emerald-100 text-slate-400 hover:text-emerald-500 shadow-sm transition-all">
+            <span translate="no" class="material-symbols-outlined notranslate font-bold text-[20px] sm:text-[24px]">arrow_back</span>
           </button>
-          <div>
-            <h1 class="text-3xl font-black uppercase tracking-tight text-emerald-900">
+          <div class="min-w-0">
+            <h1 class="text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tight text-emerald-900 truncate">
               {{ selectedChild ? (selectedChild.fullName || 'Child').split(' ')[0] + "'s" : 'My' }} <span class="text-emerald-500">Attendance</span>
             </h1>
-            <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mt-1">Presence Log</p>
+            <p class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-widest mt-0.5 sm:mt-1">Presence Log</p>
           </div>
         </div>
 
-        <div class="flex items-center gap-3">
-          <span class="px-4 py-2 bg-green-100 text-green-700 rounded-full text-xs font-black tracking-widest shadow-sm">
+        <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto">
+          <span class="flex-1 md:flex-none text-center px-3 sm:px-4 py-2 bg-green-100 text-green-700 rounded-full text-[10px] sm:text-xs font-black tracking-widest shadow-sm">
             PRESENT: {{ presentPercentage }}%
           </span>
-          <span class="px-4 py-2 bg-red-100 text-red-700 rounded-full text-xs font-black tracking-widest shadow-sm">
+          <span class="flex-1 md:flex-none text-center px-3 sm:px-4 py-2 bg-red-100 text-red-700 rounded-full text-[10px] sm:text-xs font-black tracking-widest shadow-sm whitespace-nowrap">
             ABSENT: {{ absentDays }} DAYS
           </span>
         </div>
       </div>
 
-      <div *ngIf="isLoading" class="text-center py-20 text-emerald-500 animate-pulse font-bold">
+      <div *ngIf="isLoading" class="text-center py-10 sm:py-20 text-emerald-500 animate-pulse font-bold text-sm sm:text-base">
         Loading attendance records...
       </div>
 
-      <div *ngIf="!isLoading && attendanceRecords.length === 0" class="bg-white rounded-[2.5rem] border border-emerald-100 shadow-sm flex flex-col items-center justify-center h-64">
-        <span translate="no" class="material-symbols-outlined notranslate text-6xl text-emerald-100 mb-4">calendar_today</span>
-        <p class="text-sm font-black uppercase tracking-widest text-slate-400">No Attendance Logs Found.</p>
+      <div *ngIf="!isLoading && attendanceRecords.length === 0" class="bg-white rounded-[2rem] sm:rounded-[2.5rem] border border-emerald-100 shadow-sm flex flex-col items-center justify-center h-48 sm:h-64">
+        <span translate="no" class="material-symbols-outlined notranslate text-5xl sm:text-6xl text-emerald-100 mb-3 sm:mb-4">calendar_today</span>
+        <p class="text-xs sm:text-sm font-black uppercase tracking-widest text-slate-400">No Attendance Logs Found.</p>
       </div>
 
-      <div *ngIf="!isLoading && attendanceRecords.length > 0" class="bg-white rounded-[2.5rem] border border-emerald-100 overflow-hidden shadow-xl shadow-emerald-500/5">
-        <table class="w-full text-left">
+      <div *ngIf="!isLoading && attendanceRecords.length > 0" class="bg-white rounded-[1.5rem] sm:rounded-[2.5rem] border border-emerald-100 overflow-x-auto shadow-xl shadow-emerald-500/5 custom-scrollbar" style="-webkit-overflow-scrolling: touch;">
+        <table class="w-full min-w-[600px] text-left border-collapse">
           <thead class="bg-emerald-50/50 border-b border-emerald-100">
           <tr>
-            <th class="p-6 text-[10px] font-black uppercase text-emerald-800 tracking-widest">Date</th>
-            <th class="p-6 text-[10px] font-black uppercase text-emerald-800 tracking-widest">Status</th>
-            <th class="p-6 text-[10px] font-black uppercase text-emerald-800 tracking-widest">Remarks</th>
+            <th class="p-4 sm:p-6 text-[9px] sm:text-[10px] font-black uppercase text-emerald-800 tracking-widest whitespace-nowrap w-[20%]">Date</th>
+            <th class="p-4 sm:p-6 text-[9px] sm:text-[10px] font-black uppercase text-emerald-800 tracking-widest whitespace-nowrap w-[20%]">Status</th>
+            <th class="p-4 sm:p-6 text-[9px] sm:text-[10px] font-black uppercase text-emerald-800 tracking-widest whitespace-nowrap w-[60%]">Medical Certificate (MC)</th>
           </tr>
           </thead>
           <tbody class="divide-y divide-emerald-50">
           <tr *ngFor="let log of attendanceRecords" class="hover:bg-emerald-50/20 transition-colors">
-            <td class="p-6 font-bold text-slate-700">{{ log.date | date:'mediumDate' }}</td>
-            <td class="p-6">
-              <span [class]="getStatusClass(log.status)" class="px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider">
+            <td class="p-4 sm:p-6 font-bold text-xs sm:text-sm text-slate-700 whitespace-nowrap">{{ log.date | date:'mediumDate' }}</td>
+            <td class="p-4 sm:p-6">
+              <span [class]="getStatusClass(log.status)" class="px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-wider whitespace-nowrap border border-white shadow-sm inline-block">
                 {{ log.status }}
               </span>
             </td>
-            <td class="p-6 text-sm font-medium text-slate-500">
-              {{ log.remarks || '-' }}
+
+            <td class="p-4 sm:p-6 min-w-[250px] md:min-w-[350px]">
+
+              <div class="flex flex-row flex-wrap items-center justify-start gap-4 w-full" *ngIf="log.status === 'ABSENT' || log.status === 'EXCUSED' || log.mcFile">
+
+                <div class="flex items-center gap-2">
+                  <ng-container *ngIf="log.mcFile">
+                    <span class="truncate max-w-[120px] sm:max-w-[150px] text-[10px] font-bold text-emerald-600 border border-emerald-100 bg-emerald-50 px-2 py-1.5 rounded shadow-sm" [title]="log.mcFile">{{ log.mcFile }}</span>
+                    <span class="px-2 py-1.5 rounded text-[8px] sm:text-[9px] font-black uppercase shadow-sm border whitespace-nowrap"
+                          [ngClass]="{
+                            'bg-blue-50 text-blue-600 border-blue-200': log.mcStatus === 'Pending Review',
+                            'bg-emerald-50 text-emerald-600 border-emerald-200': log.mcStatus === 'Approved',
+                            'bg-rose-50 text-rose-500 border-rose-200': log.mcStatus === 'Failed'
+                          }">
+                          {{ log.mcStatus || 'Pending Review' }}
+                    </span>
+                  </ng-container>
+                  <span *ngIf="!log.mcFile" class="text-rose-400 text-[10px] font-bold uppercase italic whitespace-nowrap">No MC Uploaded</span>
+                </div>
+
+                <div class="flex flex-row items-center gap-2">
+                  <button (click)="uploadMC(log)"
+                          [disabled]="log.mcStatus === 'Approved'"
+                          [ngClass]="log.mcStatus === 'Approved' ? 'bg-slate-50 border-slate-200 text-slate-400 cursor-not-allowed shadow-none' : 'bg-white border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 shadow-sm'"
+                          class="px-3 py-1.5 rounded-lg text-[9px] sm:text-[10px] font-black uppercase transition-colors flex items-center justify-center gap-1.5 whitespace-nowrap border">
+                    <span translate="no" class="material-symbols-outlined notranslate text-[14px]">upload_file</span> {{ log.mcFile ? 'Re-upload' : 'Upload MC' }}
+                  </button>
+                  <button *ngIf="log.mcUrl" (click)="downloadMC(log)" class="bg-white border border-slate-200 text-slate-600 px-3 py-1.5 rounded-lg text-[9px] sm:text-[10px] font-black uppercase hover:bg-slate-50 transition-colors flex items-center justify-center gap-1.5 shadow-sm whitespace-nowrap">
+                    <span translate="no" class="material-symbols-outlined notranslate text-[14px]">download</span> Download
+                  </button>
+                </div>
+
+              </div>
+
+              <span *ngIf="!log.mcFile && (log.status === 'PRESENT' || log.status === 'LATE')" class="text-gray-300 font-bold block mt-1">-</span>
             </td>
+
           </tr>
           </tbody>
         </table>
       </div>
 
+      <div class="h-24 md:h-32 w-full shrink-0"></div>
     </div>
   </div>
 

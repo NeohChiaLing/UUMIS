@@ -80,7 +80,6 @@ export class HomeComponent implements OnInit {
         desc: 'Take a journey through our state-of-the-art facilities, modern classrooms, and vibrant student life.'
       };
     }
-    // NEW: Default Editable Shortcuts
     if (!defaultData.shortcuts) {
       defaultData.shortcuts = [
         { title: 'Board of Governors', subtitle: 'Meet the leadership', link: '/about/board', image: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=1080&q=90' },
@@ -94,7 +93,6 @@ export class HomeComponent implements OnInit {
       next: (data) => {
         if (data && data.length > 5) {
           this.pageData = JSON.parse(data);
-          // Failsafe in case existing DB doesn't have shortcuts yet
           if(!this.pageData.shortcuts) this.pageData.shortcuts = defaultData.shortcuts;
         } else {
           this.pageData = defaultData;
@@ -136,7 +134,7 @@ export class HomeComponent implements OnInit {
     else if (type === 'video') this.editData = { ...this.pageData.videoText, url: this.pageData.videoSection.youtubeUrl };
     else if (type === 'announcement') this.editData = { ...item };
     else if (type === 'event') this.editData = item ? { ...item } : { month: '', day: '', title: '', subtitle: '' };
-    else if (type === 'shortcut') this.editData = { ...item }; // NEW: Handle Shortcut edit
+    else if (type === 'shortcut') this.editData = { ...item };
   }
 
   closeEditModal() { this.editMode = null; this.editData = {}; }
@@ -154,7 +152,6 @@ export class HomeComponent implements OnInit {
       else this.pageData.events.push({ ...this.editData });
     }
     else if (this.editMode === 'shortcut') {
-      // NEW: Save Shortcut edit
       this.pageData.shortcuts[this.editIndex] = { ...this.editData };
     }
     this.closeEditModal();

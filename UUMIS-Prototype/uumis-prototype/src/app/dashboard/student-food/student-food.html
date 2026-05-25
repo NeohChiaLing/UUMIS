@@ -1,72 +1,74 @@
-<div class="min-h-screen bg-[#f0fdf4] font-display text-slate-800 p-6 lg:p-10 pb-20">
+<div class="min-h-screen bg-[#f0fdf4] font-display text-slate-800 p-4 sm:p-6 lg:p-10 pb-20">
 
-  <div class="max-w-6xl mx-auto space-y-10">
+  <div class="max-w-6xl mx-auto space-y-6 sm:space-y-10 w-full">
 
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
-      <div class="flex items-center gap-5">
-        <button (click)="goBack()" class="size-12 flex items-center justify-center rounded-2xl bg-white border border-emerald-100 text-slate-400 hover:text-emerald-600 hover:border-emerald-200 shadow-sm transition-all group">
-          <span translate="no" class="material-symbols-outlined notranslate group-hover:-translate-x-1 transition-transform">arrow_back</span>
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 sm:gap-6">
+      <div class="flex items-center gap-3 sm:gap-5 w-full md:w-auto">
+        <button (click)="goBack()" class="size-10 sm:size-12 flex-none flex items-center justify-center rounded-xl sm:rounded-2xl bg-white border border-emerald-100 text-slate-400 hover:text-emerald-600 hover:border-emerald-200 shadow-sm transition-all group shrink-0">
+          <span translate="no" class="material-symbols-outlined notranslate group-hover:-translate-x-1 transition-transform text-[20px] sm:text-[24px]">arrow_back</span>
         </button>
-        <div>
-          <h1 class="text-4xl font-black uppercase tracking-tight text-emerald-950">Food <span class="text-emerald-500">Menu</span></h1>
-          <p class="text-slate-500 font-bold text-sm mt-1">Browse the cafeteria menu (Parents must place orders)</p>
+        <div class="min-w-0">
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-tight text-emerald-950 truncate">Food <span class="text-emerald-500">Menu</span></h1>
+          <p class="text-slate-500 font-bold text-xs sm:text-sm mt-0.5 sm:mt-1 truncate">Browse the cafeteria menu (Parents order)</p>
         </div>
       </div>
     </div>
 
-    <div class="space-y-6">
-      <div class="sticky top-0 z-10 py-4 bg-[#f0fdf4]/95 backdrop-blur-sm flex items-center gap-3 border-b border-emerald-50/50">
-        <span class="p-2.5 bg-orange-100 text-orange-600 rounded-xl"><span translate="no" class="material-symbols-outlined notranslate">bakery_dining</span></span>
-        <h3 class="text-2xl font-black text-emerald-900 uppercase tracking-tight">Breakfast Menu</h3>
+    <div class="space-y-4 sm:space-y-6">
+      <div class="sticky top-0 z-10 py-3 sm:py-4 bg-[#f0fdf4]/95 backdrop-blur-sm flex items-center gap-2 sm:gap-3 border-b border-emerald-50/50">
+        <span class="p-2 sm:p-2.5 bg-orange-100 text-orange-600 rounded-lg sm:rounded-xl shrink-0"><span translate="no" class="material-symbols-outlined notranslate text-[20px] sm:text-[24px]">bakery_dining</span></span>
+        <h3 class="text-xl sm:text-2xl font-black text-emerald-900 uppercase tracking-tight truncate">Breakfast Menu</h3>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div *ngFor="let item of breakfastMenu" class="bg-white p-6 rounded-[2rem] border border-emerald-50 shadow-sm relative overflow-hidden">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div *ngFor="let item of breakfastMenu" class="bg-white p-5 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border border-emerald-50 shadow-sm relative overflow-hidden flex flex-col hover:shadow-md transition-shadow hover:border-emerald-100">
 
-          <div class="mb-5 relative z-10">
-            <div class="size-14 rounded-2xl flex items-center justify-center text-3xl bg-orange-50 text-orange-400">
+          <div class="mb-4 sm:mb-5 relative z-10 shrink-0">
+            <div class="size-12 sm:size-14 rounded-xl sm:rounded-2xl flex items-center justify-center text-2xl sm:text-3xl bg-orange-50 text-orange-400">
               <span translate="no" class="material-symbols-outlined notranslate">restaurant</span>
             </div>
           </div>
 
-          <div class="space-y-2 mb-6 relative z-10">
-            <h4 class="text-xl font-black text-slate-800 leading-tight">{{item.name}}</h4>
-            <p class="text-sm font-medium text-slate-400 leading-relaxed">{{item.description}}</p>
+          <div class="space-y-1.5 sm:space-y-2 mb-4 sm:mb-6 relative z-10 flex-1">
+            <h4 class="text-lg sm:text-xl font-black text-slate-800 leading-tight">{{item.name}}</h4>
+            <p class="text-xs sm:text-sm font-medium text-slate-400 leading-relaxed line-clamp-3 sm:line-clamp-none">{{item.description}}</p>
           </div>
 
-          <div class="pt-4 border-t border-slate-50 flex justify-between items-center relative z-10">
-            <span class="text-2xl font-black text-slate-700 tracking-tight">RM {{item.price.toFixed(2)}}</span>
+          <div class="pt-3 sm:pt-4 border-t border-slate-50 flex justify-between items-center relative z-10 shrink-0">
+            <span class="text-xl sm:text-2xl font-black text-slate-700 tracking-tight">RM {{item.price.toFixed(2)}}</span>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="space-y-6">
-      <div class="sticky top-0 z-10 py-4 bg-[#f0fdf4]/95 backdrop-blur-sm flex items-center gap-3 border-b border-emerald-50/50">
-        <span class="p-2.5 bg-sky-100 text-sky-600 rounded-xl"><span translate="no" class="material-symbols-outlined notranslate">lunch_dining</span></span>
-        <h3 class="text-2xl font-black text-emerald-900 uppercase tracking-tight">Lunch Menu</h3>
+    <div class="space-y-4 sm:space-y-6">
+      <div class="sticky top-0 z-10 py-3 sm:py-4 bg-[#f0fdf4]/95 backdrop-blur-sm flex items-center gap-2 sm:gap-3 border-b border-emerald-50/50">
+        <span class="p-2 sm:p-2.5 bg-sky-100 text-sky-600 rounded-lg sm:rounded-xl shrink-0"><span translate="no" class="material-symbols-outlined notranslate text-[20px] sm:text-[24px]">lunch_dining</span></span>
+        <h3 class="text-xl sm:text-2xl font-black text-emerald-900 uppercase tracking-tight truncate">Lunch Menu</h3>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div *ngFor="let item of lunchMenu" class="bg-white p-6 rounded-[2rem] border border-sky-50 shadow-sm relative overflow-hidden">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div *ngFor="let item of lunchMenu" class="bg-white p-5 sm:p-6 rounded-[1.5rem] sm:rounded-[2rem] border border-sky-50 shadow-sm relative overflow-hidden flex flex-col hover:shadow-md transition-shadow hover:border-sky-100">
 
-          <div class="mb-5 relative z-10">
-            <div class="size-14 rounded-2xl flex items-center justify-center text-3xl bg-blue-50 text-blue-300">
+          <div class="mb-4 sm:mb-5 relative z-10 shrink-0">
+            <div class="size-12 sm:size-14 rounded-xl sm:rounded-2xl flex items-center justify-center text-2xl sm:text-3xl bg-blue-50 text-blue-300">
               <span translate="no" class="material-symbols-outlined notranslate">fastfood</span>
             </div>
           </div>
 
-          <div class="space-y-2 mb-6 relative z-10">
-            <h4 class="text-xl font-black text-slate-800 leading-tight">{{item.name}}</h4>
-            <p class="text-sm font-medium text-slate-400 leading-relaxed">{{item.description}}</p>
+          <div class="space-y-1.5 sm:space-y-2 mb-4 sm:mb-6 relative z-10 flex-1">
+            <h4 class="text-lg sm:text-xl font-black text-slate-800 leading-tight">{{item.name}}</h4>
+            <p class="text-xs sm:text-sm font-medium text-slate-400 leading-relaxed line-clamp-3 sm:line-clamp-none">{{item.description}}</p>
           </div>
 
-          <div class="pt-4 border-t border-slate-50 flex justify-between items-center relative z-10">
-            <span class="text-2xl font-black text-slate-700 tracking-tight">RM {{item.price.toFixed(2)}}</span>
+          <div class="pt-3 sm:pt-4 border-t border-slate-50 flex justify-between items-center relative z-10 shrink-0">
+            <span class="text-xl sm:text-2xl font-black text-slate-700 tracking-tight">RM {{item.price.toFixed(2)}}</span>
           </div>
         </div>
       </div>
     </div>
+
+    <div class="h-24 md:h-32 w-full shrink-0"></div>
 
   </div>
 </div>

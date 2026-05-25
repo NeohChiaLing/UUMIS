@@ -26,6 +26,8 @@ export class StudentDashboardComponent implements OnInit {
   upcomingSubjects: any[] = [];
   completedSubjects: any[] = [];
 
+  isMobileMenuOpen: boolean = false;
+
   fullHeaders: string[] = [];
   fullRows: string[][] = [];
   days = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY'];
@@ -43,48 +45,58 @@ export class StudentDashboardComponent implements OnInit {
     const savedWeekView = sessionStorage.getItem('uumis_studentShowFullWeek');
     if (savedWeekView) this._showFullTimetable = (savedWeekView === 'true');
 
-    if (typeof localStorage !== 'undefined') {
-      const userStr = localStorage.getItem('user');
-      if (userStr) {
-        try {
-          this.currentUser = JSON.parse(userStr);
+    // Use the reliable authService method
+    this.currentUser = this.authService.getCurrentUser();
 
-          const role = this.currentUser.role ? this.currentUser.role.toLowerCase().trim() : '';
+    if (this.currentUser) {
+      const role = this.currentUser.role ? this.currentUser.role.toLowerCase().trim() : '';
 
-          if (role !== 'student' && role !== 'parent') {
-            alert('Access Denied: You are not authorized to view the Student Portal.');
-            this.authService.logout();
-            this.router.navigate(['/login']);
-            return;
-          }
-
-          if (role === 'parent') {
-            this.studentName = "My Child's Dashboard";
-            this.studentInitials = "PR";
-            this.studentGrade = "N/A";
-          } else {
-            this.studentName = this.currentUser.fullName || this.currentUser.username;
-            this.studentInitials = this.getInitials(this.studentName);
-            this.studentGrade = this.currentUser.bio || 'Unassigned';
-          }
-
-          // THE FIX: Do NOT split the bio! Use the exact "Level - Year" string (e.g., "Primary - Year 1")
-          let exactScheduleKey = 'Kindergarten - Pre-Kindergarten';
-          if (this.currentUser.bio && this.currentUser.bio !== 'Unassigned' && role !== 'parent') {
-            exactScheduleKey = this.currentUser.bio.trim();
-          }
-
-          const date = new Date();
-          this.todayDate = date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
-          this.todayDayName = date.toLocaleDateString('en-GB', { weekday: 'long' }).toUpperCase();
-
-          // THE FIX: Pass the combined key to the database!
-          this.loadTodayTimetable(exactScheduleKey);
-
-        } catch (e) {}
-      } else {
+      if (role !== 'student' && role !== 'parent') {
+        alert('Access Denied: You are not authorized to view the Student Portal.');
+        this.authService.logout();
         this.router.navigate(['/login']);
+        return;
       }
+
+      if (role === 'parent') {
+        this.studentName = "My Child's Dashboard";
+        this.studentInitials = "PR";
+        this.studentGrade = "N/A";
+      } else {
+        // THE FIX: Unpack JSON so Student sees their real name if populated
+        let profileData: any = {};
+        const rawJson = this.currentUser.profileJson || this.currentUser.profile_json;
+        if (rawJson) {
+          try {
+            profileData = typeof rawJson === 'string' ? JSON.parse(rawJson) : rawJson;
+          } catch(e){}
+        }
+
+        let displayName = this.currentUser.fullName || this.currentUser.full_name || this.currentUser.username || 'Student User';
+        if (profileData.firstName || profileData.lastName || profileData.familyName) {
+          const fName = profileData.firstName || '';
+          const mName = profileData.middleName || '';
+          const lName = profileData.lastName || profileData.familyName || '';
+          displayName = [fName, mName, lName].filter(Boolean).join(' ');
+        }
+
+        this.studentName = displayName;
+        this.studentInitials = this.getInitials(this.studentName);
+        this.studentGrade = this.currentUser.bio || 'Unassigned';
+      }
+
+      let exactScheduleKey = 'Kindergarten - Pre-Kindergarten';
+      if (this.currentUser.bio && this.currentUser.bio !== 'Unassigned' && role !== 'parent') {
+        exactScheduleKey = this.currentUser.bio.trim();
+      }
+
+      const date = new Date();
+      this.todayDate = date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+      this.todayDayName = date.toLocaleDateString('en-GB', { weekday: 'long' }).toUpperCase();
+
+      this.loadTodayTimetable(exactScheduleKey);
+    } else {
+      this.router.navigate(['/login']);
     }
   }
 
@@ -108,14 +120,12 @@ export class StudentDashboardComponent implements OnInit {
       next: (res: any) => {
         if (res && res.headers) {
           const headers = JSON.parse(res.headers);
-          // THE FIX: Account for the snake_case vs camelCase mismatch!
           const rows = JSON.parse(res.gridData || res.grid_data);
 
           this.fullHeaders = headers;
           this.fullRows = rows;
 
           let dayIndex = this.days.indexOf(this.todayDayName);
-          // Fallback to Sunday if they open it on a Friday/Saturday
           if (dayIndex === -1) {
             dayIndex = 0;
             this.todayDate += ' (Showing Sunday)';

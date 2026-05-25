@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-transparent font-display text-slate-900 relative overflow-x-hidden pb-32">
+<div class="min-h-screen bg-transparent font-display text-slate-900 relative overflow-x-hidden pb-10">
   <div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
     <div class="absolute -top-40 -right-40 w-[800px] h-[800px] bg-sky-200/40 rounded-full blur-[120px] bubble-float"></div>
     <div class="absolute top-1/4 -left-48 w-[600px] h-[600px] bg-blue-400/20 rounded-full blur-[100px] bubble-float-alt" style="animation-delay: -5s;"></div>
@@ -14,7 +14,7 @@
   <app-navbar></app-navbar>
 
   <section class="relative w-full h-auto md:h-[calc(100vh-80px)] min-h-[500px] md:min-h-[600px] flex items-center justify-center text-center group rounded-b-[2rem] sm:rounded-b-[4rem] overflow-hidden shadow-2xl mt-0 py-16 md:py-0">
-    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105 z-0" [style.background-image]="'url(' + (pageData.hero?.bgImage || 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1920&q=80') + ')'"></div>
+    <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105 z-0" [style.background-image]="'url(' + (pageData.hero?.bgImage || 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1920&q=80') + ')'"></div>
     <div class="absolute inset-0 bg-black/30 z-0"></div>
 
     <button *ngIf="isAdmin" (click)="openEditModal('hero')" class="absolute top-4 right-4 md:top-6 md:right-6 z-50 bg-white hover:bg-sky-500 hover:text-white text-slate-800 rounded-full px-4 py-2 shadow-lg font-bold text-sm flex items-center gap-2 transition-all opacity-100 md:opacity-0 group-hover:opacity-100">
@@ -113,6 +113,41 @@
         <div *ngIf="liveTeachers.length === 0" class="col-span-full text-center text-slate-400 font-bold py-12 text-sm">No teaching faculty registered in database.</div>
       </div>
     </section>
+
+    <div class="h-24 md:h-32 w-full shrink-0 block mt-8"></div>
   </main>
   <app-footer></app-footer>
+
+  <div *ngIf="editMode" class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+    <div class="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
+        <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight">Edit {{ editMode }}</h3>
+        <button (click)="closeEditModal()" class="text-slate-400 hover:text-red-500 transition-colors">
+          <span translate="no" class="material-symbols-outlined text-2xl">close</span>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto flex-1 space-y-4 custom-scrollbar">
+        <ng-container *ngIf="editMode === 'hero'">
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Badge</label><input [(ngModel)]="editData.badge" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Title Start</label><input [(ngModel)]="editData.titleStart" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Title Highlight</label><input [(ngModel)]="editData.titleHighlight" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Description</label><textarea [(ngModel)]="editData.desc" rows="3" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-medium focus:ring-2 focus:ring-sky-200 outline-none"></textarea></div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Background Image</label>
+            <div class="flex items-center gap-3">
+              <img *ngIf="editData.bgImage" [src]="editData.bgImage" class="h-12 w-12 object-cover rounded-lg border border-slate-200">
+              <button (click)="imgInput.click()" class="bg-slate-100 px-4 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-sky-100 hover:text-sky-600 transition-colors">Change Image</button>
+              <input #imgInput type="file" class="hidden" accept="image/*" (change)="onFileSelected($event, 'bgImage')">
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+      <div class="p-4 border-t border-slate-100 bg-white flex justify-end shrink-0">
+        <button (click)="saveEdits()" class="px-8 py-3 bg-sky-500 hover:bg-sky-600 text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-lg transition-all">Save Temporarily</button>
+      </div>
+    </div>
+  </div>
+
 </div>

@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-transparent font-display text-slate-900 relative flex flex-col overflow-x-hidden pb-32">
+<div class="min-h-screen bg-transparent font-display text-slate-900 relative flex flex-col overflow-x-hidden pb-10">
   <div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
     <div class="absolute -top-40 -right-40 w-[800px] h-[800px] bg-sky-200/40 rounded-full blur-[120px] bubble-float"></div>
     <div class="absolute top-1/4 -left-48 w-[600px] h-[600px] bg-blue-400/20 rounded-full blur-[100px] bubble-float-alt" style="animation-delay: -5s;"></div>
@@ -44,16 +44,76 @@
       </button>
     </div>
 
-    <section class="py-4 md:py-12 animate-fade-in-up delay-200 mt-0 md:mt-4">
+    <section *ngIf="pageData.desc || isAdmin" class="py-4 md:py-8 mt-0 md:mt-4 p-6 sm:p-8 md:p-10 rounded-[2rem] bg-white/60 backdrop-blur-md shadow-xl border border-white transition-all w-full max-w-7xl mx-auto flex flex-col items-center gap-4 relative group hover:border-sky-500/30">
+      <div class="flex-1 w-full flex flex-col justify-center gap-1 md:gap-2">
+        <h3 class="text-xl md:text-2xl font-black text-slate-900 flex items-center gap-3">
+                <span class="flex items-center justify-center size-8 md:size-10 rounded-full bg-sky-50 border border-white text-sky-500 shadow-sm">
+                  <span translate="no" class="material-symbols-outlined notranslate text-[18px] md:text-[24px]">description</span>
+                </span>
+          Overview
+        </h3>
+        <p *ngIf="pageData.desc" class="text-slate-600 leading-relaxed text-sm md:text-lg font-medium mt-2">{{ pageData.desc }}</p>
+        <p *ngIf="!pageData.desc && isAdmin" class="text-slate-400 italic text-sm mt-2">No description provided. Click edit to add an optional overview description.</p>
+      </div>
+    </section>
+
+    <section class="py-4 md:py-12 animate-fade-in-up delay-200 mt-0 md:mt-4 relative group">
       <p class="text-xs text-slate-500 font-bold text-center mb-2 md:hidden flex items-center justify-center gap-1"><span translate="no" class="material-symbols-outlined notranslate text-[14px]">swipe</span> Swipe left to view full chart</p>
 
       <div class="bg-white/80 backdrop-blur-md border border-white rounded-[1.5rem] md:rounded-[2.5rem] p-2 sm:p-4 md:p-12 shadow-xl overflow-x-auto custom-scrollbar flex justify-start md:justify-center hover:border-sky-500/30 transition-all" style="-webkit-overflow-scrolling: touch;">
-        <img [src]="pageData.chartImage"
+        <img [src]="pageData.chartImage || 'assets/organizational structure.png'"
              alt="UUMIS Organizational Structure Chart"
              class="max-w-none md:max-w-full min-w-[600px] h-auto object-contain rounded-xl hover:scale-[1.02] transition-transform duration-500 mix-blend-darken px-2">
       </div>
     </section>
 
+    <div class="h-24 md:h-32 w-full shrink-0 block mt-4"></div>
+
   </main>
   <app-footer></app-footer>
+
+  <div *ngIf="editMode" class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+    <div class="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
+        <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight">Edit Page Content</h3>
+        <button (click)="closeEditModal()" class="text-slate-400 hover:text-red-500 transition-colors">
+          <span translate="no" class="material-symbols-outlined text-2xl">close</span>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto flex-1 space-y-4 custom-scrollbar">
+
+        <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Badge</label><input [(ngModel)]="editData.badge" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+        <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Title Start</label><input [(ngModel)]="editData.titleStart" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+        <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Title Highlight</label><input [(ngModel)]="editData.titleHighlight" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+
+        <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Description (Optional)</label><textarea [(ngModel)]="editData.desc" rows="3" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-medium focus:ring-2 focus:ring-sky-200 outline-none"></textarea></div>
+
+        <div class="space-y-1">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Background Image</label>
+          <div class="flex items-center gap-3">
+            <img *ngIf="editData.bgImage || editData.hero?.bgImage" [src]="editData.bgImage || editData.hero?.bgImage" class="h-12 w-12 object-cover rounded-lg border border-slate-200">
+            <button (click)="bgInput.click()" class="bg-slate-100 px-4 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-sky-100 hover:text-sky-600 transition-colors">Change Image</button>
+            <input #bgInput type="file" class="hidden" accept="image/*" (change)="onFileSelected($event, 'bgImage')">
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Organizational Chart Image</label>
+          <div class="flex items-center gap-3">
+            <img *ngIf="editData.chartImage" [src]="editData.chartImage" class="h-12 w-12 object-cover rounded-lg border border-slate-200">
+            <button (click)="chartInput.click()" class="bg-slate-100 px-4 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-sky-100 hover:text-sky-600 transition-colors">Change Chart</button>
+            <input #chartInput type="file" class="hidden" accept="image/*" (change)="onFileSelected($event, 'chartImage')">
+          </div>
+        </div>
+
+      </div>
+
+      <div class="p-4 border-t border-slate-100 bg-white flex justify-end shrink-0">
+        <button (click)="saveEdits()" class="px-8 py-3 bg-sky-500 hover:bg-sky-600 text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-lg transition-all">Save Temporarily</button>
+      </div>
+    </div>
+  </div>
+
 </div>

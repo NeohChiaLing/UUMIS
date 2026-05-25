@@ -45,7 +45,7 @@ export class MissionVisionComponent implements OnInit {
       this.isAdmin = isEditMode && isActuallyAdmin;
     });
 
-    const rawObjectives = ["Acknowledges and values students' diversity...", "Discovers each student's uniqueness...", "Equips students with knowledge...", "Prepares students to be academically...", "Teaches students to respect different cultures..."];
+    const rawObjectives = ["Acknowledges and values students' diversity to engage effective learning experience to all students", "Discovers each student's uniqueness and seeks opportunities to enhance the skills.", "Equips students with knowledge, skills and confidence to make informed choices.", "Prepares students to be academically and socially ready to enter the global universities.", "Teaches students to respect different cultures, ideas, attitudes, feelings and value of one another."];
     const defaultData = {
       hero: { badge: 'Est. 2014', titleStart: 'Our Purpose &', titleHighlight: 'Direction', desc: 'Driven by a commitment to excellence...', bgImage: '/assets/UUMIS.jpg' },
       legacy: { titleStart: 'A Legacy of', titleHighlight: 'Excellence', p1: 'UUM International School was formed in 2014...', p2: 'UUM International School offers a quality...', p3: 'UUM International School is committed...', image: 'assets/UUMIS-BROCHURE-1.jpg' },
@@ -65,7 +65,6 @@ export class MissionVisionComponent implements OnInit {
     });
   }
 
-  // DB SAVE
   publishChanges() {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     this.http.post('/api/content/mission_vision', JSON.stringify(this.pageData), { headers, responseType: 'text' }).subscribe({
@@ -74,16 +73,86 @@ export class MissionVisionComponent implements OnInit {
     });
   }
 
-  recalculateCircleLayout() { const total = this.pageData.objectives.length; const radius = 290; this.pageData.objectives.forEach((obj: any, i: number) => { const angle = (i / total) * 2 * Math.PI - (Math.PI / 2); obj.x = radius * Math.cos(angle); obj.y = radius * Math.sin(angle); }); }
-  getArrowTransform(obj: any): string { const angle = Math.atan2(-obj.y, -obj.x) * (180 / Math.PI); return `translate(-50%, -50%) rotate(${angle}deg) translateX(155px)`; }
-  startObjDrag(i: number, event: MouseEvent) { if (!this.isAdmin) return; this.draggedObjIndex = i; this.startX = event.clientX; this.startY = event.clientY; event.preventDefault(); }
-  onObjDrag(event: MouseEvent) { if (this.draggedObjIndex === -1) return; const dx = event.clientX - this.startX; const dy = event.clientY - this.startY; this.pageData.objectives[this.draggedObjIndex].x += dx; this.pageData.objectives[this.draggedObjIndex].y += dy; this.startX = event.clientX; this.startY = event.clientY; }
-  endObjDrag() { this.draggedObjIndex = -1; }
+  // MATHEMATICAL CIRCLE LAYOUT (Used strictly for Desktop resolution)
+  recalculateCircleLayout() {
+    const total = this.pageData.objectives.length;
+    const radius = 290;
+
+    this.pageData.objectives.forEach((obj: any, i: number) => {
+      const angle = (i / total) * 2 * Math.PI - (Math.PI / 2);
+      obj.x = radius * Math.cos(angle);
+      obj.y = radius * Math.sin(angle);
+    });
+  }
+
+  // DESKTOP FREE-FORM DRAGGING LOGIC (Disabled on mobile flex layout)
+  startObjDrag(i: number, event: MouseEvent) {
+    // Ignore drags on mobile widths where elements are stacked vertically
+    if (!this.isAdmin || window.innerWidth < 768) return;
+    this.draggedObjIndex = i;
+    this.startX = event.clientX;
+    this.startY = event.clientY;
+    event.preventDefault();
+  }
+
+  onObjDrag(event: MouseEvent) {
+    if (this.draggedObjIndex === -1) return;
+    const dx = event.clientX - this.startX;
+    const dy = event.clientY - this.startY;
+    this.pageData.objectives[this.draggedObjIndex].x += dx;
+    this.pageData.objectives[this.draggedObjIndex].y += dy;
+    this.startX = event.clientX;
+    this.startY = event.clientY;
+  }
+
+  endObjDrag() {
+    this.draggedObjIndex = -1;
+  }
+
   toggleLangModal() { this.showLangModal = !this.showLangModal; }
   switchLanguage(lang: string) { window.location.reload(); }
-  openEditModal(type: string, index: number = -1) { this.editMode = type; this.editIndex = index; if (type === 'hero') this.editData = { ...this.pageData.hero }; else if (type === 'legacy') this.editData = { ...this.pageData.legacy }; else if (type === 'objective') this.editData = { text: index >= 0 ? this.pageData.objectives[index].text : '' }; }
-  closeEditModal() { this.editMode = null; this.editData = {}; }
-  saveEdits() { if (this.editMode === 'hero') this.pageData.hero = { ...this.editData }; else if (this.editMode === 'legacy') this.pageData.legacy = { ...this.editData }; else if (this.editMode === 'objective') { if (this.editIndex >= 0) { this.pageData.objectives[this.editIndex].text = this.editData.text; } else { this.pageData.objectives.push({ text: this.editData.text, x: 0, y: 0 }); this.recalculateCircleLayout(); } } this.closeEditModal(); }
-  deleteObjective(index: number, event: Event) { event.stopPropagation(); if(confirm("Delete this objective?")) { this.pageData.objectives.splice(index, 1); this.recalculateCircleLayout(); } }
-  onFileSelected(event: any, fieldName: string) { const file: File = event.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (e: any) => this.editData[fieldName] = e.target.result; reader.readAsDataURL(file); } }
+
+  openEditModal(type: string, index: number = -1) {
+    this.editMode = type;
+    this.editIndex = index;
+    if (type === 'hero') this.editData = { ...this.pageData.hero };
+    else if (type === 'legacy') this.editData = { ...this.pageData.legacy };
+    else if (type === 'objective') this.editData = { text: index >= 0 ? this.pageData.objectives[index].text : '' };
+  }
+
+  closeEditModal() {
+    this.editMode = null;
+    this.editData = {};
+  }
+
+  saveEdits() {
+    if (this.editMode === 'hero') this.pageData.hero = { ...this.editData };
+    else if (this.editMode === 'legacy') this.pageData.legacy = { ...this.editData };
+    else if (this.editMode === 'objective') {
+      if (this.editIndex >= 0) {
+        this.pageData.objectives[this.editIndex].text = this.editData.text;
+      } else {
+        this.pageData.objectives.push({ text: this.editData.text, x: 0, y: 0 });
+        this.recalculateCircleLayout();
+      }
+    }
+    this.closeEditModal();
+  }
+
+  deleteObjective(index: number, event: Event) {
+    event.stopPropagation();
+    if(confirm("Are you sure you want to delete this objective?")) {
+      this.pageData.objectives.splice(index, 1);
+      this.recalculateCircleLayout();
+    }
+  }
+
+  onFileSelected(event: any, fieldName: string) {
+    const file: File = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e: any) => this.editData[fieldName] = e.target.result;
+      reader.readAsDataURL(file);
+    }
+  }
 }

@@ -23,6 +23,9 @@ export class LoginComponent {
   showResetPass = false;
   showConfirmResetPass = false;
 
+  // THE FIX: New dynamic error message state to display on the UI instead of browser alerts
+  errorMessage: string = '';
+
   // Data Models
   username = '';
   password = '';
@@ -46,11 +49,17 @@ export class LoginComponent {
   get hasSymbol(): boolean { return /[!@#$%^&*(),.?":{}|<>]/.test(this.resetData.newPassword); }
 
   // --- Navigation ---
-  switchView(view: AuthView) { this.currentView = view; }
+  switchView(view: AuthView) {
+    this.currentView = view;
+    this.errorMessage = ''; // Clear error message when navigating
+  }
+
   goHome() { this.router.navigate(['/home']); }
 
   // --- 1. LOGIN ---
   onLogin() {
+    this.errorMessage = ''; // Reset error state
+
     const credentials = {username: this.username, password: this.password};
 
     this.authService.login(credentials).subscribe({
@@ -62,7 +71,7 @@ export class LoginComponent {
         // --- NEW ROLE-BASED ROUTING ---
         const userRole = res.user.role ? res.user.role.toLowerCase().trim() : 'student';
 
-        // THE FIX: Route specific managers to the Staff portal where their tools are!
+        // Route specific managers to the Staff portal where their tools are!
         if (userRole === 'admin') {
           this.router.navigate(['/dashboard/admin']);
         } else if (userRole === 'staff' || userRole === 'financial_manager' || userRole === 'register_manager') {
@@ -77,38 +86,50 @@ export class LoginComponent {
 
       },
       error: (err) => {
-        alert("Login failed: " + err.error.message);
+        // Render the exact error message from Spring Boot / Node onto the UI
+        this.errorMessage = err.error?.message || "Login failed. Please check your credentials.";
       }
     });
   }
 
   // --- 2. FORGOT PASSWORD ---
   onVerifyEmail() {
-    if(!this.forgotData.email) return;
+    this.errorMessage = ''; // Reset error state
+
+    if(!this.forgotData.email) {
+      this.errorMessage = "Please enter your registered email or username.";
+      return;
+    }
+
     this.authService.forgotPassword(this.forgotData.email).subscribe({
       next: (res) => {
         this.modalType = 'email-sent';
         this.showSuccessMessage = true;
       },
-      error: (err) => alert("User not found")
+      error: (err) => {
+        // Render the "Account not approved or found" error dynamically onto the UI
+        this.errorMessage = err.error?.message || "Email not found or account is not approved yet.";
+      }
     });
   }
 
   // --- 3. RESET PASSWORD ---
   onResetPassword() {
+    this.errorMessage = ''; // Reset error state
+
     // 1. Check Code
     if (!this.resetData.code) {
-      alert("Please enter the verification code.");
+      this.errorMessage = "Please enter the verification code.";
       return;
     }
 
     // 2. Validate Password
     if (!this.isLengthValid || !this.hasUppercase || !this.hasNumber || !this.hasSymbol) {
-      alert("Password does not meet requirements.");
+      this.errorMessage = "Password does not meet the security requirements.";
       return;
     }
     if(this.resetData.newPassword !== this.resetData.confirmNewPassword) {
-      alert("Passwords do not match!");
+      this.errorMessage = "Passwords do not match!";
       return;
     }
 
@@ -124,7 +145,9 @@ export class LoginComponent {
         alert("Password reset successful! Please login.");
         this.switchView('login');
       },
-      error: (err) => alert(err.error.message || "Reset failed")
+      error: (err) => {
+        this.errorMessage = err.error?.message || "Password reset failed. Please try again.";
+      }
     });
   }
 

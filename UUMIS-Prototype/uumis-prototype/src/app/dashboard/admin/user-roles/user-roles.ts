@@ -16,8 +16,6 @@ export class UserRolesComponent implements OnInit {
   searchTerm: string = '';
   selectedRoleFilter: string = 'All';
 
-  // THE FIX: We use objects now so the database gets the exact code ('financial_manager')
-  // but your dashboard UI displays it cleanly as "Financial Manager"
   availableRoles = [
     { value: 'admin', label: 'Admin' },
     { value: 'staff', label: 'General Staff' },
@@ -28,7 +26,6 @@ export class UserRolesComponent implements OnInit {
     { value: 'student', label: 'Student' }
   ];
 
-  // Modal State Variables
   showInviteModal: boolean = false;
   inviteEmail: string = '';
   inviteRole: string = 'staff';
@@ -51,6 +48,21 @@ export class UserRolesComponent implements OnInit {
           } else {
             u.role = 'student';
           }
+
+          let profileData: any = {};
+          const rawJson = u.profile_json || u.profileJson;
+          if (rawJson) {
+            try { profileData = JSON.parse(rawJson); } catch(e){}
+          }
+
+          // THE FIX: Added u.full_name explicitly to the fallback chain to catch Parent updates
+          let displayName = u.full_name || u.fullName || u.username || 'No Name Set';
+          if (profileData.firstName || profileData.lastName || profileData.familyName) {
+            const lName = profileData.lastName || profileData.familyName || '';
+            displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+          }
+
+          u.fullName = displayName;
           return u;
         });
 
@@ -110,14 +122,12 @@ export class UserRolesComponent implements OnInit {
     }
   }
 
-  // THE FIX: This helper cleans up the ugly underscores in the database role names for the UI!
   formatRole(roleValue: string): string {
     if (!roleValue) return 'Student';
     const found = this.availableRoles.find(r => r.value === roleValue.toLowerCase());
     return found ? found.label : roleValue;
   }
 
-  // --- Invite Modal Functions ---
   openInviteModal() {
     this.inviteEmail = '';
     this.inviteRole = 'staff';
@@ -140,7 +150,7 @@ export class UserRolesComponent implements OnInit {
         alert(res.message || 'User invited successfully! They will receive an email shortly.');
         this.isInviting = false;
         this.closeInviteModal();
-        this.loadUsers(); // Refresh the table to show the new user
+        this.loadUsers();
       },
       error: (err) => {
         console.error(err);

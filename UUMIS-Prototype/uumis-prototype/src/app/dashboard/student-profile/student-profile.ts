@@ -13,11 +13,14 @@ import { AuthService } from '../../services/auth.service';
 export class StudentProfileComponent implements OnInit {
 
   studentProfile: any = {
-    name: '', id: '', grade: '', admissionDate: '2023-01-01', level: '', year: '',
+    name: 'Loading...', id: '', grade: '', level: '', year: '', email: '', status: 'Pending',
+    profileStatus: 'PENDING', admissionDate: '2023-01-01', teacher: 'Unassigned', completion: 0,
     dob: '', gender: 'Male', address: '', passport: '', phone: '',
     bloodGroup: 'O+', allergies: 'None', medicalConditions: 'None',
     father: { name: '', ic: '', phone: '', email: '', job: '' },
     mother: { name: '', ic: '', phone: '', email: '', job: '' },
+    siblingName: '', siblingGrade: '', siblingPhone: '', siblingEmail: '',
+    firstName: '', middleName: '', lastName: '', age: '', pob: '', nationality: '', religion: '', doi: '', doe: '', lang1: '', lang2: '', studentMobile: '', primaryEmail: '', altEmail: '', homePhone: '',
     avatarUrl: null
   };
 
@@ -28,32 +31,39 @@ export class StudentProfileComponent implements OnInit {
 
   ngOnInit() {
     this.currentUser = this.authService.getCurrentUser();
+    this.canEditPicture = false;
 
-    // Rule: Admins, Staff, Register Managers, and Parents can edit. Students CANNOT.
-    const role = this.currentUser?.role ? this.currentUser.role.toLowerCase().trim() : '';
-    this.canEditPicture = role !== 'student';
-
-    if (this.currentUser && role === 'student') {
+    if (this.currentUser && this.currentUser.role.toLowerCase() === 'student') {
       this.studentProfile.avatarUrl = this.currentUser.avatar || null;
 
-      if (this.currentUser.profileJson) {
+      const rawProfileJson = this.currentUser.profileJson || this.currentUser.profile_json;
+
+      let parsedData: any = {};
+      if (rawProfileJson) {
         try {
-          const savedData = JSON.parse(this.currentUser.profileJson);
-          this.studentProfile = { ...this.studentProfile, ...savedData };
+          parsedData = JSON.parse(rawProfileJson);
+          this.studentProfile = { ...this.studentProfile, ...parsedData };
         } catch(e) {}
       }
 
-      this.studentProfile.name = this.currentUser.fullName || this.currentUser.username || this.studentProfile.name || 'Student Name';
-      this.studentProfile.id = this.currentUser.studentId || '';
-      this.studentProfile.grade = this.currentUser.bio || this.studentProfile.grade || 'Unassigned';
+      let displayName = this.currentUser.fullName || this.currentUser.username || 'Student Name';
+      if (parsedData.firstName || parsedData.lastName || parsedData.familyName) {
+        const lName = parsedData.lastName || parsedData.familyName || '';
+        displayName = [parsedData.firstName, parsedData.middleName, lName].filter(Boolean).join(' ');
+      }
+
+      this.studentProfile.name = displayName;
+      this.studentProfile.id = this.currentUser.studentId || this.currentUser.student_id || '123456';
+      this.studentProfile.grade = this.currentUser.bio || 'Unassigned';
 
       if (this.studentProfile.grade !== 'Unassigned') {
         const parts = this.studentProfile.grade.split(' - ');
-        this.studentProfile.level = this.studentProfile.level || parts[0] || 'Unassigned';
-        this.studentProfile.year = this.studentProfile.year || parts[1] || 'Unassigned';
+        this.studentProfile.level = parts[0] || 'Unassigned';
+        this.studentProfile.year = parts[1] || 'Unassigned';
       }
 
       this.studentProfile.phone = this.studentProfile.phone || this.currentUser.phone || '';
+      this.studentProfile.status = (this.currentUser.enabled || this.currentUser.is_enabled) ? 'Active' : 'Pending';
     }
   }
 
@@ -81,17 +91,21 @@ export class StudentProfileComponent implements OnInit {
     checkValue(this.studentProfile.allergies);
     checkValue(this.studentProfile.medicalConditions);
 
-    checkValue(this.studentProfile.father.name);
-    checkValue(this.studentProfile.father.ic);
-    checkValue(this.studentProfile.father.phone);
-    checkValue(this.studentProfile.father.email);
-    checkValue(this.studentProfile.father.job);
+    if (this.studentProfile.father) {
+      checkValue(this.studentProfile.father.name);
+      checkValue(this.studentProfile.father.ic);
+      checkValue(this.studentProfile.father.phone);
+      checkValue(this.studentProfile.father.email);
+      checkValue(this.studentProfile.father.job);
+    }
 
-    checkValue(this.studentProfile.mother.name);
-    checkValue(this.studentProfile.mother.ic);
-    checkValue(this.studentProfile.mother.phone);
-    checkValue(this.studentProfile.mother.email);
-    checkValue(this.studentProfile.mother.job);
+    if (this.studentProfile.mother) {
+      checkValue(this.studentProfile.mother.name);
+      checkValue(this.studentProfile.mother.ic);
+      checkValue(this.studentProfile.mother.phone);
+      checkValue(this.studentProfile.mother.email);
+      checkValue(this.studentProfile.mother.job);
+    }
 
     if (totalFields === 0) return 0;
     return Math.round((filledFields / totalFields) * 100);
@@ -113,49 +127,6 @@ export class StudentProfileComponent implements OnInit {
     this.location.back();
   }
 
-  triggerFileInput() {
-    if (this.canEditPicture) {
-      document.getElementById('studentAvatarInput')?.click();
-    }
-  }
-
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.studentProfile.avatarUrl = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-  }
-
-  saveUpdates() {
-    // --- THE FIX: Clean up the JSON ---
-    const cleanProfile = {
-      dob: this.studentProfile.dob || '',
-      gender: this.studentProfile.gender || 'Male',
-      address: this.studentProfile.address || '',
-      passport: this.studentProfile.passport || '',
-      bloodGroup: this.studentProfile.bloodGroup || 'O+',
-      allergies: this.studentProfile.allergies || 'None',
-      medicalConditions: this.studentProfile.medicalConditions || 'None',
-      father: this.studentProfile.father || { name: '', ic: '', phone: '', email: '', job: '' },
-      mother: this.studentProfile.mother || { name: '', ic: '', phone: '', email: '', job: '' }
-    };
-
-    const payload = {
-      profileStatus: 'PENDING',
-      profileJson: JSON.stringify(cleanProfile),
-      avatar: this.studentProfile.avatarUrl
-    };
-
-    this.authService.adminUpdateStudent(this.currentUser.id, payload).subscribe({
-      next: () => {
-        alert('Profile updates submitted to school admin for approval. Please login again later to see official changes from the Admin.');
-        this.goBack();
-      },
-      error: () => alert('Failed to submit updates.')
-    });
-  }
+  triggerFileInput() { }
+  onFileSelected(event: any) {}
 }

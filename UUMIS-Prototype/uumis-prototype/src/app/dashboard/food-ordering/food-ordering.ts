@@ -33,7 +33,6 @@ export class FoodOrderingComponent implements OnInit {
   }
 
   loadData() {
-    // Load Menu
     this.authService.getFoodItems().subscribe({
       next: (items) => {
         this.breakfastMenu = items.filter((i: any) => i.category === 'BREAKFAST');
@@ -42,16 +41,40 @@ export class FoodOrderingComponent implements OnInit {
       error: (err: any) => console.error(err)
     });
 
-    // Load Orders
     this.authService.getFoodOrders().subscribe({
       next: (orders: any[]) => {
-        // THE FIX: Map snake_case to camelCase
-        this.studentOrders = orders.map((o: any) => ({
-          ...o,
-          studentName: o.student_name,
-          orderDate: o.order_date,
-          totalAmount: o.total_amount
-        }));
+
+        // Fetch users to cross-reference fresh names for past orders
+        this.authService.getUsers().subscribe(users => {
+
+          const unpackedUsers = users.map((u: any) => {
+            let profileData: any = {};
+            try { profileData = JSON.parse(u.profile_json || u.profileJson || '{}'); } catch(e){}
+
+            let displayName = u.fullName || u.username;
+            if (profileData.firstName || profileData.lastName || profileData.familyName) {
+              const lName = profileData.lastName || profileData.familyName || '';
+              displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+            }
+            return { ...u, freshName: displayName };
+          });
+
+          this.studentOrders = orders.map((o: any) => {
+            // Find a match based on the old static name to replace it with the fresh name
+            const match = unpackedUsers.find(u =>
+              u.username === o.student_name ||
+              u.fullName === o.student_name ||
+              u.freshName === o.student_name
+            );
+
+            return {
+              ...o,
+              studentName: match ? match.freshName : o.student_name,
+              orderDate: o.order_date,
+              totalAmount: o.total_amount
+            };
+          }).reverse(); // Show newest orders at the top
+        });
       },
       error: (err: any) => console.error(err)
     });
@@ -59,7 +82,6 @@ export class FoodOrderingComponent implements OnInit {
 
   goBack() { this.location.back(); }
 
-  // --- MENU MANAGEMENT ---
   addBreakfastItem() {
     this.breakfastMenu.push({ name: '', description: '', price: 0.00, active: false, category: 'BREAKFAST' });
   }
@@ -92,7 +114,7 @@ export class FoodOrderingComponent implements OnInit {
         alert('Menu updates saved to Database!');
         this.loadData();
       },
-      error: (err: any) => alert('Failed to save menu. Check console.') // Fix: added : any
+      error: (err: any) => alert('Failed to save menu. Check console.')
     });
   }
 
@@ -102,17 +124,15 @@ export class FoodOrderingComponent implements OnInit {
     }
   }
 
-  // --- ORDER MANAGEMENT ---
   markAsCompleted(order: any) {
     this.authService.completeFoodOrder(order.id).subscribe({
       next: () => {
         order.status = 'COMPLETED';
       },
-      error: (err: any) => alert('Failed to complete order.') // Fix: added : any
+      error: (err: any) => alert('Failed to complete order.')
     });
   }
 
-  // --- NEW: DELETE ORDER FUNCTION ---
   deleteOrder(order: any, index: number) {
     if (confirm(`Are you sure you want to permanently delete order #${order.id} for ${order.studentName}?`)) {
       this.authService.deleteFoodOrder(order.id).subscribe({
@@ -120,7 +140,6 @@ export class FoodOrderingComponent implements OnInit {
           this.studentOrders.splice(index, 1);
           alert('Order deleted successfully.');
         },
-        // THE FIX: Added `: any` to the err parameter to fix TS7006
         error: (err: any) => alert('Failed to delete order. Please check backend connection.')
       });
     }

@@ -45,12 +45,21 @@ export class OrganizationalStructureComponent implements OnInit {
       badge: 'Hierarchy',
       titleStart: 'Organizational',
       titleHighlight: 'Structure',
+      desc: 'The chain of command and communication flow within UUMIS, illustrating how different departments and roles collaborate to achieve educational excellence.',
       chartImage: 'assets/organizational structure.png'
     };
 
     // DB LOAD
     this.http.get('/api/content/organizational_structure', { responseType: 'text' }).subscribe({
-      next: (data) => { this.pageData = (data && data.length > 5) ? JSON.parse(data) : defaultData; },
+      next: (data) => {
+        if (data && data.length > 5) {
+          this.pageData = JSON.parse(data);
+
+          if (!this.pageData.desc) this.pageData.desc = '';
+        } else {
+          this.pageData = defaultData;
+        }
+      },
       error: () => { this.pageData = defaultData; }
     });
   }

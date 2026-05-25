@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-transparent font-display text-slate-900 relative flex flex-col overflow-x-hidden pb-32">
+<div class="min-h-screen bg-transparent font-display text-slate-900 relative flex flex-col overflow-x-hidden pb-10">
 
   <div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
     <div class="absolute -top-40 -right-40 w-[800px] h-[800px] bg-sky-200/40 rounded-full blur-[120px] bubble-float"></div>
@@ -19,22 +19,22 @@
     <div class="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-105 z-0" [style.background-image]="'url(' + pageData.bgImage + ')'"></div>
     <div class="absolute inset-0 bg-black/40 z-0"></div>
 
-    <button *ngIf="isAdmin" (click)="openEditModal('header')" class="absolute top-4 right-4 md:top-6 md:right-6 z-50 bg-white hover:bg-sky-500 hover:text-white text-slate-800 rounded-full px-4 py-2 shadow-lg font-bold text-sm flex items-center gap-2 transition-all opacity-100 md:opacity-0 group-hover:opacity-100">
-      <span translate="no" class="material-symbols-outlined notranslate text-[18px]">edit</span> <span class="hidden md:inline">Edit Background</span>
+    <button *ngIf="isAdmin" (click)="openEditModal('header')" class="absolute top-4 sm:top-6 right-4 sm:right-6 z-50 bg-white hover:bg-sky-500 hover:text-white text-slate-800 rounded-full px-4 py-2 shadow-lg font-bold text-xs sm:text-sm flex items-center gap-2 transition-all opacity-100 md:opacity-0 group-hover:opacity-100">
+      <span translate="no" class="material-symbols-outlined notranslate text-[16px] sm:text-[18px]">edit</span> <span class="hidden sm:inline">Edit Background</span>
     </button>
 
-    <div class="relative z-10 flex flex-col items-center gap-6 md:gap-8 max-w-4xl mx-auto px-4 sm:px-6 animate-fade-in-up mt-4 md:mt-8">
-      <div class="flex flex-col gap-4 items-center w-full">
-        <span class="inline-block px-4 py-1.5 rounded-full bg-sky-500/30 backdrop-blur-md border border-sky-400/30 text-sky-100 text-xs font-black uppercase tracking-wider w-fit shadow-lg">
+    <div class="relative z-10 flex flex-col items-center gap-6 md:gap-8 max-w-4xl mx-auto px-4 sm:px-6 animate-fade-in-up mt-4 sm:mt-8 w-full">
+      <div class="flex flex-col gap-3 sm:gap-4 items-center w-full">
+        <span class="inline-block px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-sky-500/30 backdrop-blur-md border border-sky-400/30 text-sky-100 text-[10px] sm:text-xs font-black uppercase tracking-wider w-fit shadow-lg">
           {{ pageData.badge }}
         </span>
 
-        <div class="flex flex-col items-center justify-center gap-4 w-full my-2 md:my-4">
-          <h1 class="text-4xl sm:text-6xl md:text-8xl font-black leading-[1.2] md:leading-[1.1] tracking-tighter text-white drop-shadow-2xl text-center uppercase">
-            {{ pageData.titleStart }} <br class="hidden md:block"/>
-            <span *ngIf="!isAdmin" class="text-transparent bg-clip-text bg-gradient-to-r from-sky-300 to-sky-100 drop-shadow-lg">{{ academicYear }}</span>
-            <select *ngIf="isAdmin" [(ngModel)]="academicYear" class="bg-sky-500/80 backdrop-blur border border-white/50 rounded-xl outline-none text-center font-black text-xl md:text-4xl text-white px-2 py-1.5 md:px-4 md:py-2 w-full max-w-[250px] md:max-w-[350px] transition-colors cursor-pointer shadow-lg appearance-none mt-2">
-              <option *ngFor="let year of availableYears" [value]="year" class="text-base md:text-lg font-bold text-slate-900 bg-white">{{ year }}</option>
+        <div class="flex flex-col items-center justify-center gap-3 sm:gap-4 w-full my-2 md:my-4">
+          <h1 class="text-4xl sm:text-6xl md:text-8xl font-black leading-[1.2] md:leading-[1.1] tracking-tighter text-white drop-shadow-2xl text-center uppercase w-full">
+            {{ pageData.titleStart }} <br class="hidden sm:block"/>
+            <span *ngIf="!isAdmin" class="text-transparent bg-clip-text bg-gradient-to-r from-sky-300 to-sky-100 drop-shadow-lg block sm:inline mt-1 sm:mt-0">{{ academicYear }}</span>
+            <select *ngIf="isAdmin" [(ngModel)]="academicYear" class="bg-sky-500/80 backdrop-blur border border-white/50 rounded-xl outline-none text-center font-black text-xl sm:text-2xl md:text-4xl text-white px-2 py-1.5 md:px-4 md:py-2 w-full max-w-[200px] sm:max-w-[250px] md:max-w-[350px] transition-colors cursor-pointer shadow-lg appearance-none mt-2">
+              <option *ngFor="let year of availableYears" [value]="year" class="text-sm sm:text-base md:text-lg font-bold text-slate-900 bg-white">{{ year }}</option>
             </select>
           </h1>
         </div>
@@ -44,68 +44,77 @@
     </div>
   </section>
 
-  <main class="flex-grow w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 space-y-8 md:space-y-12 relative z-10">
+  <main class="flex-grow w-full max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-16 space-y-8 sm:space-y-12 relative z-10">
 
     <div class="fixed bottom-24 right-4 md:right-8 z-[90] flex flex-col items-end gap-4">
-      <button *ngIf="isAdmin" (click)="publishChanges()" class="bg-slate-900 text-white px-4 md:px-6 py-3 rounded-full font-black text-xs md:text-sm shadow-2xl hover:bg-sky-500 transition-all flex items-center gap-2 animate-fade-in-up border border-slate-700">
-        <span translate="no" class="material-symbols-outlined notranslate text-[18px]">cloud_upload</span> <span class="hidden md:inline">Publish Changes</span><span class="md:hidden">Save</span>
-      </button>
-
-      @if (showLangModal) {
-      <div class="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-white p-3 w-48 animate-fade-in-up flex flex-col gap-1">
-        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 px-3 mt-1">Select Language</h3>
-        <button (click)="switchLanguage('en')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-sky-50 hover:text-sky-500 font-bold text-sm transition-colors flex items-center gap-3"><span class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-black">EN</span> English</button>
-        <button (click)="switchLanguage('ms')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-sky-50 hover:text-sky-500 font-bold text-sm transition-colors flex items-center gap-3"><span class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-black">MS</span> Melayu</button>
-      </div>
-      }
-      <button (click)="toggleLangModal()" class="size-12 md:size-14 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-2xl hover:scale-110 hover:bg-sky-500 transition-all cursor-pointer group border border-slate-700">
-        <span translate="no" class="material-symbols-outlined notranslate text-xl md:text-2xl group-hover:scale-110 transition-transform">translate</span>
+      <button *ngIf="isAdmin" (click)="publishChanges()" class="bg-slate-900 text-white px-4 md:px-6 py-2.5 sm:py-3 rounded-full font-black text-[10px] sm:text-xs md:text-sm shadow-2xl hover:bg-sky-500 transition-all flex items-center gap-1.5 sm:gap-2 animate-fade-in-up border border-slate-700 hover:scale-105">
+        <span translate="no" class="material-symbols-outlined notranslate text-[16px] sm:text-[18px]">cloud_upload</span> <span class="hidden md:inline">Publish Changes</span><span class="md:hidden">Save</span>
       </button>
     </div>
 
-    <section class="animate-fade-in-up relative group mt-4 md:mt-8 w-full overflow-hidden">
+    <section *ngIf="pageData.showMainTable !== false" class="animate-fade-in-up relative mt-6 md:mt-12 bg-white/80 backdrop-blur-md rounded-[1.5rem] md:rounded-[2rem] border border-white shadow-lg p-4 sm:p-6 w-full overflow-hidden">
 
-      <div *ngIf="isAdmin" class="absolute -top-12 right-0 z-50 flex flex-wrap justify-end gap-2 px-4 md:px-0">
-        <button (click)="addColumn()" class="bg-sky-100 text-sky-700 px-2 py-1 md:px-3 md:py-1.5 rounded-lg font-bold text-[10px] md:text-xs flex items-center gap-1 hover:bg-sky-500 hover:text-white transition-colors shadow-sm">
-          <span translate="no" class="material-symbols-outlined text-[12px] md:text-[14px] notranslate">view_column</span> Add Col
-        </button>
-        <button (click)="addMergedRow()" class="bg-purple-100 text-purple-700 px-2 py-1 md:px-3 md:py-1.5 rounded-lg font-bold text-[10px] md:text-xs flex items-center gap-1 hover:bg-purple-500 hover:text-white transition-colors shadow-sm">
-          <span translate="no" class="material-symbols-outlined text-[12px] md:text-[14px] notranslate">horizontal_rule</span> Add Merge
-        </button>
-        <button (click)="addRow()" class="bg-slate-900 text-white px-2 py-1 md:px-3 md:py-1.5 rounded-lg font-bold text-[10px] md:text-xs flex items-center gap-1 hover:bg-sky-500 transition-colors shadow-sm border border-slate-700">
-          <span translate="no" class="material-symbols-outlined text-[12px] md:text-[14px] notranslate">add</span> Add Row
-        </button>
+      <div class="mb-3 md:mb-6 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4">
+        <input *ngIf="isAdmin" [(ngModel)]="pageData.mainTableTitle" class="bg-transparent border-b-2 border-dashed border-blue-300 outline-none text-base sm:text-xl md:text-2xl font-black text-blue-900 w-full md:max-w-md focus:border-blue-600">
+        <h2 *ngIf="!isAdmin" class="text-base sm:text-xl md:text-2xl font-black text-slate-900 uppercase tracking-tight">{{ pageData.mainTableTitle }}</h2>
+
+        <div *ngIf="isAdmin" class="flex flex-wrap justify-start sm:justify-end gap-1.5 sm:gap-2">
+          <button (click)="addColumn()" class="bg-sky-100 text-sky-700 px-2 py-1 md:px-3 md:py-1.5 rounded-lg font-bold text-[9px] sm:text-[10px] md:text-xs flex items-center gap-1 hover:bg-sky-500 hover:text-white transition-colors shadow-sm">
+            <span translate="no" class="material-symbols-outlined text-[10px] md:text-[14px] notranslate">view_column</span> <span class="hidden sm:inline">Add Col</span><span class="sm:hidden">Col</span>
+          </button>
+          <button (click)="addMergedRow()" class="bg-purple-100 text-purple-700 px-2 py-1 md:px-3 md:py-1.5 rounded-lg font-bold text-[9px] sm:text-[10px] md:text-xs flex items-center gap-1 hover:bg-purple-500 hover:text-white transition-colors shadow-sm">
+            <span translate="no" class="material-symbols-outlined text-[10px] md:text-[14px] notranslate">horizontal_rule</span> <span class="hidden sm:inline">Add Merge</span><span class="sm:hidden">Merge</span>
+          </button>
+          <button (click)="addRow()" class="bg-slate-900 text-white px-2 py-1 md:px-3 md:py-1.5 rounded-lg font-bold text-[9px] sm:text-[10px] md:text-xs flex items-center gap-1 hover:bg-sky-500 transition-colors shadow-sm border border-slate-700">
+            <span translate="no" class="material-symbols-outlined text-[10px] md:text-[14px] notranslate">add</span> <span class="hidden sm:inline">Add Row</span><span class="sm:hidden">Row</span>
+          </button>
+          <button (click)="deleteMainTable()" class="bg-red-100 text-red-700 px-2 py-1 md:px-3 md:py-1.5 rounded-lg font-bold text-[9px] sm:text-[10px] md:text-xs flex items-center gap-1 hover:bg-red-600 hover:text-white transition-colors shadow-sm">
+            <span translate="no" class="material-symbols-outlined text-[10px] md:text-[14px] notranslate">delete</span> <span class="hidden sm:inline">Delete Table</span><span class="sm:hidden">Delete</span>
+          </button>
+        </div>
       </div>
 
-      <p class="text-xs text-slate-500 font-bold text-center mb-2 md:hidden flex items-center justify-center gap-1"><span translate="no" class="material-symbols-outlined notranslate text-[14px]">swipe</span> Swipe to view full table</p>
+      <p class="text-[10px] sm:text-xs text-slate-500 font-bold text-center mb-2 md:hidden flex items-center justify-center gap-1"><span translate="no" class="material-symbols-outlined notranslate text-[14px]">swipe</span> Swipe to view full table</p>
 
-      <div class="bg-white/90 backdrop-blur-md border border-white rounded-[1rem] md:rounded-[2rem] shadow-xl overflow-x-auto relative custom-scrollbar w-full" style="-webkit-overflow-scrolling: touch;">
-        <table class="w-full text-[10px] sm:text-xs md:text-sm text-left border-collapse min-w-[900px] md:min-w-[1200px]">
+      <div class="overflow-x-auto rounded-[1rem] sm:rounded-xl border border-white shadow-sm bg-white/50 custom-scrollbar w-full" style="-webkit-overflow-scrolling: touch;">
+        <table class="w-full text-[9px] sm:text-xs md:text-sm text-left border-collapse min-w-[800px] sm:min-w-[900px] md:min-w-[1200px]">
           <thead class="bg-slate-50/80 text-slate-900 uppercase tracking-wider font-bold">
           <tr>
-            <th rowspan="2" class="p-2 sm:p-3 md:p-4 border-r border-white/50 font-black text-sky-600 sticky left-0 bg-slate-50/90 backdrop-blur z-20 shadow-[1px_0_0_rgba(255,255,255,0.5)] min-w-[100px] md:min-w-[150px]">Grade Level</th>
-            <th colspan="2" class="p-2 sm:p-3 md:p-3 text-center border-r border-b border-white/50 bg-sky-50">School Fees</th>
-            <th colspan="4" class="p-2 sm:p-3 md:p-3 text-center border-r border-b border-white/50 bg-indigo-50">Academic Related Fees</th>
-            <th rowspan="2" class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 font-black text-amber-500 min-w-[80px]">Total<br>Semester</th>
-            <th rowspan="2" class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 font-black text-amber-500 min-w-[80px]">Total<br>Year</th>
-            <th rowspan="2" class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 text-slate-500 min-w-[70px]">Adm.<br>Fee</th>
-            <th rowspan="2" class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 text-slate-500 min-w-[70px]">Uni.<br>Fee</th>
+            <th rowspan="2" class="p-2 sm:p-3 md:p-4 border-r border-white/50 font-black text-sky-600 sticky left-0 bg-slate-50/90 backdrop-blur z-20 shadow-[1px_0_0_rgba(255,255,255,0.5)] min-w-[90px] sm:min-w-[100px] md:min-w-[150px]">Grade Level</th>
 
-            <th *ngFor="let col of customColumns; let cIdx = index" rowspan="2" class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 bg-purple-50 text-purple-700 relative group/col min-w-[80px]">
-              <input *ngIf="isAdmin" [(ngModel)]="customColumns[cIdx]" class="bg-transparent border-b border-dashed border-purple-300 w-full text-center outline-none font-black text-purple-700 uppercase">
-              <span *ngIf="!isAdmin">{{ col }}</span>
-              <button *ngIf="isAdmin" (click)="removeColumn(cIdx)" class="absolute -top-2 -right-2 size-5 md:-top-3 md:-right-2 md:size-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover/col:opacity-100 transition-opacity shadow-lg"><span translate="no" class="material-symbols-outlined text-[10px] md:text-[12px] notranslate">close</span></button>
+            <th colspan="2" class="p-2 sm:p-3 md:p-3 text-center border-r border-b border-white/50 bg-sky-50">
+              <input *ngIf="isAdmin" [(ngModel)]="pageData.mainTableTitle1" class="bg-transparent border-b border-dashed border-sky-300 w-full text-center outline-none font-bold text-slate-900">
+              <span *ngIf="!isAdmin">{{ pageData.mainTableTitle1 }}</span>
+            </th>
+            <th colspan="4" class="p-2 sm:p-3 md:p-3 text-center border-r border-b border-white/50 bg-indigo-50">
+              <input *ngIf="isAdmin" [(ngModel)]="pageData.mainTableTitle2" class="bg-transparent border-b border-dashed border-indigo-300 w-full text-center outline-none font-bold text-slate-900">
+              <span *ngIf="!isAdmin">{{ pageData.mainTableTitle2 }}</span>
             </th>
 
-            <th *ngIf="isAdmin" rowspan="2" class="p-2 sm:p-3 md:p-3 text-center text-red-500 min-w-[60px]">Act</th>
+            <th rowspan="2" class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 font-black text-amber-500 min-w-[60px] sm:min-w-[70px] md:min-w-[80px]">Total<br>Semester</th>
+            <th rowspan="2" class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 font-black text-amber-500 min-w-[60px] sm:min-w-[70px] md:min-w-[80px]">Total<br>Year</th>
+            <th rowspan="2" class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 text-slate-500 min-w-[50px] sm:min-w-[60px] md:min-w-[70px]">Adm.<br>Fee</th>
+            <th rowspan="2" class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 text-slate-500 min-w-[50px] sm:min-w-[60px] md:min-w-[70px]">Uni.<br>Fee</th>
+
+            <th *ngFor="let col of customColumns; let cIdx = index" rowspan="2" class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 bg-purple-50 text-purple-700 min-w-[60px] sm:min-w-[70px] md:min-w-[80px] align-middle">
+              <div class="flex flex-col items-center gap-1 justify-center">
+                <input *ngIf="isAdmin" [(ngModel)]="customColumns[cIdx]" class="bg-transparent border-b border-dashed border-purple-300 w-full text-center outline-none font-black text-purple-700 uppercase text-[9px] sm:text-xs md:text-sm">
+                <span *ngIf="!isAdmin">{{ col }}</span>
+                <button *ngIf="isAdmin" (click)="removeColumn(cIdx)" class="text-red-400 hover:text-red-600 bg-red-50 rounded p-1 flex items-center justify-center transition-colors shadow-sm mt-1">
+                  <span translate="no" class="material-symbols-outlined text-[10px] md:text-[12px] notranslate">delete</span>
+                </button>
+              </div>
+            </th>
+
+            <th *ngIf="isAdmin" rowspan="2" class="p-1 sm:p-2 md:p-3 text-center text-red-500 min-w-[40px] sm:min-w-[50px] md:min-w-[60px]">Act</th>
           </tr>
           <tr>
-            <th class="p-2 sm:p-3 md:p-3 text-center border-r border-b border-white/50 text-slate-600 min-w-[70px]">Semester</th>
-            <th class="p-2 sm:p-3 md:p-3 text-center border-r border-b border-white/50 text-slate-600 font-bold min-w-[80px]">Yearly</th>
-            <th class="p-2 sm:p-3 md:p-3 text-center border-r border-b border-white/50 text-slate-600 min-w-[70px]">Material</th>
-            <th class="p-2 sm:p-3 md:p-3 text-center border-r border-b border-white/50 text-slate-600 min-w-[70px]">Tech</th>
-            <th class="p-2 sm:p-3 md:p-3 text-center border-r border-b border-white/50 text-slate-600 min-w-[70px]">Science</th>
-            <th class="p-2 sm:p-3 md:p-3 text-center border-r border-b border-white/50 text-slate-600 min-w-[70px]">Subtotal</th>
+            <th class="p-2 sm:p-3 md:p-3 text-center border-r border-b border-white/50 text-slate-600 min-w-[50px] sm:min-w-[60px] md:min-w-[70px]">Semester</th>
+            <th class="p-2 sm:p-3 md:p-3 text-center border-r border-b border-white/50 text-slate-600 font-bold min-w-[60px] sm:min-w-[70px] md:min-w-[80px]">Yearly</th>
+            <th class="p-2 sm:p-3 md:p-3 text-center border-r border-b border-white/50 text-slate-600 min-w-[50px] sm:min-w-[60px] md:min-w-[70px]">Material</th>
+            <th class="p-2 sm:p-3 md:p-3 text-center border-r border-b border-white/50 text-slate-600 min-w-[50px] sm:min-w-[60px] md:min-w-[70px]">Tech</th>
+            <th class="p-2 sm:p-3 md:p-3 text-center border-r border-b border-white/50 text-slate-600 min-w-[50px] sm:min-w-[60px] md:min-w-[70px]">Science</th>
+            <th class="p-2 sm:p-3 md:p-3 text-center border-r border-b border-white/50 text-slate-600 min-w-[50px] sm:min-w-[60px] md:min-w-[70px]">Subtotal</th>
           </tr>
           </thead>
 
@@ -114,34 +123,34 @@
 
             <ng-container *ngIf="!row.isHeading">
               <td class="p-2 sm:p-3 md:p-4 font-bold text-slate-900 border-r border-white/50 sticky left-0 bg-white/90 backdrop-blur group-hover/row:bg-white z-10 shadow-[1px_0_0_rgba(255,255,255,0.5)]">
-                <input *ngIf="isAdmin" [(ngModel)]="row.grade" class="bg-transparent border-b border-dashed border-sky-300 outline-none w-full text-sky-800 font-bold min-w-[80px]">
+                <input *ngIf="isAdmin" [(ngModel)]="row.grade" class="bg-transparent border-b border-dashed border-sky-300 outline-none w-full text-sky-800 font-bold min-w-[80px] text-[9px] sm:text-xs md:text-sm">
                 <span *ngIf="!isAdmin">{{ row.grade }}</span>
               </td>
-              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50"><input *ngIf="isAdmin" [(ngModel)]="row.semFee" class="bg-transparent border-b border-dashed border-slate-300 w-12 sm:w-16 text-center outline-none"><span *ngIf="!isAdmin">{{ row.semFee }}</span></td>
-              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 font-bold text-sky-600"><input *ngIf="isAdmin" [(ngModel)]="row.yearFee" class="bg-transparent border-b border-dashed border-sky-300 w-16 sm:w-20 text-center outline-none"><span *ngIf="!isAdmin">{{ row.yearFee }}</span></td>
-              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50"><input *ngIf="isAdmin" [(ngModel)]="row.matFee" class="bg-transparent border-b border-dashed border-slate-300 w-12 sm:w-16 text-center outline-none"><span *ngIf="!isAdmin">{{ row.matFee }}</span></td>
-              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 text-slate-400"><input *ngIf="isAdmin" [(ngModel)]="row.techFee" class="bg-transparent border-b border-dashed border-slate-300 w-12 sm:w-16 text-center outline-none"><span *ngIf="!isAdmin">{{ row.techFee }}</span></td>
-              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 text-slate-400"><input *ngIf="isAdmin" [(ngModel)]="row.sciFee" class="bg-transparent border-b border-dashed border-slate-300 w-12 sm:w-16 text-center outline-none"><span *ngIf="!isAdmin">{{ row.sciFee }}</span></td>
-              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50"><input *ngIf="isAdmin" [(ngModel)]="row.sub" class="bg-transparent border-b border-dashed border-slate-300 w-12 sm:w-16 text-center outline-none"><span *ngIf="!isAdmin">{{ row.sub }}</span></td>
-              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 font-bold text-amber-500"><input *ngIf="isAdmin" [(ngModel)]="row.totSem" class="bg-transparent border-b border-dashed border-amber-300 w-16 sm:w-20 text-center outline-none text-amber-600"><span *ngIf="!isAdmin">{{ row.totSem }}</span></td>
-              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 font-bold text-amber-500"><input *ngIf="isAdmin" [(ngModel)]="row.totYear" class="bg-transparent border-b border-dashed border-amber-300 w-16 sm:w-20 text-center outline-none text-amber-600"><span *ngIf="!isAdmin">{{ row.totYear }}</span></td>
-              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50"><input *ngIf="isAdmin" [(ngModel)]="row.admFee" class="bg-transparent border-b border-dashed border-slate-300 w-12 sm:w-16 text-center outline-none"><span *ngIf="!isAdmin">{{ row.admFee }}</span></td>
-              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50"><input *ngIf="isAdmin" [(ngModel)]="row.uniFee" class="bg-transparent border-b border-dashed border-slate-300 w-12 sm:w-16 text-center outline-none"><span *ngIf="!isAdmin">{{ row.uniFee }}</span></td>
+              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50"><input *ngIf="isAdmin" [(ngModel)]="row.semFee" class="bg-transparent border-b border-dashed border-slate-300 w-10 sm:w-12 md:w-16 text-center outline-none text-[9px] sm:text-xs md:text-sm"><span *ngIf="!isAdmin">{{ row.semFee }}</span></td>
+              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 font-bold text-sky-600"><input *ngIf="isAdmin" [(ngModel)]="row.yearFee" class="bg-transparent border-b border-dashed border-sky-300 w-12 sm:w-14 md:w-20 text-center outline-none text-[9px] sm:text-xs md:text-sm"><span *ngIf="!isAdmin">{{ row.yearFee }}</span></td>
+              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50"><input *ngIf="isAdmin" [(ngModel)]="row.matFee" class="bg-transparent border-b border-dashed border-slate-300 w-10 sm:w-12 md:w-16 text-center outline-none text-[9px] sm:text-xs md:text-sm"><span *ngIf="!isAdmin">{{ row.matFee }}</span></td>
+              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 text-slate-400"><input *ngIf="isAdmin" [(ngModel)]="row.techFee" class="bg-transparent border-b border-dashed border-slate-300 w-10 sm:w-12 md:w-16 text-center outline-none text-[9px] sm:text-xs md:text-sm"><span *ngIf="!isAdmin">{{ row.techFee }}</span></td>
+              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 text-slate-400"><input *ngIf="isAdmin" [(ngModel)]="row.sciFee" class="bg-transparent border-b border-dashed border-slate-300 w-10 sm:w-12 md:w-16 text-center outline-none text-[9px] sm:text-xs md:text-sm"><span *ngIf="!isAdmin">{{ row.sciFee }}</span></td>
+              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50"><input *ngIf="isAdmin" [(ngModel)]="row.sub" class="bg-transparent border-b border-dashed border-slate-300 w-10 sm:w-12 md:w-16 text-center outline-none text-[9px] sm:text-xs md:text-sm"><span *ngIf="!isAdmin">{{ row.sub }}</span></td>
+              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 font-bold text-amber-500"><input *ngIf="isAdmin" [(ngModel)]="row.totSem" class="bg-transparent border-b border-dashed border-amber-300 w-12 sm:w-14 md:w-20 text-center outline-none text-amber-600 text-[9px] sm:text-xs md:text-sm"><span *ngIf="!isAdmin">{{ row.totSem }}</span></td>
+              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 font-bold text-amber-500"><input *ngIf="isAdmin" [(ngModel)]="row.totYear" class="bg-transparent border-b border-dashed border-amber-300 w-12 sm:w-14 md:w-20 text-center outline-none text-amber-600 text-[9px] sm:text-xs md:text-sm"><span *ngIf="!isAdmin">{{ row.totYear }}</span></td>
+              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50"><input *ngIf="isAdmin" [(ngModel)]="row.admFee" class="bg-transparent border-b border-dashed border-slate-300 w-10 sm:w-12 md:w-16 text-center outline-none text-[9px] sm:text-xs md:text-sm"><span *ngIf="!isAdmin">{{ row.admFee }}</span></td>
+              <td class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50"><input *ngIf="isAdmin" [(ngModel)]="row.uniFee" class="bg-transparent border-b border-dashed border-slate-300 w-10 sm:w-12 md:w-16 text-center outline-none text-[9px] sm:text-xs md:text-sm"><span *ngIf="!isAdmin">{{ row.uniFee }}</span></td>
 
               <td *ngFor="let col of customColumns; let cIdx = index" class="p-2 sm:p-3 md:p-3 text-center border-r border-white/50 bg-purple-50/30 group-hover/row:bg-purple-50">
-                <input *ngIf="isAdmin" [(ngModel)]="row.customData[cIdx]" class="bg-transparent border-b border-dashed border-purple-300 w-12 sm:w-16 text-center outline-none text-purple-800 font-bold"><span *ngIf="!isAdmin" class="text-purple-800 font-bold">{{ row.customData[cIdx] }}</span>
+                <input *ngIf="isAdmin" [(ngModel)]="row.customData[cIdx]" class="bg-transparent border-b border-dashed border-purple-300 w-10 sm:w-12 md:w-16 text-center outline-none text-purple-800 font-bold text-[9px] sm:text-xs md:text-sm"><span *ngIf="!isAdmin" class="text-purple-800 font-bold">{{ row.customData[cIdx] }}</span>
               </td>
             </ng-container>
 
             <ng-container *ngIf="row.isHeading">
-              <td [attr.colspan]="11 + customColumns.length" class="p-3 sm:p-4 md:p-4 text-center border-r border-white/50">
-                <input *ngIf="isAdmin" [(ngModel)]="row.grade" class="bg-transparent border-b border-dashed border-slate-400 w-full max-w-[200px] sm:max-w-md mx-auto text-center outline-none text-slate-800 font-black uppercase tracking-widest text-[10px] sm:text-xs">
-                <span *ngIf="!isAdmin" class="text-slate-800 font-black uppercase tracking-widest text-[10px] sm:text-xs">{{ row.grade }}</span>
+              <td [attr.colspan]="11 + customColumns.length" class="p-2 sm:p-3 md:p-4 text-center border-r border-white/50">
+                <input *ngIf="isAdmin" [(ngModel)]="row.grade" class="bg-transparent border-b border-dashed border-slate-400 w-full max-w-[150px] sm:max-w-[200px] md:max-w-md mx-auto text-center outline-none text-slate-800 font-black uppercase tracking-widest text-[9px] sm:text-[10px] md:text-xs">
+                <span *ngIf="!isAdmin" class="text-slate-800 font-black uppercase tracking-widest text-[9px] sm:text-[10px] md:text-xs">{{ row.grade }}</span>
               </td>
             </ng-container>
 
-            <td *ngIf="isAdmin" class="p-2 sm:p-3 md:p-3 text-center">
-              <button (click)="removeRow(i)" class="text-red-500 hover:text-red-700 bg-red-50 p-1 rounded-lg"><span translate="no" class="material-symbols-outlined text-[14px] sm:text-[16px] notranslate">delete</span></button>
+            <td *ngIf="isAdmin" class="p-1 sm:p-2 md:p-3 text-center">
+              <button (click)="removeRow(i)" class="text-red-500 hover:text-red-700 bg-red-50 p-1 rounded-lg border border-red-100"><span translate="no" class="material-symbols-outlined text-[14px] sm:text-[16px] notranslate">delete</span></button>
             </td>
           </tr>
           </tbody>
@@ -149,67 +158,68 @@
       </div>
     </section>
 
-    <div *ngIf="isAdmin" class="flex justify-center pt-4 md:pt-8 border-t border-slate-200">
-      <button (click)="addTable()" class="bg-slate-900 text-white px-4 md:px-6 py-2.5 md:py-3 rounded-full font-black text-xs md:text-sm flex items-center gap-2 hover:bg-sky-500 transition-all shadow-md border border-slate-700">
+    <div *ngIf="isAdmin" class="flex justify-center pt-6 md:pt-8 border-t border-slate-200 mt-6 sm:mt-8">
+      <button (click)="addTable()" class="bg-slate-900 text-white px-4 sm:px-5 md:px-6 py-2.5 md:py-3 rounded-full font-black text-[10px] sm:text-xs md:text-sm flex items-center gap-1.5 md:gap-2 hover:bg-sky-500 transition-all shadow-md border border-slate-700">
         <span translate="no" class="material-symbols-outlined text-[16px] md:text-[18px] notranslate">table_view</span> Add Additional Table
       </button>
     </div>
 
-    <section *ngFor="let table of extraTables; let tIdx = index" class="animate-fade-in-up relative mt-8 md:mt-12 bg-white/80 backdrop-blur-md rounded-[1.5rem] md:rounded-[2rem] border border-white shadow-lg p-4 sm:p-6 group hover:border-sky-300 transition-all w-full overflow-hidden">
+    <section *ngFor="let table of extraTables; let tIdx = index" class="animate-fade-in-up relative mt-6 sm:mt-8 md:mt-12 bg-white/80 backdrop-blur-md rounded-[1.5rem] md:rounded-[2rem] border border-white shadow-lg p-4 sm:p-6 w-full overflow-hidden">
 
-      <button *ngIf="isAdmin" (click)="removeTable(tIdx)" class="absolute -top-3 -left-3 md:-top-4 md:-left-4 size-8 md:size-10 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 shadow-xl transition-all z-50 border border-red-200">
-        <span translate="no" class="material-symbols-outlined text-[14px] md:text-[18px] notranslate">delete</span>
-      </button>
+      <div class="mb-3 md:mb-6 flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4">
+        <input *ngIf="isAdmin" [(ngModel)]="table.title" class="bg-transparent border-b-2 border-dashed border-blue-300 outline-none text-base sm:text-xl md:text-2xl font-black text-blue-900 w-full sm:max-w-xs md:max-w-md focus:border-blue-600">
+        <h2 *ngIf="!isAdmin" class="text-base sm:text-xl md:text-2xl font-black text-slate-900 uppercase tracking-tight">{{ table.title }}</h2>
 
-      <div class="mb-4 md:mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <input *ngIf="isAdmin" [(ngModel)]="table.title" class="bg-transparent border-b-2 border-dashed border-blue-300 outline-none text-xl sm:text-2xl font-black text-blue-900 w-full md:max-w-md focus:border-blue-600">
-        <h2 *ngIf="!isAdmin" class="text-xl sm:text-2xl font-black text-slate-900 uppercase tracking-tight">{{ table.title }}</h2>
-
-        <div *ngIf="isAdmin" class="flex flex-wrap justify-start md:justify-end gap-2">
-          <button (click)="addExtraTableColumn(tIdx)" class="bg-sky-100 text-sky-700 px-2 py-1 md:px-3 md:py-1.5 rounded-lg font-bold text-[10px] md:text-xs flex items-center gap-1 hover:bg-sky-500 hover:text-white transition-colors shadow-sm">
-            <span translate="no" class="material-symbols-outlined text-[12px] md:text-[14px] notranslate">view_column</span> Add Col
+        <div *ngIf="isAdmin" class="flex flex-wrap justify-start sm:justify-end gap-1.5 sm:gap-2">
+          <button (click)="addExtraTableColumn(tIdx)" class="bg-sky-100 text-sky-700 px-2 py-1 md:px-3 md:py-1.5 rounded-lg font-bold text-[9px] sm:text-[10px] md:text-xs flex items-center gap-1 hover:bg-sky-500 hover:text-white transition-colors shadow-sm">
+            <span translate="no" class="material-symbols-outlined text-[10px] md:text-[14px] notranslate">view_column</span> <span class="hidden sm:inline">Add Col</span><span class="sm:hidden">Col</span>
           </button>
-          <button (click)="addExtraTableHeading(tIdx)" class="bg-purple-100 text-purple-700 px-2 py-1 md:px-3 md:py-1.5 rounded-lg font-bold text-[10px] md:text-xs flex items-center gap-1 hover:bg-purple-500 hover:text-white transition-colors shadow-sm">
-            <span translate="no" class="material-symbols-outlined text-[12px] md:text-[14px] notranslate">horizontal_rule</span> Add Merge
+          <button (click)="addExtraTableHeading(tIdx)" class="bg-purple-100 text-purple-700 px-2 py-1 md:px-3 md:py-1.5 rounded-lg font-bold text-[9px] sm:text-[10px] md:text-xs flex items-center gap-1 hover:bg-purple-500 hover:text-white transition-colors shadow-sm">
+            <span translate="no" class="material-symbols-outlined text-[10px] md:text-[14px] notranslate">horizontal_rule</span> <span class="hidden sm:inline">Add Merge</span><span class="sm:hidden">Merge</span>
           </button>
-          <button (click)="addExtraTableRow(tIdx)" class="bg-slate-900 text-white px-2 py-1 md:px-3 md:py-1.5 rounded-lg font-bold text-[10px] md:text-xs flex items-center gap-1 hover:bg-sky-500 transition-colors shadow-sm border border-slate-700">
-            <span translate="no" class="material-symbols-outlined text-[12px] md:text-[14px] notranslate">add</span> Add Row
+          <button (click)="addExtraTableRow(tIdx)" class="bg-slate-900 text-white px-2 py-1 md:px-3 md:py-1.5 rounded-lg font-bold text-[9px] sm:text-[10px] md:text-xs flex items-center gap-1 hover:bg-sky-500 transition-colors shadow-sm border border-slate-700">
+            <span translate="no" class="material-symbols-outlined text-[10px] md:text-[14px] notranslate">add</span> <span class="hidden sm:inline">Add Row</span><span class="sm:hidden">Row</span>
+          </button>
+          <button (click)="removeTable(tIdx)" class="bg-red-100 text-red-700 px-2 py-1 md:px-3 md:py-1.5 rounded-lg font-bold text-[9px] sm:text-[10px] md:text-xs flex items-center gap-1 hover:bg-red-600 hover:text-white transition-colors shadow-sm">
+            <span translate="no" class="material-symbols-outlined text-[10px] md:text-[14px] notranslate">delete</span> <span class="hidden sm:inline">Delete Table</span><span class="sm:hidden">Delete</span>
           </button>
         </div>
       </div>
 
-      <div class="overflow-x-auto rounded-xl border border-white shadow-sm bg-white/50">
-        <table class="w-full text-xs sm:text-sm text-left border-collapse min-w-[500px]">
+      <div class="overflow-x-auto rounded-[1rem] sm:rounded-xl border border-white shadow-sm bg-white/50 custom-scrollbar" style="-webkit-overflow-scrolling: touch;">
+        <table class="w-full text-[10px] sm:text-xs md:text-sm text-left border-collapse min-w-[300px] sm:min-w-[400px]">
 
           <thead class="bg-slate-50/80 text-slate-700 uppercase tracking-wider font-bold">
           <tr>
-            <th *ngFor="let col of table.columns; let cIdx = index" class="p-3 sm:p-4 border-r border-b border-white/50 relative group/col min-w-[100px]">
-              <input *ngIf="isAdmin" [(ngModel)]="table.columns[cIdx]" class="bg-transparent border-b border-dashed border-slate-400 w-full outline-none font-bold text-slate-700">
-              <span *ngIf="!isAdmin">{{ table.columns[cIdx] }}</span>
-              <button *ngIf="isAdmin && table.columns.length > 1" (click)="removeExtraTableColumn(tIdx, cIdx)" class="absolute top-1 right-1 size-4 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover/col:opacity-100 transition-opacity shadow-sm"><span translate="no" class="material-symbols-outlined text-[8px] notranslate">close</span></button>
+            <th *ngFor="let col of table.columns; let cIdx = index" class="p-2 sm:p-4 border-r border-b border-white/50 min-w-[80px] align-middle">
+              <div class="flex flex-col items-center gap-1 justify-center">
+                <input *ngIf="isAdmin" [(ngModel)]="table.columns[cIdx]" class="bg-transparent border-b border-dashed border-slate-400 w-full outline-none font-bold text-slate-700 text-center text-[9px] sm:text-[10px] md:text-xs">
+                <span *ngIf="!isAdmin" class="text-center">{{ table.columns[cIdx] }}</span>
+                <button *ngIf="isAdmin && table.columns.length > 1" (click)="removeExtraTableColumn(tIdx, cIdx)" class="text-red-400 hover:text-red-600 bg-red-50 rounded p-1 flex items-center justify-center transition-colors shadow-sm mt-1"><span translate="no" class="material-symbols-outlined text-[10px] md:text-[12px] notranslate">delete</span></button>
+              </div>
             </th>
-            <th *ngIf="isAdmin" class="p-3 sm:p-4 border-b border-white/50 text-center text-red-500 uppercase">Act</th>
+            <th *ngIf="isAdmin" class="p-2 sm:p-4 border-b border-white/50 text-center text-red-500 uppercase w-8 sm:w-10 text-[9px] sm:text-[10px]">Act</th>
           </tr>
           </thead>
 
           <tbody class="divide-y divide-white/50 text-slate-600 font-medium">
-          <tr *ngFor="let row of table.rows; let rIdx = index" class="hover:bg-white transition-colors" [ngClass]="{'bg-slate-100/50 font-black shadow-inner': row.isHeading}">
+          <tr *ngFor="let row of table.rows; let rIdx = index" class="hover:bg-white transition-colors group/xrow" [ngClass]="{'bg-slate-100/50 font-black shadow-inner': row.isHeading}">
 
             <ng-container *ngIf="!row.isHeading">
-              <td *ngFor="let cell of row.data; let cIdx = index" class="p-3 sm:p-4 border-r border-white/50">
-                <input *ngIf="isAdmin" [(ngModel)]="row.data[cIdx]" class="bg-transparent border-b border-dashed border-slate-300 w-full outline-none" [ngClass]="{'text-right text-blue-600 font-bold': cIdx > 0, 'font-bold text-slate-800': cIdx === 0}">
+              <td *ngFor="let cell of row.data; let cIdx = index" class="p-2 sm:p-4 border-r border-white/50">
+                <input *ngIf="isAdmin" [(ngModel)]="row.data[cIdx]" class="bg-transparent border-b border-dashed border-slate-300 w-full outline-none text-[9px] sm:text-[10px] md:text-xs" [ngClass]="{'text-right text-blue-600 font-bold': cIdx > 0, 'font-bold text-slate-800': cIdx === 0}">
                 <div *ngIf="!isAdmin" [ngClass]="{'text-right text-blue-600 font-bold': cIdx > 0, 'font-bold text-slate-800': cIdx === 0}">{{ row.data[cIdx] }}</div>
               </td>
             </ng-container>
 
             <ng-container *ngIf="row.isHeading">
-              <td [attr.colspan]="table.columns.length" class="p-3 sm:p-4 text-center border-r border-white/50">
-                <input *ngIf="isAdmin" [(ngModel)]="row.data[0]" class="bg-transparent border-b border-dashed border-slate-400 w-full max-w-[200px] sm:max-w-md mx-auto text-center outline-none text-slate-800 font-black uppercase tracking-widest text-[10px] sm:text-xs">
-                <span *ngIf="!isAdmin" class="text-slate-800 font-black uppercase tracking-widest text-[10px] sm:text-xs">{{ row.data[0] }}</span>
+              <td [attr.colspan]="table.columns.length" class="p-2 sm:p-3 md:p-4 text-center border-r border-white/50">
+                <input *ngIf="isAdmin" [(ngModel)]="row.data[0]" class="bg-transparent border-b border-dashed border-slate-400 w-full max-w-[120px] sm:max-w-[150px] md:max-w-md mx-auto text-center outline-none text-slate-800 font-black uppercase tracking-widest text-[9px] sm:text-[10px] md:text-xs">
+                <span *ngIf="!isAdmin" class="text-slate-800 font-black uppercase tracking-widest text-[9px] sm:text-[10px] md:text-xs">{{ row.data[0] }}</span>
               </td>
             </ng-container>
 
-            <td *ngIf="isAdmin" class="p-2 sm:p-4 text-center">
+            <td *ngIf="isAdmin" class="p-1 sm:p-2 text-center">
               <button (click)="removeExtraTableRow(tIdx, rIdx)" class="text-red-500 hover:text-red-700 bg-red-50 p-1 rounded-lg border border-red-100">
                 <span translate="no" class="material-symbols-outlined text-[14px] sm:text-[16px] notranslate">delete</span>
               </button>
@@ -220,59 +230,60 @@
       </div>
     </section>
 
-    <section class="bg-white/80 backdrop-blur-md border-l-8 border-amber-400 rounded-r-[1.5rem] md:rounded-[2rem] border-y border-r border-white p-6 md:p-8 shadow-lg animate-fade-in-up delay-200 relative mt-8 md:mt-12 hover:border-r-amber-100 hover:border-y-amber-100 transition-colors w-full overflow-hidden">
-      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-3">
-        <h3 class="text-lg md:text-xl font-bold text-slate-900 flex items-center gap-2">
-          <span translate="no" class="material-symbols-outlined notranslate text-amber-500 text-[20px] md:text-[24px]">warning</span> Important Notes
+    <section class="bg-white/80 backdrop-blur-md border-l-4 sm:border-l-8 border-amber-400 rounded-r-[1.5rem] md:rounded-[2rem] border-y border-r border-white p-4 sm:p-6 md:p-8 shadow-lg animate-fade-in-up delay-200 relative mt-6 sm:mt-8 md:mt-12 hover:border-r-amber-100 hover:border-y-amber-100 transition-colors w-full overflow-hidden">
+      <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-3 sm:mb-4 gap-2 sm:gap-3">
+        <h3 class="text-base sm:text-lg md:text-xl font-bold text-slate-900 flex items-center gap-1.5 sm:gap-2">
+          <span translate="no" class="material-symbols-outlined notranslate text-amber-500 text-[18px] sm:text-[20px] md:text-[24px]">warning</span> Important Notes
         </h3>
-        <button *ngIf="isAdmin" (click)="addNote()" class="w-fit text-[10px] md:text-xs bg-amber-100 text-amber-700 px-3 py-1.5 rounded-lg font-bold hover:bg-amber-200 shadow-sm border border-amber-200">+ Add Note</button>
+        <button *ngIf="isAdmin" (click)="addNote()" class="w-fit text-[9px] sm:text-[10px] md:text-xs bg-amber-100 text-amber-700 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg font-bold hover:bg-amber-200 shadow-sm border border-amber-200">+ Add Note</button>
       </div>
 
-      <ol class="list-decimal list-outside pl-4 sm:pl-5 space-y-3 text-xs md:text-sm text-slate-600 font-medium">
+      <ol class="list-decimal list-outside pl-4 sm:pl-5 space-y-2.5 sm:space-y-3 text-[10px] sm:text-xs md:text-sm text-slate-600 font-medium">
         <li *ngFor="let note of notes; let i = index" [class.text-red-500]="note.isRed" [class.font-bold]="note.isRed" class="relative group">
-          <input *ngIf="isAdmin" [(ngModel)]="note.text" class="w-full bg-transparent border-b border-dashed border-slate-300 outline-none p-1 mt-1">
-          <span *ngIf="!isAdmin" class="block mt-1 leading-relaxed">{{ note.text }}</span>
+          <input *ngIf="isAdmin" [(ngModel)]="note.text" class="w-full bg-transparent border-b border-dashed border-slate-300 outline-none p-1 mt-0.5 sm:mt-1">
+          <span *ngIf="!isAdmin" class="block mt-0.5 sm:mt-1 leading-relaxed">{{ note.text }}</span>
 
-          <div *ngIf="isAdmin" class="absolute right-0 top-6 sm:-right-2 sm:top-0 flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity bg-white px-2 py-1 rounded-lg shadow-md border border-slate-100 z-10">
-            <label class="text-[10px] flex items-center gap-1 cursor-pointer font-bold"><input type="checkbox" [(ngModel)]="note.isRed" class="accent-red-500"> Red Text</label>
-            <button (click)="removeNote(i)" class="text-red-500 hover:text-red-700"><span translate="no" class="material-symbols-outlined text-[14px] notranslate">delete</span></button>
+          <div *ngIf="isAdmin" class="absolute right-0 -top-1 sm:-right-2 sm:top-0 flex gap-1.5 sm:gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity bg-white px-1.5 sm:px-2 py-1 rounded-lg shadow-md border border-slate-100 z-10">
+            <label class="text-[9px] sm:text-[10px] flex items-center gap-1 cursor-pointer font-bold"><input type="checkbox" [(ngModel)]="note.isRed" class="accent-red-500 size-3 sm:size-auto"> Red</label>
+            <button (click)="removeNote(i)" class="text-red-500 hover:text-red-700"><span translate="no" class="material-symbols-outlined text-[12px] sm:text-[14px] notranslate">delete</span></button>
           </div>
         </li>
       </ol>
     </section>
 
+    <div class="h-24 md:h-32 w-full shrink-0 block mt-8"></div>
   </main>
 
   <div *ngIf="editMode" class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
     <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
-      <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-        <h2 class="text-xl font-black text-slate-800 uppercase tracking-tight">Edit Section</h2>
-        <button (click)="closeEditModal()" class="text-slate-400 hover:text-red-500 transition-colors"><span translate="no" class="material-symbols-outlined notranslate">close</span></button>
+      <div class="p-5 sm:p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 shrink-0">
+        <h2 class="text-lg sm:text-xl font-black text-slate-800 uppercase tracking-tight">Edit Section</h2>
+        <button (click)="closeEditModal()" class="text-slate-400 hover:text-red-500 transition-colors"><span translate="no" class="material-symbols-outlined notranslate text-xl sm:text-2xl">close</span></button>
       </div>
 
-      <div class="p-6 flex flex-col gap-4 overflow-y-auto custom-scrollbar">
+      <div class="p-5 sm:p-6 flex flex-col gap-4 overflow-y-auto custom-scrollbar">
         <ng-container *ngIf="editMode === 'header'">
-          <div><label class="text-xs font-bold text-slate-500 uppercase block mb-1">Badge Text</label><input type="text" [(ngModel)]="editData.badge" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500"></div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase block mb-1">Title Start</label><input type="text" [(ngModel)]="editData.titleStart" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500"></div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase block mb-1">Title Highlight</label><input type="text" [(ngModel)]="editData.titleHighlight" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500"></div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase block mb-1">Description</label><textarea [(ngModel)]="editData.description" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500"></textarea></div>
+          <div><label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1">Badge Text</label><input type="text" [(ngModel)]="editData.badge" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500 text-sm"></div>
+          <div><label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1">Title Start</label><input type="text" [(ngModel)]="editData.titleStart" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500 text-sm"></div>
+          <div><label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1">Description</label><textarea [(ngModel)]="editData.desc" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500 text-sm resize-none"></textarea></div>
           <div>
-            <label class="text-xs font-bold text-slate-500 uppercase block mb-1 mt-2">Background Image</label>
-            <div class="flex items-center gap-4">
+            <label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1 mt-2">Background Image</label>
+            <div class="flex items-center gap-3 sm:gap-4">
               <input type="file" #bgInput (change)="onFileSelected($event, 'bgImage')" accept="image/*" class="hidden">
-              <button (click)="bgInput.click()" class="px-4 py-2 bg-sky-100 text-sky-700 font-bold rounded-lg hover:bg-sky-200 flex items-center gap-2"><span translate="no" class="material-symbols-outlined notranslate text-[18px]">upload_file</span> Choose Image</button>
-              <div *ngIf="editData.bgImage" class="h-10 w-16 rounded bg-cover bg-center border border-slate-200 shadow-inner" [style.background-image]="'url(' + editData.bgImage + ')'"></div>
+              <button (click)="bgInput.click()" class="px-3 sm:px-4 py-2 bg-sky-100 text-sky-700 font-bold rounded-lg hover:bg-sky-200 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm"><span translate="no" class="material-symbols-outlined notranslate text-[16px] sm:text-[18px]">upload_file</span> <span class="whitespace-nowrap">Choose Image</span></button>
+              <div *ngIf="editData.bgImage" class="h-10 w-16 rounded bg-cover bg-center border border-slate-200 shadow-inner shrink-0" [style.background-image]="'url(' + editData.bgImage + ')'"></div>
             </div>
           </div>
         </ng-container>
       </div>
 
-      <div class="p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/50 mt-auto">
-        <button (click)="closeEditModal()" class="px-6 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-slate-200 transition-colors">Cancel</button>
-        <button (click)="saveEdits()" class="px-6 py-2.5 rounded-xl font-bold bg-slate-900 text-white hover:bg-sky-500 shadow-lg transition-all flex items-center gap-2"><span translate="no" class="material-symbols-outlined text-[18px] notranslate">save</span> Save</button>
+      <div class="p-5 sm:p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/50 mt-auto shrink-0">
+        <button (click)="closeEditModal()" class="px-5 sm:px-6 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-slate-200 transition-colors text-xs sm:text-sm">Cancel</button>
+        <button (click)="saveEdits()" class="px-5 sm:px-6 py-2.5 rounded-xl font-bold bg-slate-900 text-white hover:bg-sky-500 shadow-lg transition-all flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm"><span translate="no" class="material-symbols-outlined text-[16px] sm:text-[18px] notranslate">save</span> Save</button>
       </div>
     </div>
   </div>
 
   <app-footer></app-footer>
+
 </div>

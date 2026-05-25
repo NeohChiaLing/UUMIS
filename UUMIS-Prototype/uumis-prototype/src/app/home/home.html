@@ -161,16 +161,94 @@
   <app-footer></app-footer>
 
   <div *ngIf="editMode" class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+    <div class="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
+        <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight">Edit {{ editMode }}</h3>
+        <button (click)="closeEditModal()" class="text-slate-400 hover:text-red-500 transition-colors">
+          <span translate="no" class="material-symbols-outlined text-2xl">close</span>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto flex-1 space-y-4 custom-scrollbar">
+
+        <ng-container *ngIf="editMode === 'hero'">
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Badge</label><input [(ngModel)]="editData.badge" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Title Start</label><input [(ngModel)]="editData.titleStart" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Title Highlight</label><input [(ngModel)]="editData.titleHighlight" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Description</label><textarea [(ngModel)]="editData.description" rows="3" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-medium focus:ring-2 focus:ring-sky-200 outline-none"></textarea></div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Background Image</label>
+            <div class="flex items-center gap-3">
+              <img *ngIf="editData.bgImage" [src]="editData.bgImage" class="h-12 w-12 object-cover rounded-lg border border-slate-200">
+              <button (click)="heroImgInput.click()" class="bg-slate-100 px-4 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-sky-100 hover:text-sky-600 transition-colors">Change Image</button>
+              <input #heroImgInput type="file" class="hidden" accept="image/*" (change)="onFileSelected($event, 'bgImage')">
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="editMode === 'video'">
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Badge</label><input [(ngModel)]="editData.badge" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Title Start</label><input [(ngModel)]="editData.titleStart" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Title End</label><input [(ngModel)]="editData.titleEnd" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Description</label><textarea [(ngModel)]="editData.desc" rows="3" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-medium focus:ring-2 focus:ring-sky-200 outline-none"></textarea></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">YouTube URL (Embed Link)</label><input [(ngModel)]="editData.url" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+        </ng-container>
+
+        <ng-container *ngIf="editMode === 'announcement'">
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Category / Badge</label><input [(ngModel)]="editData.category" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Style Class (e.g. bg-blue-100 text-blue-700)</label><input [(ngModel)]="editData.styleClass" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-mono focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Title</label><input [(ngModel)]="editData.title" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Description</label><textarea [(ngModel)]="editData.desc" rows="4" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-medium focus:ring-2 focus:ring-sky-200 outline-none"></textarea></div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Image</label>
+            <div class="flex items-center gap-3">
+              <img *ngIf="editData.image" [src]="editData.image" class="h-12 w-12 object-cover rounded-lg border border-slate-200">
+              <button (click)="annImgInput.click()" class="bg-slate-100 px-4 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-sky-100 hover:text-sky-600 transition-colors">Change Image</button>
+              <input #annImgInput type="file" class="hidden" accept="image/*" (change)="onFileSelected($event, 'image')">
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="editMode === 'event'">
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Month</label><input [(ngModel)]="editData.month" placeholder="e.g. MAY" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none uppercase"></div>
+            <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Day</label><input [(ngModel)]="editData.day" placeholder="e.g. 24" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          </div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Event Title</label><input [(ngModel)]="editData.title" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Subtitle / Time</label><input [(ngModel)]="editData.subtitle" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+        </ng-container>
+
+        <ng-container *ngIf="editMode === 'shortcut'">
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Title</label><input [(ngModel)]="editData.title" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Subtitle</label><input [(ngModel)]="editData.subtitle" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Link URL</label><input [(ngModel)]="editData.link" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Background Image</label>
+            <div class="flex items-center gap-3">
+              <img *ngIf="editData.image" [src]="editData.image" class="h-12 w-12 object-cover rounded-lg border border-slate-200">
+              <button (click)="scImgInput.click()" class="bg-slate-100 px-4 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-sky-100 hover:text-sky-600 transition-colors">Change Image</button>
+              <input #scImgInput type="file" class="hidden" accept="image/*" (change)="onFileSelected($event, 'image')">
+            </div>
+          </div>
+        </ng-container>
+
+      </div>
+
+      <div class="p-4 border-t border-slate-100 bg-white flex justify-end shrink-0">
+        <button (click)="saveEdits()" class="px-8 py-3 bg-sky-500 hover:bg-sky-600 text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-lg shadow-sky-200 transition-all">Save Temporarily</button>
+      </div>
+    </div>
   </div>
 
   @if (selectedImage) {
-  <div class="fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in overflow-hidden" (click)="closeImage()">
-    <button class="absolute top-6 right-6 text-white/70 hover:text-white transition-colors z-50" (click)="closeImage()">
-      <span translate="no" class="material-symbols-outlined notranslate text-4xl">close</span>
-    </button>
-    <div class="relative w-full h-full flex items-center justify-center overflow-hidden" (click)="$event.stopPropagation()">
-      <img [src]="selectedImage" [style.transform]="'translate(' + panX + 'px, ' + panY + 'px) scale(' + currentZoom + ')'" (mousedown)="startDrag($event)" (mousemove)="onDrag($event)" (mouseup)="endDrag()" (mouseleave)="endDrag()" class="max-w-full max-h-[85vh] object-contain shadow-2xl transition-transform duration-0 ease-linear rounded-lg" [class.cursor-grab]="currentZoom > 1 && !isDragging" [class.cursor-grabbing]="isDragging" [class.cursor-default]="currentZoom <= 1" alt="Full View">
+    <div class="fixed inset-0 z-[100] bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in overflow-hidden" (click)="closeImage()">
+      <button class="absolute top-6 right-6 text-white/70 hover:text-white transition-colors z-50" (click)="closeImage()">
+        <span translate="no" class="material-symbols-outlined notranslate text-4xl">close</span>
+      </button>
+      <div class="relative w-full h-full flex items-center justify-center overflow-hidden" (click)="$event.stopPropagation()">
+        <img [src]="selectedImage" [style.transform]="'translate(' + panX + 'px, ' + panY + 'px) scale(' + currentZoom + ')'" (mousedown)="startDrag($event)" (mousemove)="onDrag($event)" (mouseup)="endDrag()" (mouseleave)="endDrag()" class="max-w-full max-h-[85vh] object-contain shadow-2xl transition-transform duration-0 ease-linear rounded-lg" [class.cursor-grab]="currentZoom > 1 && !isDragging" [class.cursor-grabbing]="isDragging" [class.cursor-default]="currentZoom <= 1" alt="Full View">
+      </div>
     </div>
-  </div>
   }
 </div>

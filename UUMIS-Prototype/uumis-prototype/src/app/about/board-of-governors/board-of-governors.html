@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-transparent font-display text-slate-900 relative flex flex-col overflow-x-hidden pb-32">
+<div class="min-h-screen bg-transparent font-display text-slate-900 relative flex flex-col overflow-x-hidden pb-10">
 
   <div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
     <div class="absolute -top-40 -right-40 w-[800px] h-[800px] bg-sky-200/40 rounded-full blur-[120px] bubble-float"></div>
@@ -45,21 +45,6 @@
     <div class="fixed bottom-24 right-4 md:right-8 z-[90] flex flex-col items-end gap-4">
       <button *ngIf="isAdmin" (click)="publishChanges()" class="bg-slate-900 text-white px-4 md:px-6 py-3 rounded-full font-black text-xs md:text-sm shadow-2xl hover:bg-sky-500 transition-all flex items-center gap-2 animate-fade-in-up border border-slate-700">
         <span translate="no" class="material-symbols-outlined notranslate text-[18px]">cloud_upload</span> <span class="hidden md:inline">Publish Changes</span><span class="md:hidden">Save</span>
-      </button>
-
-      @if (showLangModal) {
-      <div class="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-white p-3 w-48 animate-fade-in-up flex flex-col gap-1">
-        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 px-3 mt-1">Select Language</h3>
-        <button (click)="switchLanguage('en')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-sky-50 hover:text-sky-500 font-bold text-sm transition-colors flex items-center gap-3">
-          <span class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-black">EN</span> English
-        </button>
-        <button (click)="switchLanguage('ms')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-sky-50 hover:text-sky-500 font-bold text-sm transition-colors flex items-center gap-3">
-          <span class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-black">MS</span> Melayu
-        </button>
-      </div>
-      }
-      <button (click)="toggleLangModal()" class="size-12 md:size-14 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-2xl hover:scale-110 hover:bg-sky-500 transition-all cursor-pointer group border border-slate-700">
-        <span translate="no" class="material-symbols-outlined notranslate text-xl md:text-2xl group-hover:scale-110 transition-transform">translate</span>
       </button>
     </div>
 
@@ -134,7 +119,72 @@
       </div>
     </section>
 
+    <div class="h-24 md:h-32 w-full shrink-0 block mt-4"></div>
+
   </main>
   <app-footer></app-footer>
 
+  <div *ngIf="editMode" class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
+    <div class="bg-white rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+
+      <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 shrink-0">
+        <h3 class="text-xl font-black text-slate-800 uppercase tracking-tight">Edit {{ editMode }}</h3>
+        <button (click)="closeEditModal()" class="text-slate-400 hover:text-red-500 transition-colors">
+          <span translate="no" class="material-symbols-outlined text-2xl">close</span>
+        </button>
+      </div>
+
+      <div class="p-6 overflow-y-auto flex-1 space-y-4 custom-scrollbar">
+
+        <ng-container *ngIf="editMode === 'hero'">
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Badge</label><input [(ngModel)]="editData.badge" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Title Start</label><input [(ngModel)]="editData.titleStart" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Title Highlight</label><input [(ngModel)]="editData.titleHighlight" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Description</label><textarea [(ngModel)]="editData.desc" rows="3" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-medium focus:ring-2 focus:ring-sky-200 outline-none"></textarea></div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Background Image</label>
+            <div class="flex items-center gap-3">
+              <img *ngIf="editData.bgImage" [src]="editData.bgImage" class="h-12 w-12 object-cover rounded-lg border border-slate-200">
+              <button (click)="imgInput.click()" class="bg-slate-100 px-4 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-sky-100 hover:text-sky-600 transition-colors">Change Image</button>
+              <input #imgInput type="file" class="hidden" accept="image/*" (change)="onFileSelected($event, 'bgImage')">
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="editMode === 'vc'">
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Name</label><input [(ngModel)]="editData.name" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Title</label><input [(ngModel)]="editData.title" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Quote</label><textarea [(ngModel)]="editData.quote" rows="4" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-medium focus:ring-2 focus:ring-sky-200 outline-none"></textarea></div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Image</label>
+            <div class="flex items-center gap-3">
+              <img *ngIf="editData.image" [src]="editData.image" class="h-12 w-12 object-cover rounded-lg border border-slate-200">
+              <button (click)="vcImgInput.click()" class="bg-slate-100 px-4 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-sky-100 hover:text-sky-600 transition-colors">Change Image</button>
+              <input #vcImgInput type="file" class="hidden" accept="image/*" (change)="onFileSelected($event, 'image')">
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="editMode === 'member'">
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Name</label><input [(ngModel)]="editData.name" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Role / Position</label><input [(ngModel)]="editData.role" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-bold focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Icon (Google Material Symbol)</label><input [(ngModel)]="editData.icon" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-mono focus:ring-2 focus:ring-sky-200 outline-none"></div>
+          <div class="space-y-1"><label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Description</label><textarea [(ngModel)]="editData.desc" rows="4" class="w-full bg-slate-50 border-none rounded-xl p-3 text-sm font-medium focus:ring-2 focus:ring-sky-200 outline-none"></textarea></div>
+          <div class="space-y-1">
+            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">Image</label>
+            <div class="flex items-center gap-3">
+              <img *ngIf="editData.image" [src]="editData.image" class="h-12 w-12 object-cover rounded-lg border border-slate-200">
+              <button (click)="memberImgInput.click()" class="bg-slate-100 px-4 py-2 rounded-lg text-xs font-bold text-slate-600 hover:bg-sky-100 hover:text-sky-600 transition-colors">Change Image</button>
+              <input #memberImgInput type="file" class="hidden" accept="image/*" (change)="onFileSelected($event, 'image')">
+            </div>
+          </div>
+        </ng-container>
+
+      </div>
+
+      <div class="p-4 border-t border-slate-100 bg-white flex justify-end shrink-0">
+        <button (click)="saveEdits()" class="px-8 py-3 bg-sky-500 hover:bg-sky-600 text-white font-black text-xs uppercase tracking-widest rounded-xl shadow-lg transition-all">Save Temporarily</button>
+      </div>
+    </div>
+  </div>
 </div>

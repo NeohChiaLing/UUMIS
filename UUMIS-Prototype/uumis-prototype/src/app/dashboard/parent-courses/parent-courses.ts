@@ -44,7 +44,28 @@ export class ParentCoursesComponent implements OnInit, OnDestroy {
     if (this.currentUser && this.currentUser.role.toLowerCase() === 'parent') {
       this.authService.getStudents().subscribe({
         next: (students: any[]) => {
-          this.myChildren = students.filter(s => s.parentId === this.currentUser.id);
+          this.myChildren = students
+            .filter(s => s.parentId === this.currentUser.id || s.parent_id === this.currentUser.id)
+            .map(child => {
+              let profileData: any = {};
+              const rawProfileJson = child.profile_json || child.profileJson;
+              if (rawProfileJson) {
+                try { profileData = JSON.parse(rawProfileJson); } catch (e) {}
+              }
+
+              let displayName = child.fullName || child.username || 'No Name';
+              if (profileData.firstName || profileData.lastName || profileData.familyName) {
+                const lName = profileData.lastName || profileData.familyName || '';
+                displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+              }
+
+              return {
+                ...child,
+                displayName: displayName,
+                fullName: displayName,
+                name: displayName
+              };
+            });
         }
       });
     }
@@ -79,7 +100,6 @@ export class ParentCoursesComponent implements OnInit, OnDestroy {
 
     this.authService.getSubjects().subscribe({
       next: (dbSubjects) => {
-        // ⭐ THE FIX: Added s.year_group fallback to correctly fetch subjects!
         const mySubjects = dbSubjects.filter(s => (s.yearGroup || s.year_group || '').trim().toLowerCase() === this.studentYear.toLowerCase());
 
         this.authService.getStudentGrades(childIdentifier).subscribe({
@@ -87,7 +107,6 @@ export class ParentCoursesComponent implements OnInit, OnDestroy {
 
             this.authService.getAssignments().subscribe({
               next: (assignmentsRes) => {
-                // ⭐ THE FIX: Added a.year_group fallback to correctly fetch tasks!
                 const myAssignments = assignmentsRes.filter(a => (a.yearGroup || a.year_group || '').trim().toLowerCase() === this.studentYear.toLowerCase());
 
                 this.allAssignments = myAssignments.map((a: any) => {

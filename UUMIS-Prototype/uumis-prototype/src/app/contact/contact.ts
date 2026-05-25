@@ -90,23 +90,38 @@ export class ContactComponent implements OnInit {
       });
   }
 
-  // --- FORM SUBMISSIONS ---
+// --- FORM SUBMISSIONS ---
   submitGeneral(event: Event) {
     event.preventDefault();
     if(!this.generalForm.consent1 || !this.generalForm.consent2) {
       alert("Please agree to the Privacy Policy to continue.");
       return;
     }
-    console.log("General Form Payload:", this.generalForm);
-    alert('Thank you! Your general enquiry has been sent to our team.');
-    this.generalForm = { consent1: false, consent2: '' };
+
+    console.log("Sending General Form Payload to server...", this.generalForm);
+
+    // THE FIX: Send the form data to the backend API
+    this.http.post('/api/contact/submit', this.generalForm).subscribe({
+      next: () => {
+        alert('Thank you! Your general enquiry has been sent to our team.');
+        this.generalForm = { consent1: false, consent2: '' };
+      },
+      error: () => alert('Failed to send enquiry. Please try again later.')
+    });
   }
 
   submitAdmissions(event: Event) {
     event.preventDefault();
-    console.log("Admissions Form Payload:", this.admissionsForm);
-    alert('Thank you! Our Admissions team will contact you shortly.');
-    this.admissionsForm = {};
+    console.log("Sending Admissions Form Payload to server...", this.admissionsForm);
+
+    // THE FIX: Send admissions data to the same backend API
+    this.http.post('/api/contact/submit', this.admissionsForm).subscribe({
+      next: () => {
+        alert('Thank you! Our Admissions team will contact you shortly.');
+        this.admissionsForm = {};
+      },
+      error: () => alert('Failed to send enquiry. Please try again later.')
+    });
   }
 
   scrollToAdmissions() {

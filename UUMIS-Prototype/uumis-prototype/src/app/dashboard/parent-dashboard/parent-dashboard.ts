@@ -13,12 +13,25 @@ import { AuthService } from '../../services/auth.service';
 export class ParentDashboardComponent implements OnInit {
 
   currentUser: any = null;
-  parentName: string = 'Parent';
   todayDate: string = '';
   todayDayName: string = '';
 
-  myChildren: any[] = []; // NEW: Holds all linked children
-  isChildDropdownOpen: boolean = false; // NEW: Controls the top dropdown
+  get parentName(): string {
+    if (typeof localStorage !== 'undefined') {
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        try {
+          const u = JSON.parse(userStr);
+          return u.fullName || u.full_name || u.username || 'Parent';
+        } catch(e) {}
+      }
+    }
+    return 'Parent';
+  }
+
+  myChildren: any[] = [];
+  isChildDropdownOpen: boolean = false;
+  isMobileMenuOpen: boolean = false;
 
   linkedChildData: any = null;
   recentGrades: any[] = [];
@@ -55,20 +68,54 @@ export class ParentDashboardComponent implements OnInit {
         return;
       }
 
-      this.parentName = this.currentUser.fullName || this.currentUser.username;
       const date = new Date();
       this.todayDate = date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
       this.todayDayName = date.toLocaleDateString('en-GB', { weekday: 'long' }).toUpperCase();
 
-      // --- THE FIX: Fetch ALL children for this parent! ---
       this.authService.getStudents().subscribe({
         next: (students: any[]) => {
-          this.myChildren = students.filter(s => s.parentId === this.currentUser.id);
+
+          // THE FIX: Smart filter to perfectly link BOTH Father and Mother simultaneously!
+          this.myChildren = students
+            .filter(child => {
+              let pJson: any = {};
+              const rawJson = child.profile_json || child.profileJson;
+              if (rawJson) {
+                try { pJson = typeof rawJson === 'string' ? JSON.parse(rawJson) : rawJson; } catch(e){}
+              }
+
+              const isLegacyParent = String(child.parentId) === String(this.currentUser.id) || String(child.parent_id) === String(this.currentUser.id);
+              const isFather = String(pJson.fatherAccountId) === String(this.currentUser.id);
+              const isMother = String(pJson.motherAccountId) === String(this.currentUser.id);
+
+              return isLegacyParent || isFather || isMother;
+            })
+            .map(child => {
+              let profileData: any = {};
+              const rawProfileJson = child.profile_json || child.profileJson;
+
+              if (rawProfileJson) {
+                try { profileData = JSON.parse(rawProfileJson); } catch (e) {}
+              }
+
+              let displayName = child.fullName || child.username || 'No Name';
+
+              if (profileData.firstName || profileData.lastName || profileData.familyName) {
+                const lName = profileData.lastName || profileData.familyName || '';
+                displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+              }
+
+              return {
+                ...child,
+                displayName: displayName,
+                fullName: displayName,
+                name: displayName
+              };
+            });
 
           if (this.myChildren.length > 0) {
-            // Check if they previously selected a specific child, otherwise default to the first one
             const savedChildId = sessionStorage.getItem('parentActiveChildId');
-            const activeChild = savedChildId ? this.myChildren.find(c => c.id === savedChildId) : this.myChildren[0];
+            const activeChild = savedChildId ? this.myChildren.find(c => String(c.id) === String(savedChildId)) : this.myChildren[0];
 
             if (activeChild) {
               this.switchActiveChild(activeChild);
@@ -85,13 +132,21 @@ export class ParentDashboardComponent implements OnInit {
     }
   }
 
-  // --- NEW: Switch active child context for the dashboard ---
-  switchActiveChild(child: any) {
-    this.linkedChildData = child;
-    sessionStorage.setItem('parentActiveChildId', child.id); // Save choice to memory!
+  switchActiveChild(child: any, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
+
+    this.fullHeaders = [];
+    this.fullRows = [];
+    this.currentSubject = null;
+    this.upcomingSubjects = [];
+    this.completedSubjects = [];
+
+    this.linkedChildData = { ...child };
+    sessionStorage.setItem('parentActiveChildId', child.id);
     this.isChildDropdownOpen = false;
 
-    // Reload widgets using this specific child's ID
     this.loadChildDashboardData(child.id);
     this.loadRecentGrades(child.id);
   }
@@ -107,18 +162,20 @@ export class ParentDashboardComponent implements OnInit {
   loadChildDashboardData(childId: number) {
     this.authService.getStudentDashboardData(childId).subscribe({
       next: (res) => {
-        // Merge the dashboard specifics (like bio/grade) into the linkedChildData
-        this.linkedChildData = { ...this.linkedChildData, ...res };
-        let childLevel = 'Kindergarten';
-        if (this.linkedChildData && this.linkedChildData.bio && this.linkedChildData.bio !== 'Unassigned') {
-          const parts = this.linkedChildData.bio.split('-');
-          if (parts.length > 0) {
-            childLevel = parts[0].trim();
-          }
+        if (res && String(res.id) === String(this.linkedChildData.id)) {
+          this.linkedChildData = { ...this.linkedChildData, ...res };
         }
-        this.loadTodayTimetable(childLevel);
+
+        if (this.linkedChildData && this.linkedChildData.bio && this.linkedChildData.bio !== 'Unassigned') {
+          this.loadTodayTimetable(this.linkedChildData.bio.trim());
+        }
       },
-      error: (err) => console.log('Failed to securely fetch child data.', err)
+      error: (err) => {
+        console.log('Failed to securely fetch child data.', err);
+        if (this.linkedChildData && this.linkedChildData.bio && this.linkedChildData.bio !== 'Unassigned') {
+          this.loadTodayTimetable(this.linkedChildData.bio.trim());
+        }
+      }
     });
   }
 
@@ -132,11 +189,17 @@ export class ParentDashboardComponent implements OnInit {
   }
 
   loadTodayTimetable(level: string) {
+    this.fullHeaders = [];
+    this.fullRows = [];
+    this.currentSubject = null;
+    this.upcomingSubjects = [];
+    this.completedSubjects = [];
+
     this.authService.getSchedule(level).subscribe({
       next: (res: any) => {
-        if (res && res.headers && res.gridData) {
+        if (res && res.headers && (res.gridData || res.grid_data)) {
           const headers = JSON.parse(res.headers);
-          const rows = JSON.parse(res.gridData);
+          const rows = JSON.parse(res.gridData || res.grid_data);
 
           this.fullHeaders = headers;
           this.fullRows = rows;
@@ -187,10 +250,6 @@ export class ParentDashboardComponent implements OnInit {
             }
 
             validSlots.sort((a, b) => a.startMins - b.startMins);
-
-            this.completedSubjects = [];
-            this.currentSubject = null;
-            this.upcomingSubjects = [];
 
             for (let i = 0; i < validSlots.length; i++) {
               const slot = validSlots[i];

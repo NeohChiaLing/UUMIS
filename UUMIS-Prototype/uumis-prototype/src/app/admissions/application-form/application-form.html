@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-transparent font-display text-slate-900 relative flex flex-col overflow-x-hidden pb-32">
+<div class="min-h-screen bg-transparent font-display text-slate-900 relative flex flex-col overflow-x-hidden pb-10">
 
   <div class="fixed inset-0 pointer-events-none z-[-1] overflow-hidden">
     <div class="absolute -top-40 -right-40 w-[800px] h-[800px] bg-sky-200/40 rounded-full blur-[120px] bubble-float"></div>
@@ -48,51 +48,40 @@
       <button *ngIf="isAdmin" (click)="publishChanges()" class="bg-slate-900 text-white px-4 md:px-6 py-3 rounded-full font-black text-xs md:text-sm shadow-2xl hover:bg-sky-500 transition-all flex items-center gap-2 animate-fade-in-up border border-slate-700">
         <span translate="no" class="material-symbols-outlined notranslate text-[18px]">cloud_upload</span> <span class="hidden md:inline">Publish Changes</span><span class="md:hidden">Save</span>
       </button>
-
-      @if (showLangModal) {
-      <div class="bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl border border-white p-3 w-48 animate-fade-in-up flex flex-col gap-1">
-        <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 px-3 mt-1">Select Language</h3>
-        <button (click)="switchLanguage('en')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-sky-50 hover:text-sky-500 font-bold text-sm transition-colors flex items-center gap-3"><span class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-black">EN</span> English</button>
-        <button (click)="switchLanguage('ms')" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-sky-50 hover:text-sky-500 font-bold text-sm transition-colors flex items-center gap-3"><span class="text-[10px] px-1.5 py-0.5 bg-slate-100 rounded text-slate-500 font-black">MS</span> Melayu</button>
-      </div>
-      }
-      <button (click)="toggleLangModal()" class="size-12 md:size-14 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-2xl hover:scale-110 hover:bg-sky-500 transition-all cursor-pointer group border border-slate-700">
-        <span translate="no" class="material-symbols-outlined notranslate text-xl md:text-2xl group-hover:scale-110 transition-transform">translate</span>
-      </button>
     </div>
 
-    <section class="bg-white/90 backdrop-blur-md border-l-8 border-sky-500 border-white rounded-r-[2rem] p-8 md:p-10 shadow-xl animate-fade-in-up relative group mt-8">
-      <h3 class="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2 uppercase tracking-wide border-b border-slate-200/50 pb-4">
+    <section class="bg-white/90 backdrop-blur-md border-l-8 border-sky-500 border-white rounded-[1.5rem] sm:rounded-r-[2rem] p-6 sm:p-8 md:p-10 shadow-xl animate-fade-in-up relative group mt-8">
+      <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-4 flex items-center gap-2 uppercase tracking-wide border-b border-slate-200/50 pb-4">
         <span translate="no" class="material-symbols-outlined notranslate text-sky-500">description</span> Required Documents
       </h3>
 
-      <div class="grid md:grid-cols-2 gap-8 mt-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mt-6">
         <div class="space-y-3">
           <div class="flex justify-between items-center">
-            <h4 class="font-bold text-blue-600 text-sm uppercase tracking-wider">Malaysian Citizens</h4>
+            <h4 class="font-bold text-blue-600 text-xs sm:text-sm uppercase tracking-wider">Malaysian Citizens</h4>
             <button *ngIf="isAdmin" (click)="addDoc('my')" class="text-[10px] bg-blue-100 text-blue-700 px-2 py-1 rounded font-bold hover:bg-blue-200">+ Add</button>
           </div>
-          <ul class="space-y-2 text-sm text-slate-600 font-medium">
+          <ul class="space-y-2 text-xs sm:text-sm text-slate-600 font-medium">
             <li *ngFor="let doc of malaysianDocs; let i = index; trackBy: trackByIndex" class="flex items-start gap-2">
-              <span translate="no" class="material-symbols-outlined notranslate text-sky-500 text-base">check_circle</span>
+              <span translate="no" class="material-symbols-outlined notranslate text-sky-500 text-sm sm:text-base">check_circle</span>
               <input *ngIf="isAdmin" [(ngModel)]="malaysianDocs[i]" [ngModelOptions]="{standalone: true}" class="border-b border-dashed border-slate-300 outline-none bg-transparent w-full text-blue-700">
-              <span *ngIf="!isAdmin">{{ doc }}</span>
-              <button *ngIf="isAdmin" (click)="removeDoc('my', i)" class="text-red-400 hover:text-red-600 ml-auto"><span translate="no" class="material-symbols-outlined notranslate text-sm">close</span></button>
+              <span *ngIf="!isAdmin" class="mt-0.5">{{ doc }}</span>
+              <button *ngIf="isAdmin" (click)="removeDoc('my', i)" class="text-red-400 hover:text-red-600 ml-auto shrink-0"><span translate="no" class="material-symbols-outlined notranslate text-sm">close</span></button>
             </li>
           </ul>
         </div>
 
         <div class="space-y-3">
           <div class="flex justify-between items-center">
-            <h4 class="font-bold text-indigo-600 text-sm uppercase tracking-wider">Foreign Students</h4>
+            <h4 class="font-bold text-indigo-600 text-xs sm:text-sm uppercase tracking-wider">Foreign Students</h4>
             <button *ngIf="isAdmin" (click)="addDoc('foreign')" class="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-1 rounded font-bold hover:bg-indigo-200">+ Add</button>
           </div>
-          <ul class="space-y-2 text-sm text-slate-600 font-medium">
+          <ul class="space-y-2 text-xs sm:text-sm text-slate-600 font-medium">
             <li *ngFor="let doc of foreignDocs; let i = index; trackBy: trackByIndex" class="flex items-start gap-2">
-              <span translate="no" class="material-symbols-outlined notranslate text-sky-500 text-base">check_circle</span>
+              <span translate="no" class="material-symbols-outlined notranslate text-sky-500 text-sm sm:text-base">check_circle</span>
               <input *ngIf="isAdmin" [(ngModel)]="foreignDocs[i]" [ngModelOptions]="{standalone: true}" class="border-b border-dashed border-slate-300 outline-none bg-transparent w-full text-indigo-700">
-              <span *ngIf="!isAdmin">{{ doc }}</span>
-              <button *ngIf="isAdmin" (click)="removeDoc('foreign', i)" class="text-red-400 hover:text-red-600 ml-auto"><span translate="no" class="material-symbols-outlined notranslate text-sm">close</span></button>
+              <span *ngIf="!isAdmin" class="mt-0.5">{{ doc }}</span>
+              <button *ngIf="isAdmin" (click)="removeDoc('foreign', i)" class="text-red-400 hover:text-red-600 ml-auto shrink-0"><span translate="no" class="material-symbols-outlined notranslate text-sm">close</span></button>
             </li>
           </ul>
         </div>
@@ -101,128 +90,247 @@
 
     <form (submit)="submitForm($event)" class="space-y-8 animate-fade-in-up">
 
-      <div class="bg-white/80 backdrop-blur-md border border-white rounded-[2rem] p-8 md:p-10 shadow-lg hover:border-sky-500/30 transition-colors">
-        <h3 class="text-xl font-bold text-slate-900 mb-6 border-b border-white pb-4 uppercase tracking-wide">Admission Information</h3>
-        <div class="grid md:grid-cols-3 gap-6">
-          <div class="space-y-4">
-            <p class="text-xs font-bold text-slate-400 uppercase">Application Type</p>
+      <div class="bg-white/80 backdrop-blur-md border border-white rounded-[1.5rem] sm:rounded-[2rem] p-6 sm:p-8 md:p-10 shadow-lg hover:border-sky-500/30 transition-colors">
+        <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-6 border-b border-white pb-4 uppercase tracking-wide">Admission Information</h3>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.admType?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('admType')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-2">{{ pageData.fields?.admType?.label || 'Application Type' }}</p>
             <div class="flex flex-col gap-2">
-              <label class="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer hover:text-sky-500"><input type="radio" [(ngModel)]="formData.admType" value="New Admission" name="admType" class="accent-sky-500 size-4"> New Admission</label>
-              <label class="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer hover:text-sky-500"><input type="radio" [(ngModel)]="formData.admType" value="Current Student" name="admType" class="accent-sky-500 size-4"> Current Student</label>
-              <label class="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer hover:text-sky-500"><input type="radio" [(ngModel)]="formData.admType" value="Trial Student" name="admType" class="accent-sky-500 size-4"> Trial Student</label>
+              <label class="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-600 cursor-pointer hover:text-sky-500"><input type="radio" [(ngModel)]="formData.admType" value="New Admission" name="admType" class="accent-sky-500 size-4"> New Admission</label>
+              <label class="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-600 cursor-pointer hover:text-sky-500"><input type="radio" [(ngModel)]="formData.admType" value="Current Student" name="admType" class="accent-sky-500 size-4"> Current Student</label>
+              <label class="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-600 cursor-pointer hover:text-sky-500"><input type="radio" [(ngModel)]="formData.admType" value="Trial Student" name="admType" class="accent-sky-500 size-4"> Trial Student</label>
             </div>
           </div>
-          <div class="space-y-4">
-            <p class="text-xs font-bold text-slate-400 uppercase">Intake Month</p>
+
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.intakeMonth?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('intakeMonth')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <p class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase mb-2">{{ pageData.fields?.intakeMonth?.label || 'Intake Month' }}</p>
             <div class="flex flex-col gap-2">
-              <label class="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer hover:text-sky-500"><input type="checkbox" [(ngModel)]="formData.intakeAug" name="intakeAug" class="accent-sky-500 size-4"> August Intake</label>
-              <label class="flex items-center gap-2 text-sm font-bold text-slate-600 cursor-pointer hover:text-sky-500"><input type="checkbox" [(ngModel)]="formData.intakeJan" name="intakeJan" class="accent-sky-500 size-4"> January Intake</label>
+              <label class="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-600 cursor-pointer hover:text-sky-500"><input type="checkbox" [(ngModel)]="formData.intakeAug" name="intakeAug" class="accent-sky-500 size-4"> August Intake</label>
+              <label class="flex items-center gap-2 text-xs sm:text-sm font-bold text-slate-600 cursor-pointer hover:text-sky-500"><input type="checkbox" [(ngModel)]="formData.intakeJan" name="intakeJan" class="accent-sky-500 size-4"> January Intake</label>
             </div>
           </div>
-          <div class="space-y-2">
-            <label class="text-xs font-bold text-slate-400 uppercase">Intake Year</label>
-            <input type="text" [(ngModel)]="formData.intakeYear" name="intakeYear" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition-all" placeholder="e.g., 2026">
+
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.intakeYear?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('intakeYear')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.intakeYear?.label || 'Intake Year' }}</label>
+            <input type="text" [(ngModel)]="formData.intakeYear" name="intakeYear" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 outline-none transition-all" placeholder="e.g., 2026">
           </div>
+
         </div>
       </div>
 
-      <div class="bg-white/80 backdrop-blur-md border border-white rounded-[2rem] p-8 md:p-10 shadow-lg hover:border-sky-500/30 transition-colors">
-        <h3 class="text-xl font-bold text-slate-900 mb-6 border-b border-white pb-4 uppercase tracking-wide">Personal Details - Student</h3>
-        <div class="grid md:grid-cols-3 gap-6">
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">First Name <span class="text-red-500">*</span></label><input type="text" required [(ngModel)]="formData.firstName" name="firstName" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Middle Name</label><input type="text" [(ngModel)]="formData.middleName" name="middleName" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Family Name</label><input type="text" [(ngModel)]="formData.familyName" name="familyName" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
-          <div class="space-y-2">
-            <label class="text-xs font-bold text-slate-400 uppercase">Gender</label>
-            <select [(ngModel)]="formData.gender" name="gender" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all cursor-pointer">
+      <div class="bg-white/80 backdrop-blur-md border border-white rounded-[1.5rem] sm:rounded-[2rem] p-6 sm:p-8 md:p-10 shadow-lg hover:border-sky-500/30 transition-colors">
+        <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-6 border-b border-white pb-4 uppercase tracking-wide">Personal Details - Student</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6">
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.firstName?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('firstName')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.firstName?.label || 'First Name' }}</label>
+            <input type="text" required [(ngModel)]="formData.firstName" name="firstName" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all">
+          </div>
+
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.middleName?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('middleName')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.middleName?.label || 'Middle Name' }}</label>
+            <input type="text" [(ngModel)]="formData.middleName" name="middleName" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all">
+          </div>
+
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.lastName?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('lastName')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.lastName?.label || 'Last Name' }}</label>
+            <input type="text" [(ngModel)]="formData.lastName" name="lastName" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all">
+          </div>
+
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.gender?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('gender')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.gender?.label || 'Gender' }}</label>
+            <select [(ngModel)]="formData.gender" name="gender" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all cursor-pointer">
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
           </div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Date of Birth</label><input type="date" [(ngModel)]="formData.dob" name="dob" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Age</label><input type="number" [(ngModel)]="formData.age" name="age" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Place of Birth</label><input type="text" [(ngModel)]="formData.pob" name="pob" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Nationality</label><input type="text" [(ngModel)]="formData.nationality" name="nationality" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Religion</label><input type="text" [(ngModel)]="formData.religion" name="religion" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
+
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.dob?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('dob')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.dob?.label || 'Date of Birth' }}</label>
+            <input type="date" [(ngModel)]="formData.dob" name="dob" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all">
+          </div>
+
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.age?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('age')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.age?.label || 'Age' }}</label>
+            <input type="number" [(ngModel)]="formData.age" name="age" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all">
+          </div>
+
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.pob?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('pob')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.pob?.label || 'Place of Birth' }}</label>
+            <input type="text" [(ngModel)]="formData.pob" name="pob" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all">
+          </div>
+
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.nationality?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('nationality')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.nationality?.label || 'Nationality' }}</label>
+            <input type="text" [(ngModel)]="formData.nationality" name="nationality" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all">
+          </div>
+
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.religion?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('religion')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.religion?.label || 'Religion' }}</label>
+            <input type="text" [(ngModel)]="formData.religion" name="religion" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all">
+          </div>
         </div>
 
-        <div class="mt-6 pt-6 border-t border-white grid md:grid-cols-3 gap-6">
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">IC / Passport Number</label><input type="text" [(ngModel)]="formData.ic" name="ic" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Date of Issue</label><input type="date" [(ngModel)]="formData.doi" name="doi" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Date of Expiration</label><input type="date" [(ngModel)]="formData.doe" name="doe" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">First Language</label><input type="text" [(ngModel)]="formData.lang1" name="lang1" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Second Language</label><input type="text" [(ngModel)]="formData.lang2" name="lang2" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Student Mobile Number</label><input type="tel" [(ngModel)]="formData.studentMobile" name="studentMobile" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all"></div>
+        <div class="mt-6 pt-6 border-t border-white/50 grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6">
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.ic?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('ic')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.ic?.label || 'IC / Passport Number' }}</label>
+            <input type="text" [(ngModel)]="formData.ic" name="ic" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all">
+          </div>
+
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.doi?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('doi')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.doi?.label || 'Date of Issue' }}</label>
+            <input type="date" [(ngModel)]="formData.doi" name="doi" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all">
+          </div>
+
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.doe?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('doe')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.doe?.label || 'Date of Expiration' }}</label>
+            <input type="date" [(ngModel)]="formData.doe" name="doe" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all">
+          </div>
+
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.lang1?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('lang1')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.lang1?.label || 'First Language' }}</label>
+            <input type="text" [(ngModel)]="formData.lang1" name="lang1" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all">
+          </div>
+
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.lang2?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('lang2')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.lang2?.label || 'Second Language' }}</label>
+            <input type="text" [(ngModel)]="formData.lang2" name="lang2" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all">
+          </div>
+
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.studentMobile?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('studentMobile')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.studentMobile?.label || 'Student Mobile Number' }}</label>
+            <input type="tel" [(ngModel)]="formData.studentMobile" name="studentMobile" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all">
+          </div>
         </div>
 
-        <div class="mt-6 space-y-2">
-          <label class="text-xs font-bold text-slate-400 uppercase">Medical Information (If applicable)</label>
-          <textarea [(ngModel)]="formData.medical" name="medical" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all h-20" placeholder="List any medical conditions or allergies..."></textarea>
+        <div class="mt-6">
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.medical?.width || '100')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('medical')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.medical?.label || 'Medical Information' }}</label>
+            <textarea [(ngModel)]="formData.medical" name="medical" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-500/20 transition-all h-20 resize-none" placeholder="List any medical conditions or allergies..."></textarea>
+          </div>
         </div>
       </div>
 
-      <div class="bg-white/80 backdrop-blur-md border border-white rounded-[2rem] p-8 md:p-10 shadow-lg hover:border-sky-500/30 transition-colors">
-        <h3 class="text-xl font-bold text-slate-900 mb-6 border-b border-white pb-4 uppercase tracking-wide">Educational History</h3>
-        <p class="text-xs text-slate-400 mb-4 italic font-medium">List all schools attended in descending order.</p>
+      <div class="bg-white/80 backdrop-blur-md border border-white rounded-[1.5rem] sm:rounded-[2rem] p-6 sm:p-8 md:p-10 shadow-lg hover:border-sky-500/30 transition-colors">
+        <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-4 sm:mb-6 border-b border-white pb-3 sm:pb-4 uppercase tracking-wide">Educational History</h3>
+        <p class="text-[10px] sm:text-xs text-slate-400 mb-4 italic font-medium">List all schools attended in descending order.</p>
         <div class="space-y-4">
-          <div *ngFor="let school of educationalHistory; let i = index" class="grid md:grid-cols-4 gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-200">
-            <input type="text" [(ngModel)]="school.school" name="school{{i}}" placeholder="Name of School" class="bg-transparent border-b border-slate-300 p-2 focus:border-sky-500 outline-none col-span-1 md:col-span-2 text-slate-900 font-medium placeholder:text-slate-400">
-            <input type="text" [(ngModel)]="school.country" name="country{{i}}" placeholder="Country" class="bg-transparent border-b border-slate-300 p-2 focus:border-sky-500 outline-none text-slate-900 font-medium placeholder:text-slate-400">
-            <input type="text" [(ngModel)]="school.language" name="language{{i}}" placeholder="Language" class="bg-transparent border-b border-slate-300 p-2 focus:border-sky-500 outline-none text-slate-900 font-medium placeholder:text-slate-400">
-            <input type="text" [(ngModel)]="school.dates" name="dates{{i}}" placeholder="Dates of Attendance" class="bg-transparent border-b border-slate-300 p-2 focus:border-sky-500 outline-none col-span-1 md:col-span-2 text-slate-900 font-medium placeholder:text-slate-400">
-            <input type="text" [(ngModel)]="school.grade" name="grade{{i}}" placeholder="Grade Level(s)" class="bg-transparent border-b border-slate-300 p-2 focus:border-sky-500 outline-none col-span-1 md:col-span-2 text-slate-900 font-medium placeholder:text-slate-400">
+          <div *ngFor="let school of educationalHistory; let i = index" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 p-4 bg-slate-50/50 rounded-xl border border-slate-200">
+            <input type="text" [(ngModel)]="school.school" name="school{{i}}" placeholder="Name of School" class="bg-transparent border-b border-slate-300 p-2 focus:border-sky-500 outline-none col-span-1 sm:col-span-2 text-xs sm:text-sm text-slate-900 font-medium placeholder:text-slate-400">
+            <input type="text" [(ngModel)]="school.country" name="country{{i}}" placeholder="Country" class="bg-transparent border-b border-slate-300 p-2 focus:border-sky-500 outline-none text-xs sm:text-sm text-slate-900 font-medium placeholder:text-slate-400">
+            <input type="text" [(ngModel)]="school.language" name="language{{i}}" placeholder="Language" class="bg-transparent border-b border-slate-300 p-2 focus:border-sky-500 outline-none text-xs sm:text-sm text-slate-900 font-medium placeholder:text-slate-400">
+            <input type="text" [(ngModel)]="school.dates" name="dates{{i}}" placeholder="Dates of Attendance" class="bg-transparent border-b border-slate-300 p-2 focus:border-sky-500 outline-none col-span-1 sm:col-span-2 text-xs sm:text-sm text-slate-900 font-medium placeholder:text-slate-400">
+            <input type="text" [(ngModel)]="school.grade" name="grade{{i}}" placeholder="Grade Level(s)" class="bg-transparent border-b border-slate-300 p-2 focus:border-sky-500 outline-none col-span-1 sm:col-span-2 text-xs sm:text-sm text-slate-900 font-medium placeholder:text-slate-400">
           </div>
 
-          <button type="button" (click)="addSchool()" class="text-sky-500 text-xs font-black uppercase flex items-center gap-1 hover:underline cursor-pointer hover:bg-sky-50 px-2 py-1 rounded-lg w-fit">
+          <button type="button" (click)="addSchool()" class="text-sky-500 text-[10px] sm:text-xs font-black uppercase flex items-center gap-1 hover:underline cursor-pointer hover:bg-sky-50 px-2 py-1 rounded-lg w-fit">
             <span translate="no" class="material-symbols-outlined notranslate text-sm">add_circle</span> Add another school
           </button>
         </div>
       </div>
 
-      <div class="bg-white/80 backdrop-blur-md border border-white rounded-[2rem] p-8 md:p-10 shadow-lg hover:border-sky-500/30 transition-colors">
-        <h3 class="text-xl font-bold text-slate-900 mb-6 border-b border-white pb-4 uppercase tracking-wide">Family Information</h3>
+      <div class="bg-white/80 backdrop-blur-md border border-white rounded-[1.5rem] sm:rounded-[2rem] p-6 sm:p-8 md:p-10 shadow-lg hover:border-sky-500/30 transition-colors">
+        <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-6 border-b border-white pb-4 uppercase tracking-wide">Family Information</h3>
 
-        <h4 class="text-sky-500 font-black mb-4 uppercase text-sm tracking-widest">Father's Details</h4>
-        <div class="grid md:grid-cols-3 gap-6 mb-8">
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Full Name</label><input type="text" [(ngModel)]="formData.fatherName" name="fatherName" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Mobile Number</label><input type="tel" [(ngModel)]="formData.fatherMobile" name="fatherMobile" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Occupation</label><input type="text" [(ngModel)]="formData.fatherOcc" name="fatherOcc" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500"></div>
+        <h4 class="text-sky-500 font-black mb-3 sm:mb-4 uppercase text-xs sm:text-sm tracking-widest">Father's Details</h4>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.fatherName?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('fatherName')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.fatherName?.label || 'Father Name' }}</label>
+            <input type="text" [(ngModel)]="formData.fatherName" name="fatherName" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500">
+          </div>
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.fatherMobile?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('fatherMobile')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.fatherMobile?.label || 'Mobile Number' }}</label>
+            <input type="tel" [(ngModel)]="formData.fatherMobile" name="fatherMobile" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500">
+          </div>
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.fatherOcc?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('fatherOcc')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.fatherOcc?.label || 'Occupation' }}</label>
+            <input type="text" [(ngModel)]="formData.fatherOcc" name="fatherOcc" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500">
+          </div>
         </div>
 
-        <h4 class="text-sky-500 font-black mb-4 uppercase text-sm tracking-widest">Mother's Details</h4>
-        <div class="grid md:grid-cols-3 gap-6 mb-8">
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Full Name</label><input type="text" [(ngModel)]="formData.motherName" name="motherName" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Mobile Number</label><input type="tel" [(ngModel)]="formData.motherMobile" name="motherMobile" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500"></div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Occupation</label><input type="text" [(ngModel)]="formData.motherOcc" name="motherOcc" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500"></div>
+        <h4 class="text-sky-500 font-black mb-3 sm:mb-4 uppercase text-xs sm:text-sm tracking-widest">Mother's Details</h4>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.motherName?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('motherName')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.motherName?.label || 'Mother Name' }}</label>
+            <input type="text" [(ngModel)]="formData.motherName" name="motherName" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500">
+          </div>
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.motherMobile?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('motherMobile')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.motherMobile?.label || 'Mobile Number' }}</label>
+            <input type="tel" [(ngModel)]="formData.motherMobile" name="motherMobile" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500">
+          </div>
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.motherOcc?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('motherOcc')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.motherOcc?.label || 'Occupation' }}</label>
+            <input type="text" [(ngModel)]="formData.motherOcc" name="motherOcc" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500">
+          </div>
         </div>
 
-        <h4 class="text-sky-500 font-black mb-4 uppercase text-sm tracking-widest">Siblings Information</h4>
+        <h4 class="text-sky-500 font-black mb-3 sm:mb-4 uppercase text-xs sm:text-sm tracking-widest">Siblings Information</h4>
         <div class="space-y-3">
-          <div *ngFor="let sib of siblings; let j = index" class="grid md:grid-cols-4 gap-4 bg-slate-50/50 p-4 rounded-xl border border-slate-200">
-            <input type="text" [(ngModel)]="sib.name" name="sibName{{j}}" placeholder="Sibling Name" class="bg-transparent border-b border-slate-300 p-2 outline-none text-slate-900 font-medium placeholder:text-slate-400 focus:border-sky-500">
-            <input type="number" [(ngModel)]="sib.age" name="sibAge{{j}}" placeholder="Age" class="bg-transparent border-b border-slate-300 p-2 outline-none text-slate-900 font-medium placeholder:text-slate-400 focus:border-sky-500">
-            <select [(ngModel)]="sib.gender" name="sibGender{{j}}" class="bg-transparent border-b border-slate-300 p-2 outline-none text-slate-500 font-medium focus:border-sky-500 cursor-pointer">
+          <div *ngFor="let sib of siblings; let j = index" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 bg-slate-50/50 p-4 rounded-xl border border-slate-200">
+            <input type="text" [(ngModel)]="sib.name" name="sibName{{j}}" placeholder="Sibling Name" class="bg-transparent border-b border-slate-300 p-2 outline-none text-xs sm:text-sm text-slate-900 font-medium placeholder:text-slate-400 focus:border-sky-500">
+            <input type="number" [(ngModel)]="sib.age" name="sibAge{{j}}" placeholder="Age" class="bg-transparent border-b border-slate-300 p-2 outline-none text-xs sm:text-sm text-slate-900 font-medium placeholder:text-slate-400 focus:border-sky-500">
+            <select [(ngModel)]="sib.gender" name="sibGender{{j}}" class="bg-transparent border-b border-slate-300 p-2 outline-none text-xs sm:text-sm text-slate-500 font-medium focus:border-sky-500 cursor-pointer">
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
-            <input type="text" [(ngModel)]="sib.currentSchool" name="sibSchool{{j}}" placeholder="Current School" class="bg-transparent border-b border-slate-300 p-2 outline-none text-slate-900 font-medium placeholder:text-slate-400 focus:border-sky-500">
+            <input type="text" [(ngModel)]="sib.currentSchool" name="sibSchool{{j}}" placeholder="Current School" class="bg-transparent border-b border-slate-300 p-2 outline-none text-xs sm:text-sm text-slate-900 font-medium placeholder:text-slate-400 focus:border-sky-500">
           </div>
-          <button type="button" (click)="addSibling()" class="text-sky-500 text-xs font-black uppercase flex items-center gap-1 hover:underline cursor-pointer hover:bg-sky-50 px-2 py-1 rounded-lg w-fit">
+          <button type="button" (click)="addSibling()" class="text-sky-500 text-[10px] sm:text-xs font-black uppercase flex items-center gap-1 hover:underline cursor-pointer hover:bg-sky-50 px-2 py-1 rounded-lg w-fit">
             <span translate="no" class="material-symbols-outlined notranslate text-sm">add_circle</span> Add sibling
           </button>
         </div>
       </div>
 
-      <div class="bg-white/80 backdrop-blur-md border border-white rounded-[2rem] p-8 md:p-10 shadow-lg hover:border-sky-500/30 transition-colors">
-        <h3 class="text-xl font-bold text-slate-900 mb-6 border-b border-white pb-4 uppercase tracking-wide">Family Contact Information</h3>
-        <div class="space-y-6">
-          <div class="grid md:grid-cols-2 gap-6">
-            <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Primary Email <span class="text-red-500">*</span></label><input type="email" required [(ngModel)]="formData.primaryEmail" name="primaryEmail" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500"></div>
-            <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Alternate Email</label><input type="email" [(ngModel)]="formData.altEmail" name="altEmail" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500"></div>
+      <div class="bg-white/80 backdrop-blur-md border border-white rounded-[1.5rem] sm:rounded-[2rem] p-6 sm:p-8 md:p-10 shadow-lg hover:border-sky-500/30 transition-colors">
+        <h3 class="text-lg sm:text-xl font-bold text-slate-900 mb-6 border-b border-white pb-4 uppercase tracking-wide">Family Contact Information</h3>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6">
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.primaryEmail?.width || '50')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('primaryEmail')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.primaryEmail?.label || 'Primary Email' }}</label>
+            <input type="email" required [(ngModel)]="formData.primaryEmail" name="primaryEmail" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500">
           </div>
-          <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Current Home Address</label><textarea [(ngModel)]="formData.address" name="address" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 h-24"></textarea></div>
-          <div class="grid md:grid-cols-3 gap-6">
-            <div class="space-y-2"><label class="text-xs font-bold text-slate-400 uppercase">Home Phone</label><input type="tel" [(ngModel)]="formData.homePhone" name="homePhone" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500"></div>
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.altEmail?.width || '50')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('altEmail')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.altEmail?.label || 'Alternate Email' }}</label>
+            <input type="email" [(ngModel)]="formData.altEmail" name="altEmail" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500">
+          </div>
+
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.address?.width || '100')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('address')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.address?.label || 'Current Home Address' }}</label>
+            <textarea [(ngModel)]="formData.address" name="address" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 h-24 resize-none"></textarea>
+          </div>
+
+          <div class="relative group/field p-2 -m-2 rounded hover:bg-slate-50/50 transition-colors" [ngClass]="getColSpanClass(pageData.fields?.homePhone?.width || '33')">
+            <button *ngIf="isAdmin" type="button" (click)="openFieldEdit('homePhone')" class="absolute top-1 right-1 z-10 hidden group-hover/field:flex bg-white shadow-sm border border-slate-200 rounded p-1 text-sky-500 hover:text-sky-700"><span translate="no" class="material-symbols-outlined text-[14px]">settings</span></button>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-400 uppercase block mb-1">{{ pageData.fields?.homePhone?.label || 'Home Phone' }}</label>
+            <input type="tel" [(ngModel)]="formData.homePhone" name="homePhone" class="w-full bg-slate-50/50 border border-slate-200 rounded-xl p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500">
           </div>
         </div>
       </div>
@@ -230,73 +338,82 @@
       <div *ngIf="isAdmin || customSections.length > 0" class="relative">
 
         <div *ngIf="isAdmin" class="flex justify-center mb-4">
-          <button type="button" (click)="addSection()" class="bg-indigo-100 hover:bg-indigo-500 text-indigo-700 hover:text-white px-6 py-2 rounded-full font-bold text-xs flex items-center gap-2 transition-all shadow-md">
-            <span translate="no" class="material-symbols-outlined text-[16px] notranslate">add_box</span> Add Custom Section
+          <button type="button" (click)="addSection()" class="bg-indigo-100 hover:bg-indigo-500 text-indigo-700 hover:text-white px-4 sm:px-6 py-2 rounded-full font-bold text-[10px] sm:text-xs flex items-center gap-1 sm:gap-2 transition-all shadow-md">
+            <span translate="no" class="material-symbols-outlined text-[14px] sm:text-[16px] notranslate">add_box</span> Add Custom Section
           </button>
         </div>
 
-        <div *ngFor="let section of customSections; let sIndex = index" class="bg-white/80 backdrop-blur-md border border-indigo-200 rounded-[2rem] p-8 md:p-10 shadow-lg relative group/section mb-8 hover:border-indigo-300 transition-colors">
+        <div *ngFor="let section of customSections; let sIndex = index" class="bg-white/80 backdrop-blur-md border border-indigo-200 rounded-[1.5rem] sm:rounded-[2rem] p-6 sm:p-8 md:p-10 shadow-lg relative group/section mb-6 sm:mb-8 hover:border-indigo-300 transition-colors">
 
-          <button *ngIf="isAdmin" type="button" (click)="removeSection(sIndex)" class="absolute top-4 right-4 text-red-400 hover:text-red-600 opacity-0 group-hover/section:opacity-100 transition-opacity bg-white p-1 rounded-lg shadow-sm border border-red-100">
-            <span translate="no" class="material-symbols-outlined text-[18px] notranslate">delete</span>
+          <button *ngIf="isAdmin" type="button" (click)="removeSection(sIndex)" class="absolute top-3 right-3 sm:top-4 sm:right-4 text-red-400 hover:text-red-600 opacity-100 sm:opacity-0 group-hover/section:opacity-100 transition-opacity bg-white p-1 rounded-lg shadow-sm border border-red-100">
+            <span translate="no" class="material-symbols-outlined text-[16px] sm:text-[18px] notranslate">delete</span>
           </button>
 
-          <h3 class="text-xl font-bold text-indigo-900 mb-6 border-b border-indigo-100 pb-4 uppercase tracking-wide">
-            <input *ngIf="isAdmin" [(ngModel)]="section.sectionTitle" name="secTitle{{sIndex}}" class="bg-transparent border-b border-dashed border-indigo-300 outline-none w-1/2">
+          <h3 class="text-lg sm:text-xl font-bold text-indigo-900 mb-4 sm:mb-6 border-b border-indigo-100 pb-3 sm:pb-4 uppercase tracking-wide">
+            <input *ngIf="isAdmin" [(ngModel)]="section.sectionTitle" name="secTitle{{sIndex}}" class="bg-transparent border-b border-dashed border-indigo-300 outline-none w-full sm:w-1/2">
             <span *ngIf="!isAdmin">{{ section.sectionTitle }}</span>
           </h3>
 
-          <div class="space-y-6">
-            <div *ngFor="let row of section.rows; let rIndex = index" class="relative group/row bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100">
+          <div class="space-y-4 sm:space-y-6">
+            <div *ngFor="let row of section.rows; let rIndex = index" class="relative group/row bg-indigo-50/50 p-3 sm:p-4 rounded-xl sm:rounded-2xl border border-indigo-100">
 
-              <button *ngIf="isAdmin" type="button" (click)="removeRow(sIndex, rIndex)" class="absolute -left-3 top-1/2 -translate-y-1/2 text-red-400 hover:text-red-600 opacity-0 group-hover/row:opacity-100 transition-opacity bg-white rounded-full shadow-sm p-1 border border-red-100">
-                <span translate="no" class="material-symbols-outlined text-[14px] notranslate">remove</span>
+              <button *ngIf="isAdmin" type="button" (click)="removeRow(sIndex, rIndex)" class="absolute -left-2 top-1/2 -translate-y-1/2 text-red-400 hover:text-red-600 opacity-100 sm:opacity-0 group-hover/row:opacity-100 transition-opacity bg-white rounded-full shadow-sm p-1 border border-red-100 z-10">
+                <span translate="no" class="material-symbols-outlined text-[12px] sm:text-[14px] notranslate">remove</span>
               </button>
 
-              <div class="grid grid-cols-1 md:grid-cols-{{row.columns.length}} gap-6">
-                <div *ngFor="let col of row.columns; let cIndex = index" class="relative group/col">
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-4 sm:gap-6 pl-2 sm:pl-0">
+                <div *ngFor="let col of row.columns; let cIndex = index" class="relative group/col" [ngClass]="getColSpanClass(col.width || '100')">
 
-                  <div *ngIf="isAdmin" class="bg-white/80 p-3 rounded-lg mb-2 shadow-sm border border-indigo-200">
-                    <div class="flex justify-between items-center mb-2">
-                      <span class="text-[10px] font-black text-indigo-500 uppercase tracking-widest">Edit Question</span>
-                      <button type="button" (click)="removeColumn(sIndex, rIndex, cIndex)" class="text-red-500 hover:text-red-700"><span translate="no" class="material-symbols-outlined text-[14px] notranslate">close</span></button>
+                  <div *ngIf="isAdmin" class="bg-white/80 p-2 sm:p-3 rounded-lg mb-2 shadow-sm border border-indigo-200">
+                    <div class="flex justify-between items-center mb-1.5 sm:mb-2">
+                      <span class="text-[8px] sm:text-[10px] font-black text-indigo-500 uppercase tracking-widest">Edit Question</span>
+                      <button type="button" (click)="removeColumn(sIndex, rIndex, cIndex)" class="text-red-500 hover:text-red-700"><span translate="no" class="material-symbols-outlined text-[12px] sm:text-[14px] notranslate">close</span></button>
                     </div>
-                    <input type="text" [(ngModel)]="col.label" name="l_{{sIndex}}_{{rIndex}}_{{cIndex}}" placeholder="Question Label" class="w-full text-xs font-bold text-indigo-900 bg-transparent border-b border-indigo-300 outline-none mb-2">
-                    <div class="flex gap-2 items-center">
-                      <select [(ngModel)]="col.type" name="t_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="text-xs bg-white rounded border border-indigo-200 outline-none cursor-pointer p-1">
+                    <input type="text" [(ngModel)]="col.label" name="l_{{sIndex}}_{{rIndex}}_{{cIndex}}" placeholder="Question Label" class="w-full text-[10px] sm:text-xs font-bold text-indigo-900 bg-transparent border-b border-indigo-300 outline-none mb-2">
+                    <div class="flex flex-col gap-2">
+                      <select [(ngModel)]="col.type" name="t_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="text-[10px] sm:text-xs bg-white rounded border border-indigo-200 outline-none cursor-pointer p-1">
                         <option value="text">Short Text</option>
                         <option value="dropdown">Dropdown</option>
                         <option value="checkbox">Checkbox</option>
                         <option value="date">Date</option>
                       </select>
-                      <input *ngIf="col.type === 'dropdown'" type="text" [(ngModel)]="col.options" name="o_{{sIndex}}_{{rIndex}}_{{cIndex}}" placeholder="Options (comma separated)" class="w-full text-xs bg-white rounded border border-indigo-200 outline-none p-1">
+                      <input *ngIf="col.type === 'dropdown'" type="text" [(ngModel)]="col.options" name="o_{{sIndex}}_{{rIndex}}_{{cIndex}}" placeholder="Options (comma separated)" class="w-full text-[10px] sm:text-xs bg-white rounded border border-indigo-200 outline-none p-1">
+                      <select [(ngModel)]="col.width" name="w_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="text-[10px] sm:text-xs bg-white rounded border border-indigo-200 outline-none cursor-pointer p-1">
+                        <option value="25">25% Width</option>
+                        <option value="33">33% Width</option>
+                        <option value="50">50% Width</option>
+                        <option value="66">66% Width</option>
+                        <option value="75">75% Width</option>
+                        <option value="100">100% Width</option>
+                      </select>
                     </div>
                   </div>
 
-                  <label class="text-xs font-bold text-slate-500 uppercase">{{ col.label }}</label>
+                  <label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase">{{ col.label }}</label>
 
-                  <input *ngIf="col.type === 'text'" type="text" [(ngModel)]="col.value" name="v_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 mt-2">
+                  <input *ngIf="col.type === 'text'" type="text" [(ngModel)]="col.value" name="v_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="w-full bg-white/50 border border-slate-200 rounded-lg sm:rounded-xl p-2.5 sm:p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 mt-1.5 sm:mt-2">
 
-                  <input *ngIf="col.type === 'date'" type="date" [(ngModel)]="col.value" name="v_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 mt-2">
+                  <input *ngIf="col.type === 'date'" type="date" [(ngModel)]="col.value" name="v_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="w-full bg-white/50 border border-slate-200 rounded-lg sm:rounded-xl p-2.5 sm:p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 mt-1.5 sm:mt-2">
 
-                  <select *ngIf="col.type === 'dropdown'" [(ngModel)]="col.value" name="v_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="w-full bg-white/50 border border-slate-200 rounded-xl p-3 text-slate-900 font-bold outline-none focus:border-sky-500 cursor-pointer mt-2">
-                    <option *ngFor="let opt of col.options.split(',')" [value]="opt.trim()">{{ opt.trim() }}</option>
+                  <select *ngIf="col.type === 'dropdown'" [(ngModel)]="col.value" name="v_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="w-full bg-white/50 border border-slate-200 rounded-lg sm:rounded-xl p-2.5 sm:p-3 text-xs sm:text-sm text-slate-900 font-bold outline-none focus:border-sky-500 cursor-pointer mt-1.5 sm:mt-2">
+                    <option *ngFor="let opt of (col.options || '').split(',')" [value]="opt.trim()">{{ opt.trim() }}</option>
                   </select>
 
-                  <div *ngIf="col.type === 'checkbox'" class="mt-4 flex items-center gap-2">
-                    <input type="checkbox" [(ngModel)]="col.value" name="v_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="accent-sky-500 size-5 rounded cursor-pointer">
-                    <span class="text-sm font-bold text-slate-600">Yes / Agree</span>
+                  <div *ngIf="col.type === 'checkbox'" class="mt-3 sm:mt-4 flex items-center gap-2">
+                    <input type="checkbox" [(ngModel)]="col.value" name="v_{{sIndex}}_{{rIndex}}_{{cIndex}}" class="accent-sky-500 size-4 sm:size-5 rounded cursor-pointer shrink-0">
+                    <span class="text-xs sm:text-sm font-bold text-slate-600">Yes / Agree</span>
                   </div>
 
                 </div>
 
-                <div *ngIf="isAdmin && row.columns.length < 3" class="flex items-center justify-center border-2 border-dashed border-indigo-200 rounded-xl opacity-50 hover:opacity-100 hover:bg-white transition-all cursor-pointer min-h-[60px]" (click)="addColumn(sIndex, rIndex)">
+                <div *ngIf="isAdmin" class="flex items-center justify-center border-2 border-dashed border-indigo-200 rounded-xl opacity-50 hover:opacity-100 hover:bg-white transition-all cursor-pointer min-h-[50px] sm:min-h-[60px] mt-2 md:mt-0 md:col-span-12" (click)="addColumn(sIndex, rIndex)">
                   <span translate="no" class="material-symbols-outlined text-indigo-400 notranslate">add</span>
+                  <span class="text-xs font-bold text-indigo-400 ml-1">Add Field</span>
                 </div>
               </div>
             </div>
 
-            <button *ngIf="isAdmin" type="button" (click)="addRow(sIndex)" class="text-xs bg-white border border-indigo-100 text-indigo-600 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 hover:bg-indigo-50 transition-colors w-fit mx-auto mt-4 shadow-sm">
+            <button *ngIf="isAdmin" type="button" (click)="addRow(sIndex)" class="text-[10px] sm:text-xs bg-white border border-indigo-100 text-indigo-600 px-3 py-1.5 rounded-lg font-bold flex items-center gap-1 hover:bg-indigo-50 transition-colors w-fit mx-auto mt-4 shadow-sm">
               <span translate="no" class="material-symbols-outlined text-[14px] notranslate">add</span> Add Row Here
             </button>
 
@@ -304,49 +421,242 @@
         </div>
       </div>
 
-      <div class="flex justify-between items-center bg-white/90 backdrop-blur-md p-8 rounded-[2rem] border border-white shadow-xl hover:border-sky-500/30 transition-all mt-8">
-        <div class="flex items-center gap-2 text-slate-600 font-bold text-sm">
-          <input type="checkbox" required class="accent-sky-500 size-5 rounded cursor-pointer">
-          <span>I verify that all information provided is accurate and complete.</span>
+      <div class="flex flex-col sm:flex-row sm:justify-between items-start sm:items-center bg-white/90 backdrop-blur-md p-6 md:p-8 rounded-[1.5rem] md:rounded-[2rem] border border-white shadow-xl hover:border-sky-500/30 transition-all mt-6 md:mt-8 gap-4 sm:gap-0">
+        <div class="flex items-start sm:items-center gap-2 text-slate-600 font-bold text-xs sm:text-sm w-full sm:w-auto">
+          <input type="checkbox" required class="accent-sky-500 size-4 sm:size-5 rounded cursor-pointer shrink-0 mt-0.5 sm:mt-0">
+          <span class="leading-snug">I verify that all information provided is accurate and complete.</span>
         </div>
-        <button type="submit" class="bg-sky-500 hover:bg-sky-400 text-white font-black rounded-full px-12 py-4 transition-all hover:scale-105 shadow-lg shadow-sky-500/50 text-lg uppercase tracking-widest cursor-pointer">
-          Submit Form
+        <button id="submitBtn" type="submit" [disabled]="isSubmitting" class="w-full sm:w-auto bg-sky-500 hover:bg-sky-400 text-white font-black rounded-full px-8 sm:px-12 py-3.5 sm:py-4 transition-all sm:hover:scale-105 shadow-lg shadow-sky-500/50 text-sm sm:text-lg uppercase tracking-widest cursor-pointer shrink-0 disabled:opacity-75 disabled:hover:scale-100">
+          {{ isSubmitting ? 'GENERATING APPLICATION...' : 'SUBMIT FORM' }}
         </button>
       </div>
 
     </form>
+
+    <div class="h-24 md:h-32 w-full shrink-0 block mt-8"></div>
   </main>
 
   <div *ngIf="editMode" class="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in">
-    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
-      <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-        <h2 class="text-xl font-black text-slate-800 uppercase tracking-tight">Edit Section</h2>
+    <div class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="p-4 sm:p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50 shrink-0">
+        <h2 class="text-lg sm:text-xl font-black text-slate-800 uppercase tracking-tight">Edit Section</h2>
         <button (click)="closeEditModal()" class="text-slate-400 hover:text-red-500 transition-colors"><span translate="no" class="material-symbols-outlined notranslate">close</span></button>
       </div>
 
-      <div class="p-6 flex flex-col gap-4 overflow-y-auto custom-scrollbar">
+      <div class="p-4 sm:p-6 flex flex-col gap-4 overflow-y-auto custom-scrollbar">
         <ng-container *ngIf="editMode === 'header'">
-          <div><label class="text-xs font-bold text-slate-500 uppercase block mb-1">Badge Text</label><input type="text" [(ngModel)]="editData.badge" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500"></div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase block mb-1">Title Start</label><input type="text" [(ngModel)]="editData.titleStart" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500"></div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase block mb-1">Title Highlight</label><input type="text" [(ngModel)]="editData.titleHighlight" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500"></div>
-          <div><label class="text-xs font-bold text-slate-500 uppercase block mb-1">Description</label><textarea [(ngModel)]="editData.description" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500"></textarea></div>
+          <div><label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1">Badge Text</label><input type="text" [(ngModel)]="editData.badge" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500 text-sm"></div>
+          <div><label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1">Title Start</label><input type="text" [(ngModel)]="editData.titleStart" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500 text-sm"></div>
+          <div><label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1">Title Highlight</label><input type="text" [(ngModel)]="editData.titleHighlight" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500 text-sm"></div>
+          <div><label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1">Description</label><textarea [(ngModel)]="editData.description" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500 text-sm"></textarea></div>
           <div>
-            <label class="text-xs font-bold text-slate-500 uppercase block mb-1 mt-2">Background Image</label>
-            <div class="flex items-center gap-4">
+            <label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1 mt-2">Background Image</label>
+            <div class="flex items-center gap-3 sm:gap-4">
               <input type="file" #bgInput (change)="onFileSelected($event, 'bgImage')" accept="image/*" class="hidden">
-              <button (click)="bgInput.click()" class="px-4 py-2 bg-sky-100 text-sky-700 font-bold rounded-lg hover:bg-sky-200 flex items-center gap-2"><span translate="no" class="material-symbols-outlined notranslate text-[18px]">upload_file</span> Choose Image</button>
-              <div *ngIf="editData.bgImage" class="h-10 w-16 rounded bg-cover bg-center border border-slate-200 shadow-inner" [style.background-image]="'url(' + editData.bgImage + ')'"></div>
+              <button (click)="bgInput.click()" class="px-3 sm:px-4 py-2 bg-sky-100 text-sky-700 font-bold rounded-lg hover:bg-sky-200 flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm"><span translate="no" class="material-symbols-outlined notranslate text-[16px] sm:text-[18px]">upload_file</span> <span class="whitespace-nowrap">Choose Image</span></button>
+              <div *ngIf="editData.bgImage" class="h-10 w-16 rounded bg-cover bg-center border border-slate-200 shadow-inner shrink-0" [style.background-image]="'url(' + editData.bgImage + ')'"></div>
             </div>
           </div>
         </ng-container>
+
+        <ng-container *ngIf="editMode === 'field'">
+          <div>
+            <label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1">Field Label</label>
+            <input type="text" [(ngModel)]="editData.label" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500 text-sm">
+          </div>
+          <div class="mt-4">
+            <label class="text-[10px] sm:text-xs font-bold text-slate-500 uppercase block mb-1">Field Display Width</label>
+            <select [(ngModel)]="editData.width" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 outline-none focus:border-sky-500 text-sm cursor-pointer">
+              <option value="25">25% Width (1/4 Column)</option>
+              <option value="33">33% Width (1/3 Column)</option>
+              <option value="50">50% Width (1/2 Column)</option>
+              <option value="66">66% Width (2/3 Column)</option>
+              <option value="75">75% Width (3/4 Column)</option>
+              <option value="100">100% Width (Full Column)</option>
+            </select>
+          </div>
+        </ng-container>
+
       </div>
 
-      <div class="p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/50 mt-auto">
-        <button (click)="closeEditModal()" class="px-6 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-slate-200 transition-colors">Cancel</button>
-        <button (click)="saveEdits()" class="px-6 py-2.5 rounded-xl font-bold bg-slate-900 text-white hover:bg-sky-500 shadow-lg transition-all flex items-center gap-2"><span translate="no" class="material-symbols-outlined text-[18px] notranslate">save</span> Save</button>
+      <div class="p-4 sm:p-6 border-t border-slate-100 flex justify-end gap-3 bg-slate-50/50 mt-auto shrink-0">
+        <button (click)="closeEditModal()" class="px-5 sm:px-6 py-2.5 rounded-xl font-bold text-slate-500 hover:bg-slate-200 transition-colors text-xs sm:text-sm">Cancel</button>
+        <button (click)="saveEdits()" class="px-5 sm:px-6 py-2.5 rounded-xl font-bold bg-slate-900 text-white hover:bg-sky-500 shadow-lg transition-all flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm"><span translate="no" class="material-symbols-outlined text-[16px] sm:text-[18px] notranslate">save</span> Save</button>
       </div>
     </div>
   </div>
 
   <app-footer></app-footer>
+
+  <div id="formal-application-pdf" class="absolute top-[0px] left-[-9999px] w-[850px] z-[-1] bg-white text-black font-sans">
+
+    <div class="pdf-section px-14 pt-10 pb-4">
+      <div class="flex items-center border-b-[3px] border-sky-800 pb-6 mb-4">
+        <div class="w-24 h-24 mr-6 flex-shrink-0 bg-white p-2 border-2 border-sky-800 rounded-xl flex items-center justify-center">
+          <img src="assets/UUMIS-Logo.jpg" alt="UUMIS Logo" class="w-full h-full object-contain">
+        </div>
+        <div class="flex-1">
+          <h1 class="text-2xl font-black uppercase tracking-widest text-sky-900 m-0">UUMIS International School</h1>
+          <p class="text-sm font-bold text-gray-800 mt-1">Universiti Utara Malaysia, 06010 UUM Sintok, Kedah Darul Aman.</p>
+          <p class="text-xs text-gray-600 mt-0.5">Phone: +60 4-928 4000 | Email: admin@uumis.edu.my | Portal: www.uumis.com.my</p>
+        </div>
+        <div class="text-right border-l-2 border-gray-200 pl-6 ml-4 shrink-0">
+          <p class="text-base font-black text-gray-800 uppercase tracking-widest leading-tight">STUDENT<br>ADMISSION</p>
+          <p class="text-xs text-gray-500 font-bold mt-1">Status: <span class="uppercase text-yellow-600">Pending</span></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="pdf-section px-14 py-4">
+      <h2 class="text-center text-lg font-black uppercase tracking-widest bg-gray-100 py-2 mb-4 border border-gray-300">Admission Information</h2>
+      <table class="w-full text-sm border-collapse">
+        <tbody>
+        <tr>
+          <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 text-xs uppercase">Application Type</td>
+          <td class="border border-gray-300 p-3 w-1/4">{{ formData.admType || '-' }}</td>
+          <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 text-xs uppercase">Intake Details</td>
+          <td class="border border-gray-300 p-3 w-1/4">{{ formData.intakeAug ? 'Aug' : '' }} {{ formData.intakeJan ? 'Jan' : '' }} {{ formData.intakeYear || '-' }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pdf-section px-14 py-4">
+      <h2 class="text-center text-lg font-black uppercase tracking-widest bg-gray-100 py-2 mb-4 border border-gray-300">Student Personal Details</h2>
+      <table class="w-full text-sm border-collapse">
+        <tbody>
+        <tr>
+          <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 text-xs uppercase">Full Name</td>
+          <td class="border border-gray-300 p-3" colspan="3">{{ formData.firstName }} {{ formData.middleName }} {{ formData.lastName }}</td>
+        </tr>
+        <tr>
+          <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 text-xs uppercase">Gender</td>
+          <td class="border border-gray-300 p-3 w-1/4">{{ formData.gender || '-' }}</td>
+          <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 text-xs uppercase">DOB / Age</td>
+          <td class="border border-gray-300 p-3 w-1/4">{{ formData.dob || '-' }} ({{ formData.age || '-' }})</td>
+        </tr>
+        <tr>
+          <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 text-xs uppercase">Nationality / Religion</td>
+          <td class="border border-gray-300 p-3 w-1/4">{{ formData.nationality || '-' }} / {{ formData.religion || '-' }}</td>
+          <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 text-xs uppercase">Place of Birth</td>
+          <td class="border border-gray-300 p-3 w-1/4">{{ formData.pob || '-' }}</td>
+        </tr>
+        <tr>
+          <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 text-xs uppercase">IC / Passport</td>
+          <td class="border border-gray-300 p-3 w-1/4">{{ formData.ic || '-' }}</td>
+          <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 text-xs uppercase">Issue / Expiry</td>
+          <td class="border border-gray-300 p-3 w-1/4">{{ formData.doi || '-' }} to {{ formData.doe || '-' }}</td>
+        </tr>
+        <tr>
+          <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 text-xs uppercase">Mobile / Languages</td>
+          <td class="border border-gray-300 p-3" colspan="3">{{ formData.studentMobile || '-' }} | {{ formData.lang1 || '-' }}, {{ formData.lang2 || '-' }}</td>
+        </tr>
+        <tr>
+          <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 text-xs uppercase text-red-600">Medical Info</td>
+          <td class="border border-gray-300 p-3 text-red-600 font-bold" colspan="3">{{ formData.medical || 'None' }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pdf-section px-14 py-4">
+      <h2 class="text-center text-lg font-black uppercase tracking-widest bg-gray-100 py-2 mb-4 border border-gray-300">Family Information</h2>
+      <table class="w-full text-sm border-collapse">
+        <tbody>
+        <tr>
+          <td class="border border-gray-300 bg-sky-50 font-bold p-3 w-1/4 text-xs uppercase">Father's Name</td>
+          <td class="border border-gray-300 p-3" colspan="3">{{ formData.fatherName || '-' }} ({{ formData.fatherOcc || '-' }}) - {{ formData.fatherMobile || '-' }}</td>
+        </tr>
+        <tr>
+          <td class="border border-gray-300 bg-pink-50 font-bold p-3 w-1/4 text-xs uppercase">Mother's Name</td>
+          <td class="border border-gray-300 p-3" colspan="3">{{ formData.motherName || '-' }} ({{ formData.motherOcc || '-' }}) - {{ formData.motherMobile || '-' }}</td>
+        </tr>
+        <tr>
+          <td class="border border-gray-300 bg-gray-50 font-bold p-3 w-1/4 text-xs uppercase align-top">Contact Details</td>
+          <td class="border border-gray-300 p-3" colspan="3">
+            Primary Email: {{ formData.primaryEmail }}<br>
+            Alt Email: {{ formData.altEmail || '-' }}<br>
+            Home Phone: {{ formData.homePhone || '-' }}<br>
+            Address: {{ formData.address || '-' }}
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="siblings.length > 0 && siblings[0].name" class="pdf-section px-14 py-4">
+      <h2 class="text-center text-lg font-black uppercase tracking-widest bg-gray-100 py-2 mb-4 border border-gray-300">Siblings Information</h2>
+      <table class="w-full text-sm border-collapse">
+        <thead class="bg-gray-50">
+        <tr>
+          <th class="border border-gray-300 p-2 text-xs uppercase text-left">Name</th>
+          <th class="border border-gray-300 p-2 text-xs uppercase text-center w-20">Age</th>
+          <th class="border border-gray-300 p-2 text-xs uppercase text-center w-24">Gender</th>
+          <th class="border border-gray-300 p-2 text-xs uppercase text-left w-1/3">Current School</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let sib of siblings">
+          <td class="border border-gray-300 p-2">{{ sib.name }}</td>
+          <td class="border border-gray-300 p-2 text-center">{{ sib.age }}</td>
+          <td class="border border-gray-300 p-2 text-center">{{ sib.gender }}</td>
+          <td class="border border-gray-300 p-2">{{ sib.currentSchool }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="educationalHistory.length > 0 && educationalHistory[0].school" class="pdf-section px-14 py-4">
+      <h2 class="text-center text-lg font-black uppercase tracking-widest bg-gray-100 py-2 mb-4 border border-gray-300">Educational History</h2>
+      <table class="w-full text-sm border-collapse">
+        <thead class="bg-gray-50">
+        <tr>
+          <th class="border border-gray-300 p-2 text-xs uppercase text-left">School</th>
+          <th class="border border-gray-300 p-2 text-xs uppercase text-left">Country</th>
+          <th class="border border-gray-300 p-2 text-xs uppercase text-left">Dates</th>
+          <th class="border border-gray-300 p-2 text-xs uppercase text-left">Grade</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let s of educationalHistory">
+          <td class="border border-gray-300 p-2">{{ s.school }}</td>
+          <td class="border border-gray-300 p-2">{{ s.country }}</td>
+          <td class="border border-gray-300 p-2">{{ s.dates }}</td>
+          <td class="border border-gray-300 p-2">{{ s.grade }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-container *ngIf="customSections.length > 0">
+      <div *ngFor="let sec of customSections" class="pdf-section px-14 py-4">
+        <h2 class="text-center text-lg font-black uppercase tracking-widest bg-gray-100 py-2 mb-4 border border-gray-300">{{ sec.sectionTitle }}</h2>
+        <table class="w-full text-sm border-collapse">
+          <tbody *ngFor="let row of sec.rows">
+          <tr>
+            <td *ngFor="let col of row.columns" class="border border-gray-300 p-3" [style.width]="col.width + '%'">
+              <span class="font-bold text-[10px] uppercase block text-gray-500 mb-1">{{ col.label }}</span>
+              <span class="font-bold text-sm">{{ col.value || '-' }}</span>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </ng-container>
+
+    <div class="pdf-section px-14 pt-8 pb-16 mt-8">
+      <div class="flex justify-between items-end">
+        <div class="text-center">
+          <div class="border-b border-gray-800 w-64 mb-3 mx-auto"></div>
+          <p class="text-[11px] font-black uppercase tracking-widest text-gray-600">School Counselor Signature</p>
+        </div>
+        <div class="text-center">
+          <div class="border-b border-gray-800 w-64 mb-3 mx-auto"></div>
+          <p class="text-[11px] font-black uppercase tracking-widest text-gray-600">Parent / Guardian Signature</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
 </div>

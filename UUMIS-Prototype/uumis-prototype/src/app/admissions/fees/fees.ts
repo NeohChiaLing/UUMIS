@@ -19,26 +19,26 @@ export class FeesComponent implements OnInit {
   isAdmin: boolean = false;
   showLangModal: boolean = false;
 
-  // FIXED: Organized into pageData to match the unified modal logic
   pageData: any = {
     badge: 'Financial Information',
     titleStart: 'Fee Structure',
     desc: 'Transparent and comprehensive tuition and fee schedule for the upcoming academic year.',
-    bgImage: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1920&q=80'
+    bgImage: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1920&q=80',
+    mainTableTitle1: 'School Fees',
+    mainTableTitle2: 'Academic Related Fees',
+    mainTableTitle: 'Main Fee Structure', // Main Table Global Title
+    showMainTable: true // Toggle for deleting the main table
   };
 
   academicYear: string = '';
   availableYears: string[] = [];
 
-  // Base Table Data
   feeRows: any[] = [];
   customColumns: string[] = [];
 
-  // Additional Dynamic Tables
   extraTables: any[] = [];
   notes: any[] = [];
 
-  // Background Editing Variables
   editMode: string | null = null;
   editData: any = {};
 
@@ -66,7 +66,11 @@ export class FeesComponent implements OnInit {
         badge: 'Financial Information',
         titleStart: 'Fee Structure',
         desc: 'Transparent and comprehensive tuition and fee schedule for the upcoming academic year.',
-        bgImage: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1920&q=80'
+        bgImage: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1920&q=80',
+        mainTableTitle1: 'School Fees',
+        mainTableTitle2: 'Academic Related Fees',
+        mainTableTitle: 'Main Fee Structure',
+        showMainTable: true
       },
       academicYear: '2025 - 2026',
       availableYears: ['2024 - 2025', '2025 - 2026', '2026 - 2027', '2027 - 2028', '2028 - 2029', '2029 - 2030', '2030 - 2031'],
@@ -82,9 +86,12 @@ export class FeesComponent implements OnInit {
         const parsed = (data && data.length > 5) ? JSON.parse(data) : defaultData;
         this.pageData = parsed.pageData || defaultData.pageData;
 
-        // Failsafes to prevent older DB schemas from breaking the new layout
         if (!this.pageData.bgImage) this.pageData.bgImage = defaultData.pageData.bgImage;
         if (!this.pageData.badge) this.pageData.badge = defaultData.pageData.badge;
+        if (!this.pageData.mainTableTitle1) this.pageData.mainTableTitle1 = 'School Fees';
+        if (!this.pageData.mainTableTitle2) this.pageData.mainTableTitle2 = 'Academic Related Fees';
+        if (!this.pageData.mainTableTitle) this.pageData.mainTableTitle = 'Main Fee Structure';
+        if (this.pageData.showMainTable === undefined) this.pageData.showMainTable = true;
 
         this.academicYear = parsed.academicYear || defaultData.academicYear;
         this.availableYears = parsed.availableYears || defaultData.availableYears;
@@ -158,6 +165,12 @@ export class FeesComponent implements OnInit {
     }
   }
 
+  deleteMainTable() {
+    if(confirm("Are you sure you want to delete the entire Main Fee table? You cannot undo this action without refreshing!")) {
+      this.pageData.showMainTable = false;
+    }
+  }
+
   // --- DYNAMIC EXTRA TABLES FUNCTIONS ---
   addTable() {
     this.extraTables.push({
@@ -209,7 +222,6 @@ export class FeesComponent implements OnInit {
   addNote() { this.notes.push({ text: "New note here", isRed: false }); }
   removeNote(index: number) { this.notes.splice(index, 1); }
 
-  // FIX: Edit modal clones the whole pageData object so we can edit text
   openEditModal(mode: string) {
     this.editMode = mode;
     this.editData = { ...this.pageData };
@@ -222,7 +234,11 @@ export class FeesComponent implements OnInit {
 
   saveEdits() {
     if (this.editMode === 'header') {
-      this.pageData = { ...this.editData };
+      this.pageData.badge = this.editData.badge;
+      this.pageData.titleStart = this.editData.titleStart;
+      this.pageData.titleHighlight = this.editData.titleHighlight;
+      this.pageData.description = this.editData.description;
+      this.pageData.bgImage = this.editData.bgImage;
     }
     this.closeEditModal();
   }

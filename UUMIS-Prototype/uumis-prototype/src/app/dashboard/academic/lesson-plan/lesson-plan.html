@@ -108,7 +108,7 @@
               <div class="size-8 md:size-9 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-black text-[10px] md:text-xs border border-emerald-200 shrink-0 shadow-sm">{{p.avatar}}</div>
               <div class="min-w-0">
                 <p class="text-xs md:text-sm font-black text-slate-700 uppercase truncate max-w-[120px] md:max-w-[200px]">{{p.teacher}}</p>
-                <p class="text-[9px] md:text-[10px] text-slate-400 font-bold tracking-widest uppercase mt-0.5">ID: {{p.id || p.teacherId}}</p>
+                <p class="text-[9px] md:text-[10px] text-slate-400 font-bold tracking-widest uppercase mt-0.5">ID: {{p.teacherId}}</p>
               </div>
             </div>
           </td>
@@ -131,7 +131,7 @@
           </td>
 
           <td class="px-4 md:px-8 py-4 md:py-6 text-right shrink-0">
-            <div class="flex items-center justify-end gap-1.5 md:gap-2 opacity-100 md:opacity-20 md:group-hover:opacity-100 transition-opacity">
+            <div class="flex items-center justify-end gap-1.5 md:gap-2 transition-opacity">
               <button (click)="viewPDF(p)" class="p-1.5 md:p-2.5 bg-white border border-sky-100 text-sky-600 rounded-lg md:rounded-xl hover:bg-sky-500 hover:text-white transition-all shadow-sm" title="View PDF"><span translate="no" class="material-symbols-outlined notranslate text-[16px] md:text-[20px]">visibility</span></button>
 
               <button (click)="approvePlan(p)"

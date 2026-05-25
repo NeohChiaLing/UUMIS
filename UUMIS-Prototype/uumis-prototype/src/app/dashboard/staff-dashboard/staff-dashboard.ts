@@ -1,3 +1,4 @@
+// staff-dashboard.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
@@ -12,6 +13,8 @@ import { AuthService } from '../../services/auth.service';
 })
 export class StaffDashboardComponent implements OnInit {
   isFinancialOpen = false;
+  isMobileMenuOpen = false; // <-- Ensures no TS compilation error
+
   userEmail: string = '';
   userRole: string = '';
 
@@ -29,10 +32,10 @@ export class StaffDashboardComponent implements OnInit {
       const parsedUser = JSON.parse(userData);
       this.userEmail = parsedUser.email || '';
 
-      // THE FIX: Grab the actual role from the database that we saved during login
+      // Grab the actual role from the database that we saved during login
       this.userRole = parsedUser.role ? parsedUser.role.toLowerCase().trim() : 'staff';
 
-      // Set dashboard permissions based on their true database role, not just their email!
+      // Set dashboard permissions based on their true database role
       this.isFinanceManager = this.userRole === 'financial_manager';
       this.isRegisterManager = this.userRole === 'register_manager';
       this.isGeneralAdmin = this.userRole === 'admin' || this.userRole === 'staff';

@@ -29,7 +29,6 @@ export class GradingComponent implements OnInit {
   pendingApprovalsCount: number = 0;
   activeScalesCount: number = 0;
 
-  // THE FIX: Modal variables
   showReportModal: boolean = false;
   selectedStudentForReport: any = null;
   modalMainGrades: any[] = [];
@@ -88,6 +87,23 @@ export class GradingComponent implements OnInit {
           const targetYear = this.selectedYear.toLowerCase();
 
           return stuYear === targetYear || stuLevel === targetYear;
+        }).map(u => {
+          // THE FIX: Unpack the JSON to get the real First/Last name for the grading table!
+          let profileData: any = {};
+          const rawJson = u.profile_json || u.profileJson;
+          if (rawJson) {
+            try { profileData = JSON.parse(rawJson); } catch(e){}
+          }
+          let displayName = u.fullName || u.username;
+          if (profileData.firstName || profileData.lastName || profileData.familyName) {
+            const lName = profileData.lastName || profileData.familyName || '';
+            displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+          }
+          return {
+            ...u,
+            fullName: displayName, // Guarantee the display name is used
+            studentId: u.student_id || u.studentId || '123456'
+          };
         });
 
         this.authService.getGrades(this.selectedYear, this.selectedSubject).subscribe({
@@ -102,10 +118,17 @@ export class GradingComponent implements OnInit {
   mapStudentsToGrades(yearStudents: any[], grades: any[]) {
     this.students = yearStudents.map((stu: any) => {
       const uniqueId = stu.username || '';
-      const existingGrade = grades.find(g => g.studentUsername === uniqueId && uniqueId !== '');
+
+      // Strict mapping to avoid ghosting
+      const existingGrade = grades.find(g => {
+        const matchID = (g.studentUsername === uniqueId && uniqueId !== '');
+        const matchName = (g.studentName || '').toLowerCase() === (stu.fullName || '').toLowerCase();
+        return matchID || matchName;
+      });
 
       return {
         studentUsername: uniqueId,
+        studentId: stu.studentId || stu.student_id || '123456',
         name: stu.fullName || stu.username || 'Unknown Student',
         mark: existingGrade ? existingGrade.mark : 0,
         grade: existingGrade ? existingGrade.gradeLetter || existingGrade.grade_letter : '-',
@@ -141,7 +164,6 @@ export class GradingComponent implements OnInit {
     return 'text-blue-600 bg-blue-50';
   }
 
-  // THE FIX: Added View Full Report Logic
   viewStudentFullReport(student: any) {
     this.selectedStudentForReport = student;
     this.showReportModal = true;

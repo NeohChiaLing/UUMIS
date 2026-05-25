@@ -14,12 +14,14 @@ export class ParentFoodComponent implements OnInit {
 
   currentUser: any = null;
   viewState: string = 'children';
+  activeTab: 'menu' | 'history' = 'menu'; // Added tab logic
 
   myChildren: any[] = [];
   selectedChild: any = null;
 
   breakfastMenu: any[] = [];
   lunchMenu: any[] = [];
+  myOrderHistory: any[] = [];
 
   walletBalance: number = 0.00;
 
@@ -31,12 +33,34 @@ export class ParentFoodComponent implements OnInit {
     if (this.currentUser && this.currentUser.role.toLowerCase() === 'parent') {
       this.authService.getStudents().subscribe({
         next: (students: any[]) => {
-          this.myChildren = students.filter(s => s.parentId === this.currentUser.id);
+          this.myChildren = students
+            .filter(s => s.parentId === this.currentUser.id || s.parent_id === this.currentUser.id)
+            .map(child => {
+
+              // Unpack JSON for proper first, middle, last name display
+              let profileData: any = {};
+              const rawProfileJson = child.profile_json || child.profileJson;
+              if (rawProfileJson) {
+                try { profileData = JSON.parse(rawProfileJson); } catch (e) {}
+              }
+
+              let displayName = child.fullName || child.username || 'No Name';
+              if (profileData.firstName || profileData.lastName || profileData.familyName) {
+                const lName = profileData.lastName || profileData.familyName || '';
+                displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+              }
+
+              return {
+                ...child,
+                displayName: displayName,
+                fullName: displayName,
+                name: displayName
+              };
+            });
         }
       });
     }
 
-    // Pre-load the menu items
     this.authService.getFoodItems().subscribe({
       next: (items) => {
         const activeItems = items.filter(i => i.active === true).map(i => ({ ...i, selected: false }));
@@ -52,15 +76,38 @@ export class ParentFoodComponent implements OnInit {
     return name.trim().slice(0, 2).toUpperCase();
   }
 
-  // 1. Parent selects a child
   selectChild(child: any) {
     this.selectedChild = child;
     this.viewState = 'menu';
+    this.activeTab = 'menu';
 
-    // Fetch the specific child's wallet balance
     this.authService.getWalletData(child.id).subscribe({
       next: (res: any) => this.walletBalance = res.balance || 0.00,
       error: (err: any) => console.error("Failed to load wallet", err)
+    });
+  }
+
+  switchViewMode(tab: 'menu' | 'history') {
+    this.activeTab = tab;
+    if (tab === 'history') {
+      this.loadOrderHistory();
+    }
+  }
+
+  loadOrderHistory() {
+    this.authService.getFoodOrders().subscribe({
+      next: (orders: any[]) => {
+        this.myOrderHistory = orders.filter((o: any) =>
+          o.student_name === this.selectedChild.fullName ||
+          o.student_name === this.selectedChild.username ||
+          o.studentName === this.selectedChild.fullName ||
+          o.studentName === this.selectedChild.username
+        ).map(o => ({
+          ...o,
+          totalAmount: o.total_amount || o.totalAmount,
+          orderDate: o.order_date || o.orderDate,
+        })).reverse();
+      }
     });
   }
 
@@ -84,6 +131,7 @@ export class ParentFoodComponent implements OnInit {
     ].join(', ');
 
     const orderPayload = {
+      // By sending the freshly unpacked fullName, new orders will be correct in the Admin database!
       studentName: this.selectedChild.fullName || this.selectedChild.username,
       items: selectedItems,
       totalAmount: this.totalAmount
@@ -92,7 +140,7 @@ export class ParentFoodComponent implements OnInit {
     this.authService.submitFoodOrder(orderPayload).subscribe({
       next: (res) => {
         const walletPayload = {
-          type: 'Purchase',
+          type: 'Food Order', // Non-"Top Up" types automatically deduct from the backend
           date: new Date().toISOString().split('T')[0],
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           amount: this.totalAmount,
@@ -104,9 +152,11 @@ export class ParentFoodComponent implements OnInit {
             this.walletBalance = walletRes.balance;
             alert(`Order placed successfully! RM ${this.totalAmount.toFixed(2)} has been deducted from ${this.selectedChild.fullName || 'your child'}'s wallet.`);
 
-            // Reset selections
             this.breakfastMenu.forEach(i => i.selected = false);
             this.lunchMenu.forEach(i => i.selected = false);
+
+            // Auto switch to history to show the fresh order
+            this.switchViewMode('history');
           },
           error: () => alert('Order placed, but wallet deduction failed. Please contact Admin.')
         });
@@ -115,12 +165,36 @@ export class ParentFoodComponent implements OnInit {
     });
   }
 
+  cancelOrder(order: any) {
+    if(confirm(`Cancel this order and instantly refund RM ${order.totalAmount.toFixed(2)} to the E-Wallet?`)) {
+      this.authService.deleteFoodOrder(order.id).subscribe({
+        next: () => {
+          const refundPayload = {
+            type: 'Top Up', // This type forces the backend to add the money back to the balance
+            date: new Date().toISOString().split('T')[0],
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            amount: order.totalAmount,
+            note: `Refund: Cancelled Order #${order.id}`
+          };
+
+          this.authService.addWalletTransaction(this.selectedChild.id, refundPayload).subscribe({
+            next: (walletRes: any) => {
+              this.walletBalance = walletRes.balance;
+              this.loadOrderHistory(); // Refresh the list
+              alert(`Order cancelled! RM ${order.totalAmount.toFixed(2)} has been securely refunded.`);
+            }
+          });
+        },
+        error: () => alert('Failed to cancel order.')
+      });
+    }
+  }
+
   goBack(): void {
     if (this.viewState === 'menu') {
       this.viewState = 'children';
       this.selectedChild = null;
       this.walletBalance = 0;
-      // Clear selections when going back
       this.breakfastMenu.forEach(i => i.selected = false);
       this.lunchMenu.forEach(i => i.selected = false);
     } else {

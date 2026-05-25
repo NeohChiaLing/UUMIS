@@ -35,15 +35,26 @@ export class AdminProfileComponent implements OnInit {
     this.currentUser = this.authService.getCurrentUser();
     if (!this.currentUser) return;
 
-    // Fetch fresh data from DB
     this.authService.getUsers().subscribe({
       next: (users: any[]) => {
         const myFreshProfile = users.find(u => u.id === this.currentUser.id || (u.email && u.email === this.currentUser.email));
 
         if (myFreshProfile) {
+          // THE FIX: Unpack JSON so Admins see their real name if populated
+          let profileData: any = {};
+          const rawJson = myFreshProfile.profile_json || myFreshProfile.profileJson;
+          if (rawJson) {
+            try { profileData = JSON.parse(rawJson); } catch(e){}
+          }
+          let displayName = myFreshProfile.fullName || myFreshProfile.username;
+          if (profileData.firstName || profileData.lastName || profileData.familyName) {
+            const lName = profileData.lastName || profileData.familyName || '';
+            displayName = [profileData.firstName, profileData.middleName, lName].filter(Boolean).join(' ');
+          }
+
           this.selectedAdmin = {
             dbId: myFreshProfile.id,
-            name: myFreshProfile.fullName || myFreshProfile.username,
+            name: displayName,
             role: myFreshProfile.role || 'Administrator',
             email: myFreshProfile.email || '',
             phone: myFreshProfile.phone || '',
@@ -69,10 +80,15 @@ export class AdminProfileComponent implements OnInit {
       certificatesJson: JSON.stringify(this.selectedAdmin.certificates)
     };
 
-    // We can reuse this endpoint since it updates the generic User fields in the DB!
     this.authService.adminUpdateTeacher(this.selectedAdmin.dbId, payload).subscribe({
       next: () => {
         alert('Your Admin Profile Updates have been saved!');
+
+        // Ensure local storage name updates instantly to reflect in header
+        let lsUser = JSON.parse(localStorage.getItem('user') || '{}');
+        lsUser.fullName = this.selectedAdmin.name;
+        localStorage.setItem('user', JSON.stringify(lsUser));
+
         this.isEditMode = false;
       },
       error: () => alert('Failed to save profile details. Check connection.')
