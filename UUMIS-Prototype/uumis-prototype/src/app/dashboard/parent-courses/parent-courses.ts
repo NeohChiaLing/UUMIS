@@ -44,8 +44,19 @@ export class ParentCoursesComponent implements OnInit, OnDestroy {
     if (this.currentUser && this.currentUser.role.toLowerCase() === 'parent') {
       this.authService.getStudents().subscribe({
         next: (students: any[]) => {
+          // THE FIX: Deployed the Dual-Parent Smart Filter here
           this.myChildren = students
-            .filter(s => s.parentId === this.currentUser.id || s.parent_id === this.currentUser.id)
+            .filter(child => {
+              let pJson: any = {};
+              const rawJson = child.profile_json || child.profileJson;
+              if (rawJson) {
+                try { pJson = typeof rawJson === 'string' ? JSON.parse(rawJson) : rawJson; } catch(e){}
+              }
+              const isLegacyParent = String(child.parentId) === String(this.currentUser.id) || String(child.parent_id) === String(this.currentUser.id);
+              const isFather = String(pJson.fatherAccountId) === String(this.currentUser.id);
+              const isMother = String(pJson.motherAccountId) === String(this.currentUser.id);
+              return isLegacyParent || isFather || isMother;
+            })
             .map(child => {
               let profileData: any = {};
               const rawProfileJson = child.profile_json || child.profileJson;
@@ -131,13 +142,14 @@ export class ParentCoursesComponent implements OnInit, OnDestroy {
 
                   const subjectName = `${a.type}: ${a.topic}`;
                   const oldSubjectName = `TASK_${a.id}`;
-                  const gradeRecord = myGrades.find((g: any) => g.subject === oldSubjectName || g.subject === subjectName);
+                  const gradeRecord = myGrades.find((g: any) => (g.subject || '').toLowerCase() === oldSubjectName.toLowerCase() || (g.subject || '').toLowerCase() === subjectName.toLowerCase());
 
                   let finalStatus = 'Pending';
                   let finalScore = null;
 
                   if (gradeRecord) {
-                    finalStatus = 'Submitted';
+                    // THE FIX: Directly map the mark and status stored in the DB without defaulting to 'Submitted'
+                    finalStatus = gradeRecord.status || 'Submitted';
                     finalScore = gradeRecord.mark;
                   } else if (isPastDue) {
                     finalStatus = 'Unsubmitted';
@@ -173,7 +185,7 @@ export class ParentCoursesComponent implements OnInit, OnDestroy {
                     name: sub.name,
                     icon: sub.icon || 'menu_book',
                     color: colors[index % colors.length],
-                    tasksCount: this.allAssignments.filter(a => a.subjectCode === subCode && a.status !== 'Submitted' && a.status !== 'Unsubmitted').length
+                    tasksCount: this.allAssignments.filter(a => a.subjectCode === subCode && a.status !== 'Submitted' && a.status !== 'Unsubmitted' && a.status !== 'Graded').length
                   };
                 });
               }
@@ -197,7 +209,7 @@ export class ParentCoursesComponent implements OnInit, OnDestroy {
     this.clickedTask = task;
 
     if (task.type && task.type.toLowerCase() === 'quiz') {
-      if (task.status === 'Submitted' || task.status === 'Unsubmitted') {
+      if (task.status === 'Submitted' || task.status === 'Unsubmitted' || task.status === 'Graded') {
         if (task.releaseMarks) {
           const parts = String(task.scoreText || '0 / 0').split('/');
           this.quizResult = {
@@ -213,7 +225,7 @@ export class ParentCoursesComponent implements OnInit, OnDestroy {
         this.viewState = 'quiz-gateway';
       }
     } else {
-      if (task.status === 'Submitted') {
+      if (task.status === 'Submitted' || task.status === 'Graded') {
         const scoreStr = String(task.scoreText);
         if (task.releaseMarks && task.scoreText !== null && scoreStr !== 'Pending Grading' && scoreStr !== 'File Uploaded') {
           this.viewState = 'assignment-result';

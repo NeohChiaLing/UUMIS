@@ -31,8 +31,19 @@ export class ParentAttendanceComponent implements OnInit {
     if (this.currentUser && this.currentUser.role.toLowerCase() === 'parent') {
       this.authService.getStudents().subscribe({
         next: (students: any[]) => {
+          // THE FIX: Deployed the Dual-Parent Smart Filter here
           this.myChildren = students
-            .filter(s => s.parentId === this.currentUser.id || s.parent_id === this.currentUser.id)
+            .filter(child => {
+              let pJson: any = {};
+              const rawJson = child.profile_json || child.profileJson;
+              if (rawJson) {
+                try { pJson = typeof rawJson === 'string' ? JSON.parse(rawJson) : rawJson; } catch(e){}
+              }
+              const isLegacyParent = String(child.parentId) === String(this.currentUser.id) || String(child.parent_id) === String(this.currentUser.id);
+              const isFather = String(pJson.fatherAccountId) === String(this.currentUser.id);
+              const isMother = String(pJson.motherAccountId) === String(this.currentUser.id);
+              return isLegacyParent || isFather || isMother;
+            })
             .map(child => {
               let profileData: any = {};
               const rawProfileJson = child.profile_json || child.profileJson;

@@ -87,22 +87,9 @@ export class StudentGradesComponent implements OnInit {
           next: (tasks) => {
             this.allAssignments = tasks || [];
 
-            // THE FIX: Fetch grades from the standard endpoint so we get the 'studentName' data
             this.http.get<any[]>(`/api/grades/student/${this.studentIdentifier}`).subscribe({
               next: (grades: any[]) => {
-
-                // THE FIX: Strict Collision Filter
-                // Throw away grades that belong to other students sharing the same ID (e.g. 123457)
-                const myName = this.studentName.toLowerCase().trim();
-
-                const exactGrades = (grades || []).filter(g => {
-                  const gradeName = (g.studentName || '').toLowerCase().trim();
-                  // If the grade has a name attached, it MUST match this student's exact name
-                  if (gradeName !== '' && gradeName !== myName) {
-                    return false;
-                  }
-                  return true;
-                });
+                const exactGrades = grades || [];
 
                 this.allGrades = exactGrades.map(g => {
                   let y = (g.yearGroup || g.year_group || '').trim();
@@ -129,6 +116,7 @@ export class StudentGradesComponent implements OnInit {
 
     const targetYearClean = this.cleanYearString(this.selectedYear);
 
+    // 1. Get all grades and subjects for this year
     const yearGrades = this.allGrades.filter(g => {
       return this.cleanYearString(g.yearGroup || g.year_group || '') === targetYearClean;
     });
@@ -137,6 +125,7 @@ export class StudentGradesComponent implements OnInit {
       return this.cleanYearString(s.yearGroup || s.year_group || '') === targetYearClean;
     });
 
+    // 2. Build Core Subjects List
     this.mainGrades = yearSubjects.map(sub => {
       const subName = (sub.name || '').toLowerCase();
       const subCode = (sub.code || '').toLowerCase();
@@ -147,7 +136,11 @@ export class StudentGradesComponent implements OnInit {
       });
 
       if (existingGrade) {
-        return { ...existingGrade, subject: sub.name || existingGrade.subject };
+        return {
+          ...existingGrade,
+          subject: sub.name || existingGrade.subject,
+          status: existingGrade.status || (existingGrade.mark && existingGrade.mark !== '-' ? 'Graded' : 'Pending')
+        };
       } else {
         return {
           subject: sub.name || sub.code,
@@ -158,14 +151,7 @@ export class StudentGradesComponent implements OnInit {
       }
     });
 
-    yearGrades.forEach(g => {
-      const isTask = g.subject.startsWith('TASK_') || g.subject.startsWith('Assignment:') || g.subject.startsWith('Quiz:');
-      if (!isTask) {
-        const exists = this.mainGrades.find(mg => (mg.subject || '').toLowerCase() === (g.subject || '').toLowerCase());
-        if (!exists) this.mainGrades.push(g);
-      }
-    });
-
+    // 3. Build Tasks/Assignments List STRICTLY from live assignments
     const yearTasks = this.allAssignments.filter(a => {
       return this.cleanYearString(a.yearGroup || a.year_group || '') === targetYearClean;
     });
@@ -174,10 +160,17 @@ export class StudentGradesComponent implements OnInit {
       const taskName = `${task.type}: ${task.topic}`;
       const oldTaskName = `TASK_${task.id}`;
 
-      const existingGrade = yearGrades.find(g => g.subject === oldTaskName || g.subject === taskName);
+      const existingGrade = yearGrades.find(g => {
+        const gSub = (g.subject || '').toLowerCase();
+        return gSub === taskName.toLowerCase() || gSub === oldTaskName.toLowerCase();
+      });
 
       if (existingGrade) {
-        return { ...existingGrade, subject: taskName };
+        return {
+          ...existingGrade,
+          subject: taskName,
+          status: existingGrade.status || (existingGrade.mark && existingGrade.mark !== '-' ? 'Graded' : 'Pending')
+        };
       } else {
         return {
           subject: taskName,
@@ -188,13 +181,8 @@ export class StudentGradesComponent implements OnInit {
       }
     });
 
-    yearGrades.forEach(g => {
-      const isTask = g.subject.startsWith('TASK_') || g.subject.startsWith('Assignment:') || g.subject.startsWith('Quiz:');
-      if (isTask) {
-        const exists = this.taskGrades.find(tg => (tg.subject || '').toLowerCase() === (g.subject || '').toLowerCase());
-        if (!exists) this.taskGrades.push(g);
-      }
-    });
+    // THE FIX: The orphaned "zombie" grade resurrection loop has been completely removed from here.
+    // Only tasks that actually exist in the database will be displayed.
   }
 
   goBack() { this.location.back(); }

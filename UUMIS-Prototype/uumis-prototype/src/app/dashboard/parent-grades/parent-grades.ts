@@ -47,7 +47,17 @@ export class ParentGradesComponent implements OnInit {
       this.authService.getStudents().subscribe({
         next: (students: any[]) => {
           this.myChildren = students
-            .filter(s => s.parentId === this.currentUser.id || s.parent_id === this.currentUser.id)
+            .filter(child => {
+              let pJson: any = {};
+              const rawJson = child.profile_json || child.profileJson;
+              if (rawJson) {
+                try { pJson = typeof rawJson === 'string' ? JSON.parse(rawJson) : rawJson; } catch(e){}
+              }
+              const isLegacyParent = String(child.parentId) === String(this.currentUser.id) || String(child.parent_id) === String(this.currentUser.id);
+              const isFather = String(pJson.fatherAccountId) === String(this.currentUser.id);
+              const isMother = String(pJson.motherAccountId) === String(this.currentUser.id);
+              return isLegacyParent || isFather || isMother;
+            })
             .map(child => {
               let profileData: any = {};
               const rawProfileJson = child.profile_json || child.profileJson;
@@ -117,7 +127,6 @@ export class ParentGradesComponent implements OnInit {
           next: (tasks) => {
             this.allAssignments = tasks || [];
 
-            // THE FIX: Strict Collision Filter deployed for Parents too
             this.authService.getStudentGrades(targetIdentifier).subscribe({
               next: (res: any[]) => {
                 const myName = (this.selectedChild.fullName || this.selectedChild.name || '').toLowerCase().trim();
@@ -125,7 +134,7 @@ export class ParentGradesComponent implements OnInit {
                 const exactGrades = (res || []).filter(g => {
                   const gradeName = (g.studentName || '').toLowerCase().trim();
                   if (gradeName !== '' && gradeName !== myName) {
-                    return false; // Safely strip out other students sharing the same ID
+                    return false;
                   }
                   return true;
                 });
@@ -162,6 +171,7 @@ export class ParentGradesComponent implements OnInit {
 
     const targetYearClean = this.cleanYearString(this.selectedYear);
 
+    // 1. Get all grades and subjects for this year
     const yearGrades = this.allGrades.filter(g => {
       return this.cleanYearString(g.yearGroup || g.year_group || '') === targetYearClean;
     });
@@ -170,6 +180,7 @@ export class ParentGradesComponent implements OnInit {
       return this.cleanYearString(s.yearGroup || s.year_group || '') === targetYearClean;
     });
 
+    // 2. Build Core Subjects List
     this.mainGrades = yearSubjects.map(sub => {
       const subName = (sub.name || '').toLowerCase();
       const subCode = (sub.code || '').toLowerCase();
@@ -180,7 +191,11 @@ export class ParentGradesComponent implements OnInit {
       });
 
       if (existingGrade) {
-        return { ...existingGrade, subject: sub.name || existingGrade.subject };
+        return {
+          ...existingGrade,
+          subject: sub.name || existingGrade.subject,
+          status: existingGrade.status || (existingGrade.mark && existingGrade.mark !== '-' ? 'Graded' : 'Pending')
+        };
       } else {
         return {
           subject: sub.name || sub.code,
@@ -191,14 +206,7 @@ export class ParentGradesComponent implements OnInit {
       }
     });
 
-    yearGrades.forEach(g => {
-      const isTask = g.subject.startsWith('TASK_') || g.subject.startsWith('Assignment:') || g.subject.startsWith('Quiz:');
-      if (!isTask) {
-        const exists = this.mainGrades.find(mg => (mg.subject || '').toLowerCase() === (g.subject || '').toLowerCase());
-        if (!exists) this.mainGrades.push(g);
-      }
-    });
-
+    // 3. Build Tasks/Assignments List STRICTLY from live assignments
     const yearTasks = this.allAssignments.filter(a => {
       return this.cleanYearString(a.yearGroup || a.year_group || '') === targetYearClean;
     });
@@ -207,10 +215,17 @@ export class ParentGradesComponent implements OnInit {
       const taskName = `${task.type}: ${task.topic}`;
       const oldTaskName = `TASK_${task.id}`;
 
-      const existingGrade = yearGrades.find(g => g.subject === oldTaskName || g.subject === taskName);
+      const existingGrade = yearGrades.find(g => {
+        const gSub = (g.subject || '').toLowerCase();
+        return gSub === taskName.toLowerCase() || gSub === oldTaskName.toLowerCase();
+      });
 
       if (existingGrade) {
-        return { ...existingGrade, subject: taskName };
+        return {
+          ...existingGrade,
+          subject: taskName,
+          status: existingGrade.status || (existingGrade.mark && existingGrade.mark !== '-' ? 'Graded' : 'Pending')
+        };
       } else {
         return {
           subject: taskName,
@@ -221,17 +236,11 @@ export class ParentGradesComponent implements OnInit {
       }
     });
 
-    yearGrades.forEach(g => {
-      const isTask = g.subject.startsWith('TASK_') || g.subject.startsWith('Assignment:') || g.subject.startsWith('Quiz:');
-      if (isTask) {
-        const exists = this.taskGrades.find(tg => (tg.subject || '').toLowerCase() === (g.subject || '').toLowerCase());
-        if (!exists) this.taskGrades.push(g);
-      }
-    });
+    // THE FIX: The orphaned "zombie" grade resurrection loop has been completely removed from here as well.
   }
 
   getGradeLetter(mark: any, dbGrade: string): string {
-    if (dbGrade && String(dbGrade).trim() !== '') return dbGrade;
+    if (dbGrade && String(dbGrade).trim() !== '' && String(dbGrade).trim() !== '-') return dbGrade;
     if (mark === null || mark === undefined || String(mark).trim() === '') return '-';
 
     const num = Number(mark);

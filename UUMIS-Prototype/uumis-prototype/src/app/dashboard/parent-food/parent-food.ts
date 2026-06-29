@@ -14,7 +14,7 @@ export class ParentFoodComponent implements OnInit {
 
   currentUser: any = null;
   viewState: string = 'children';
-  activeTab: 'menu' | 'history' = 'menu'; // Added tab logic
+  activeTab: 'menu' | 'history' = 'menu';
 
   myChildren: any[] = [];
   selectedChild: any = null;
@@ -33,11 +33,20 @@ export class ParentFoodComponent implements OnInit {
     if (this.currentUser && this.currentUser.role.toLowerCase() === 'parent') {
       this.authService.getStudents().subscribe({
         next: (students: any[]) => {
+          // THE FIX: Deployed the Dual-Parent Smart Filter here
           this.myChildren = students
-            .filter(s => s.parentId === this.currentUser.id || s.parent_id === this.currentUser.id)
+            .filter(child => {
+              let pJson: any = {};
+              const rawJson = child.profile_json || child.profileJson;
+              if (rawJson) {
+                try { pJson = typeof rawJson === 'string' ? JSON.parse(rawJson) : rawJson; } catch(e){}
+              }
+              const isLegacyParent = String(child.parentId) === String(this.currentUser.id) || String(child.parent_id) === String(this.currentUser.id);
+              const isFather = String(pJson.fatherAccountId) === String(this.currentUser.id);
+              const isMother = String(pJson.motherAccountId) === String(this.currentUser.id);
+              return isLegacyParent || isFather || isMother;
+            })
             .map(child => {
-
-              // Unpack JSON for proper first, middle, last name display
               let profileData: any = {};
               const rawProfileJson = child.profile_json || child.profileJson;
               if (rawProfileJson) {
@@ -131,7 +140,6 @@ export class ParentFoodComponent implements OnInit {
     ].join(', ');
 
     const orderPayload = {
-      // By sending the freshly unpacked fullName, new orders will be correct in the Admin database!
       studentName: this.selectedChild.fullName || this.selectedChild.username,
       items: selectedItems,
       totalAmount: this.totalAmount
@@ -140,7 +148,7 @@ export class ParentFoodComponent implements OnInit {
     this.authService.submitFoodOrder(orderPayload).subscribe({
       next: (res) => {
         const walletPayload = {
-          type: 'Food Order', // Non-"Top Up" types automatically deduct from the backend
+          type: 'Food Order',
           date: new Date().toISOString().split('T')[0],
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           amount: this.totalAmount,
@@ -155,7 +163,6 @@ export class ParentFoodComponent implements OnInit {
             this.breakfastMenu.forEach(i => i.selected = false);
             this.lunchMenu.forEach(i => i.selected = false);
 
-            // Auto switch to history to show the fresh order
             this.switchViewMode('history');
           },
           error: () => alert('Order placed, but wallet deduction failed. Please contact Admin.')
@@ -170,7 +177,7 @@ export class ParentFoodComponent implements OnInit {
       this.authService.deleteFoodOrder(order.id).subscribe({
         next: () => {
           const refundPayload = {
-            type: 'Top Up', // This type forces the backend to add the money back to the balance
+            type: 'Top Up',
             date: new Date().toISOString().split('T')[0],
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
             amount: order.totalAmount,
@@ -180,7 +187,7 @@ export class ParentFoodComponent implements OnInit {
           this.authService.addWalletTransaction(this.selectedChild.id, refundPayload).subscribe({
             next: (walletRes: any) => {
               this.walletBalance = walletRes.balance;
-              this.loadOrderHistory(); // Refresh the list
+              this.loadOrderHistory();
               alert(`Order cancelled! RM ${order.totalAmount.toFixed(2)} has been securely refunded.`);
             }
           });

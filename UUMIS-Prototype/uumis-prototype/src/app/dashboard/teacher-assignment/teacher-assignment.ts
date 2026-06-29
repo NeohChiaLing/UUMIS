@@ -334,13 +334,11 @@ export class TeacherAssignmentComponent implements OnInit, OnDestroy {
     const currentYearGroup = this.selectedYear;
 
     this.authService.getUsers().subscribe(users => {
-      // 1. Get ONLY students who are actively assigned to this class
       const classStudents = users.filter(u => {
         if ((u.role || '').toLowerCase() !== 'student') return false;
         const yG = (u.bio || '').includes(' - ') ? (u.bio || '').split(' - ')[1]?.trim().toLowerCase() : (u.bio || '').trim().toLowerCase();
         return yG === currentYearGroup.toLowerCase();
       }).map(u => {
-        // THE FIX: Unpack JSON to display full name correctly!
         let profileData: any = {};
         const rawJson = u.profile_json || u.profileJson;
         if (rawJson) {
@@ -360,11 +358,10 @@ export class TeacherAssignmentComponent implements OnInit, OnDestroy {
 
       Promise.all([
         fetch(`/api/grades?subject=${encodeURIComponent(subjectName)}&yearGroup=${encodeURIComponent(currentYearGroup)}`).then(res => res.ok ? res.json() : []),
-        fetch(`/api/grades?subject=${encodeURIComponent(oldSubjectName)}&yearGroup=${encodeURIComponent(currentYearGroup)}`).then(res => res.ok ? res.json() : [])
+        fetch(`/api/grades?subject=${encodeURIComponent(oldSubjectName)}&yearGroup=${encodeURIComponent(currentYearGroup)}`).then(res => res.ok ? res.json() : []),
       ]).then(([newGrades, oldGrades]) => {
         const allGrades = [...(Array.isArray(newGrades) ? newGrades : []), ...(Array.isArray(oldGrades) ? oldGrades : [])];
 
-        // THE FIX: Strict Mapping. We NO LONGER append orphaned grades.
         if (classStudents.length === 0) {
           this.taskSubmissions = [];
           this.isLoadingSubmissions = false;
@@ -389,7 +386,7 @@ export class TeacherAssignmentComponent implements OnInit, OnDestroy {
           let pctStr = '-';
 
           if (gradeRec) {
-            statusStr = 'Submitted';
+            statusStr = gradeRec.status || (gradeRec.mark && gradeRec.mark !== '-' ? 'Graded' : 'Submitted');
             markStr = gradeRec.mark !== null ? String(gradeRec.mark) : '-';
             pctStr = gradeRec.gradeLetter || '-';
           } else if (task.isPastDue) {
@@ -427,7 +424,7 @@ export class TeacherAssignmentComponent implements OnInit, OnDestroy {
   openGradeModal(student: any) {
     this.gradingStudent = student;
     const currentMark = String(student.mark);
-    this.gradingScore = (currentMark === 'Pending Grading' || currentMark === 'File Uploaded' || currentMark === '-') ? '' : currentMark;
+    this.gradingScore = (currentMark === 'Pending Grading' || currentMark === 'File Uploaded' || currentMark === '-' || currentMark === 'null') ? '' : currentMark;
     this.showGradeModal = true;
   }
 
@@ -436,7 +433,9 @@ export class TeacherAssignmentComponent implements OnInit, OnDestroy {
       const a = document.createElement('a');
       a.href = student.submittedFileUrl;
       a.download = student.submittedFileName || 'Submission.pdf';
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
     } else {
       alert("This student didn't upload a file.");
     }
@@ -453,12 +452,13 @@ export class TeacherAssignmentComponent implements OnInit, OnDestroy {
       subject: subjectName,
       mark: this.gradingScore,
       gradeLetter: '-',
-      status: 'Submitted'
+      status: 'Graded'
     }];
 
     this.authService.saveGrades(gradePayload).subscribe({
       next: () => {
         this.gradingStudent.mark = this.gradingScore;
+        this.gradingStudent.status = 'Graded';
         this.showGradeModal = false;
         alert('Grade saved successfully!');
       },

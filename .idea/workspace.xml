@@ -6,82 +6,18 @@
   <component name="ChangeListManager">
     <list default="true" id="664642ca-f811-44e7-b19b-cb99d237de11" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/about/board-of-governors/board-of-governors.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/about/board-of-governors/board-of-governors.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/about/faculty-staff/faculty-staff.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/about/faculty-staff/faculty-staff.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/about/faculty-staff/faculty-staff.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/about/faculty-staff/faculty-staff.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/about/mission-vision/mission-vision.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/about/mission-vision/mission-vision.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/about/organizational-structure/organizational-structure.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/about/organizational-structure/organizational-structure.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/admissions/application-form/application-form.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/admissions/application-form/application-form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/admissions/fees/fees.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/admissions/fees/fees.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/admissions/how-to-apply/how-to-apply.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/admissions/how-to-apply/how-to-apply.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/app.routes.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/app.routes.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/calendar/calendar/calendar.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/calendar/calendar/calendar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/contact/contact.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/contact/contact.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/assignments/assignments.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/assignments/assignments.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/assignments/assignments.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/assignments/assignments.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/attendance/attendance.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/attendance/attendance.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/attendance/attendance.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/attendance/attendance.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/grading/grading.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/grading/grading.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/grading/grading.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/grading/grading.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/lesson-plan/lesson-plan.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/lesson-plan/lesson-plan.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/student-schedule/student-schedule.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/student-schedule/student-schedule.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/student-schedule/student-schedule.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/student-schedule/student-schedule.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/subjects/subjects.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/subjects/subjects.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/subjects/subjects.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/academic/subjects/subjects.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/admin-dashboard/admin-dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/admin-dashboard/admin-dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/admin-dashboard/admin-dashboard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/admin-dashboard/admin-dashboard.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/admin/user-roles/user-roles.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/admin/user-roles/user-roles.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/admin/user-roles/user-roles.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/admin/user-roles/user-roles.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/financial/discount/discount.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/financial/discount/discount.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/financial/discount/discount.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/financial/discount/discount.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/financial/payment/payment.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/financial/payment/payment.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/financial/refund/refund.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/financial/refund/refund.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/financial/refund/refund.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/financial/refund/refund.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/food-ordering/food-ordering.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/food-ordering/food-ordering.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/inventory/inventory.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/inventory/inventory.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/inventory/inventory.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/inventory/inventory.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/notification/notification.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/notification/notification.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/notification/notification.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/notification/notification.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-attendance/parent-attendance.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-attendance/parent-attendance.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-children-list/parent-children-list.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-children-list/parent-children-list.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-courses/parent-courses.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-courses/parent-courses.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-courses/parent-courses.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-courses/parent-courses.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-dashboard/parent-dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-dashboard/parent-dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-grades/parent-grades.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-grades/parent-grades.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-financial/payment/payment.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-financial/payment/payment.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-financial/refund/refund.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-financial/refund/refund.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-financial/wallet/wallet.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-financial/wallet/wallet.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-food/parent-food.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-food/parent-food.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-grades/parent-grades.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-grades/parent-grades.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-student-profile/parent-student-profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-student-profile/parent-student-profile.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-student-profile/parent-student-profile.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/parent-student-profile/parent-student-profile.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/staff-dashboard/staff-dashboard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/staff-dashboard/staff-dashboard.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-assignment/student-assignment.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-assignment/student-assignment.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-assignment/student-assignment.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-assignment/student-assignment.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-attendance/student-attendance.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-attendance/student-attendance.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-dashboard/student-dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-dashboard/student-dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-dashboard/student-dashboard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-dashboard/student-dashboard.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-grades/student-grades.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-grades/student-grades.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-grades/student-grades.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-grades/student-grades.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-info/student-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-info/student-info.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-info/student-info.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/student-info/student-info.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-assignment/teacher-assignment.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-assignment/teacher-assignment.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-assignment/teacher-assignment.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-assignment/teacher-assignment.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-attendance/teacher-attendance.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-attendance/teacher-attendance.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-attendance/teacher-attendance.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-attendance/teacher-attendance.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-dashboard/teacher-dashboard.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-dashboard/teacher-dashboard.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-dashboard/teacher-dashboard.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-dashboard/teacher-dashboard.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-grading/teacher-grading.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-grading/teacher-grading.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-grading/teacher-grading.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-grading/teacher-grading.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-info/teacher-info.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-info/teacher-info.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-info/teacher-info.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-info/teacher-info.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-profile/teacher-profile.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-profile/teacher-profile.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-profile/teacher-profile.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/dashboard/teacher-profile/teacher-profile.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/home/home.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/home/home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/login/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/login/login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/login/login.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/login/login.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/navbar/navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/navbar/navbar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/navbar/navbar.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/navbar/navbar.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/services/auth.service.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/services/auth.service.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/user-profile/user-profile.ts" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/app/user-profile/user-profile.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/UUMIS-Prototype/uumis-prototype/src/styles.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,7 +30,19 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="C:\xampp\php\php.exe" />
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;NeohChiaLing&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/NeohChiaLing/UUMIS.git&quot;,
+    &quot;accountId&quot;: &quot;4db7c828-76b8-41a6-8da8-5483c7716f02&quot;
+  }
+}</component>
+  <component name="PhpWorkspaceProjectConfiguration" interpreter_name="PHP" />
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 1
 }</component>
@@ -110,16 +58,19 @@
   &quot;keyToString&quot;: {
     &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/geral/IdeaProjects/UUMIS/uumis-prototype/uumis-prototype/src/app/home&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/neohc/IdeaProjects/UUMIS&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;settings.typescriptcompiler&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.1.1\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\neohc\\IdeaProjects\\UUMIS\\UUMIS-Prototype\\uumis-prototype\\node_modules\\typescript\\lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
   &quot;keyToStringList&quot;: {
@@ -148,14 +99,6 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-  </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-jdk-9f38398b9061-39b83d9b5494-intellij.indexing.shared.core-IU-241.15989.150" />
-        <option value="bundled-js-predefined-1d06a55b98c1-91d5c284f522-JavaScript-IU-241.15989.150" />
-      </set>
-    </attachedChunks>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -193,6 +136,24 @@
       <workItem from="1777020906526" duration="5975000" />
       <workItem from="1777176293970" duration="13635000" />
       <workItem from="1777197517987" duration="346000" />
+      <workItem from="1777199327140" duration="22260000" />
+      <workItem from="1777254420251" duration="2702000" />
+      <workItem from="1777363447463" duration="6829000" />
+      <workItem from="1777445610745" duration="9112000" />
+      <workItem from="1777709066052" duration="3518000" />
+      <workItem from="1778563285028" duration="1730000" />
+      <workItem from="1779023575809" duration="12925000" />
+      <workItem from="1779087168271" duration="12871000" />
+      <workItem from="1779110283406" duration="9961000" />
+      <workItem from="1779173721716" duration="5787000" />
+      <workItem from="1779179968154" duration="408000" />
+      <workItem from="1779193364666" duration="2125000" />
+      <workItem from="1779414515052" duration="5922000" />
+      <workItem from="1779435105149" duration="683000" />
+      <workItem from="1779436619908" duration="2897000" />
+      <workItem from="1779672846270" duration="3282000" />
+      <workItem from="1780384967576" duration="6960000" />
+      <workItem from="1780986772185" duration="47000" />
     </task>
     <servers />
   </component>
