@@ -1,122 +1,261 @@
-This is a professional and detailed `README.md` script tailored for your **UUMIS** project. It guides users (like your lecturer) through the cloning process, the Docker setup, and the specific troubleshooting steps we solved today.
+# UUMIS - Web-Based School Management System
 
-Copy the code block below and paste it directly into your GitHub README.
+UUMIS is a full-stack web-based School Management System developed for **UUM International School (UUMIS)**. The system is designed to centralise academic, administrative, communication, and financial processes into one integrated platform. It provides role-based portals for administrators, teachers, students, parents, registration staff, finance staff, and general staff.
+
+## 🌐 Live Deployment
+
+The system has been deployed online and can be accessed through:
+
+**Live Website:** https://uumis.com.my
+
+> Note: Access to certain portals requires authorised login credentials.
 
 ---
 
-```markdown
-# UUMIS - School Management System
+## 📌 Project Overview
 
-UUMIS is a full-stack web application designed for school management, featuring dedicated portals for **Students**, **Staff**, and **Administrators**. The system handles academic records, attendance, and financial management with role-based access control.
+The UUMIS School Management System aims to reduce manual and fragmented school operations by providing a centralised digital platform. The system supports student management, teacher management, attendance tracking, grading, assignment management, finance management, parent monitoring, food ordering, inventory management, notifications, reporting, and multi-language support.
+
+This project was developed as part of the Final Year Project (FYP) for the Software Engineering programme at Universiti Utara Malaysia.
+
+---
+
+## ✨ Main Features
+
+### Public Website
+
+* Homepage and school information
+* Admission information
+* Online application form
+* Calendar and contact page
+* Multi-language support
+* Access to academic portal login
+
+### Admin Portal
+
+* User and role management
+* Student management
+* Teacher and staff management
+* Academic setup
+* Reports and notifications
+* School-wide dashboard overview
+
+### Registration Staff Portal
+
+* Student admission management
+* Student registration records
+* Student profile approval and updates
+
+### Teacher Portal
+
+* Teacher dashboard
+* Lesson plan management
+* Assignment and quiz management
+* Attendance management
+* Student grading and performance tracking
+
+### Student Portal
+
+* Student dashboard
+* Student profile
+* Assignment viewing and submission
+* Attendance record viewing
+* Grade viewing
+* Food menu access
+
+### Parent Portal
+
+* Parent dashboard
+* Child profile viewing
+* Child attendance and grade monitoring
+* Payment and wallet-related information
+* School communication and notifications
+
+### Finance Staff Portal
+
+* Payment tracking
+* Invoice and transaction records
+* Refund management
+* Discount and promotion management
+* Wallet history
+
+### General Staff Portal
+
+* Inventory management
+* Asset records
+* Food order management
+* Operational support functions
+
+---
 
 ## 🚀 Tech Stack
-* **Frontend:** Angular (Standalone Components, Tailwind CSS)
-* **Backend:** Spring Boot 3+ (Java 17, JPA/Hibernate)
-* **Database:** MySQL 8.0
-* **Deployment:** Docker & Docker Compose
-* **Web Server:** Nginx (Alpine-based)
+
+| Area       | Technology                                   |
+| ---------- | -------------------------------------------- |
+| Frontend   | Angular, HTML, CSS, TypeScript, Tailwind CSS |
+| Backend    | Spring Boot, Java, JPA / Hibernate           |
+| Database   | MySQL                                        |
+| Deployment | Online server, Docker, Docker Compose        |
+| Web Server | Nginx                                        |
+| Security   | Role-Based Access Control (RBAC)             |
 
 ---
 
-## 🛠️ Installation & Setup
+## 🧩 System Architecture
 
-Follow these steps to run the entire system on your local machine using Docker.
+The system follows a client-server architecture:
 
-### 1. Prerequisites
-Ensure you have the following installed:
-* [Git](https://git-scm.com/)
-* [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Make sure it is running)
-
-### 2. Clone the Repository
-Open your terminal/command prompt and run:
-```bash
-git clone [https://github.com/NeohChiaLing/UUMIS.git](https://github.com/NeohChiaLing/UUMIS.git)
-cd UUMIS
-
+```text
+User Browser
+     ↓
+Angular Frontend
+     ↓
+Spring Boot REST API
+     ↓
+MySQL Database
 ```
 
-### 3. Run with Docker Compose
+Users access the system through a web browser. The Angular frontend handles the user interface, while the Spring Boot backend manages business logic, authentication, role permissions, and communication with the MySQL database.
 
-From the root project folder, run:
+---
+
+## 🔐 Role-Based Access Control
+
+UUMIS uses Role-Based Access Control (RBAC) to ensure that each user can only access functions related to their role.
+
+| Role               | Access Summary                                          |
+| ------------------ | ------------------------------------------------------- |
+| Admin              | Full system management access                           |
+| Teacher            | Academic, attendance, assignment, and grading functions |
+| Student            | Personal academic records and assignment access         |
+| Parent             | Child monitoring, payment, and communication access     |
+| Registration Staff | Admission and student registration management           |
+| Finance Staff      | Payment, refund, discount, and wallet management        |
+| General Staff      | Inventory, asset, and food order management             |
+
+---
+
+## 🛠️ Local Installation and Setup
+
+Follow these steps to run the system locally using Docker.
+
+### 1. Prerequisites
+
+Make sure the following tools are installed:
+
+* [Git](https://git-scm.com/)
+* [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+
+### 2. Clone the Repository
+
+```bash
+git clone https://github.com/NeohChiaLing/UUMIS.git
+cd UUMIS
+```
+
+### 3. Run the System with Docker Compose
 
 ```bash
 docker-compose up --build
-
 ```
 
-*Note: The first build might take a few minutes as it downloads dependencies and compiles the Java/Angular code.*
+The first build may take several minutes because Docker needs to download dependencies and build both the frontend and backend.
 
-### 4. Access the Application
+### 4. Access the Local Application
 
-Once the terminal shows the Spring Boot logo and Nginx starts, open your browser:
+After the containers are running, open the system in your browser:
 
-* **Frontend:** [http://localhost:4200](https://www.google.com/search?q=http://localhost:4200)
-* **Backend API:** [http://localhost:8080/api](https://www.google.com/search?q=http://localhost:8080/api)
+```text
+Frontend: http://localhost:4200
+Backend API: http://localhost:8080/api
+```
 
----
-
-## 🔐 Default Login Credentials
-
-The system automatically seeds the database with the following accounts for testing:
-
-| Role | Email | Password |
-| --- | --- | --- |
-| **System Admin** | `admin@uumis.edu.my` | `123` |
-| **Staff Manager** | `staff@uumis.edu.my` | `123` |
-| **Register Manager** | `register@uumis.edu.my` | `123` |
-| **Financial Manager** | `finance@uumis.edu.my` | `123` |
-| **Student** | `student@uumis.edu.my` | `123` |
-| **Parent** | `parent@uumis.edu.my` | `123` |
+The actual port may depend on the configuration in `docker-compose.yml`.
 
 ---
 
-## ❗ Troubleshooting & Common Errors
+## 🔑 Demo Login Credentials
 
-### 1. Login Failed: "Undefined" or "Internal Server Error"
+For security reasons, production credentials are not published in this README.
 
-This usually happens due to duplicate records or database synchronization issues during the first setup.
-**Fix:** Reset the Docker volumes to start with a clean database:
+If demo accounts are required for project evaluation, please contact the project owner or supervisor for authorised access.
+
+For local testing, demo accounts may be seeded in the database depending on the current backend configuration.
+
+---
+
+## ❗ Troubleshooting
+
+### 1. Login Failed or Internal Server Error
+
+This may happen if the local database has duplicate records or outdated data.
+
+Try resetting the Docker volume:
 
 ```bash
 docker-compose down -v
 docker-compose up --build
-
 ```
 
-### 2. 404 Not Found on Page Refresh
+### 2. Page Refresh Shows 404 Error
 
-If you refresh the browser (F5) and see an Nginx 404 error, the `nginx.conf` was likely not picked up.
-**Fix:** Ensure the `nginx.conf` file is in the frontend folder and rebuild:
+If refreshing a frontend route causes a 404 error, the Nginx configuration may not be handling Angular routes correctly.
+
+Rebuild the frontend container:
 
 ```bash
 docker-compose build frontend
 docker-compose up
-
 ```
 
-### 3. Connection Refused (Backend failing to find Database)
+### 3. Backend Cannot Connect to MySQL
 
-The backend might start faster than the MySQL database.
-**Fix:** We have implemented a `healthcheck` in `docker-compose.yml`. If it still fails, simply stop Docker (`Ctrl+C`) and run `docker-compose up` again.
+The backend may start before the MySQL database is fully ready.
 
----
+Try stopping and restarting Docker:
 
-## 👥 Role-Based Access Control (RBAC)
-
-* **Financial Manager:** Access to Payment, Refund, Discount, and Wallet tools. **Students Management is hidden.**
-* **Register Manager:** Access to Student Profiles and Enrollment. **Financial tools are hidden.**
-* **General Staff/Admin:** Full access to all management modules.
-
+```bash
+docker-compose down
+docker-compose up --build
 ```
 
 ---
 
-### How to add this to your GitHub:
-1.  Go to your repository: [https://github.com/NeohChiaLing/UUMIS](https://github.com/NeohChiaLing/UUMIS).
-2.  Click the green **"Add a README"** button (or click **"Add file"** -> **"Create new file"** and name it `README.md`).
-3.  Paste the code above.
-4.  Scroll down and click **"Commit changes"**.
+## 📂 Project Structure
 
-**Your GitHub page will now look professional and be easy for your lecturer to run! Is there anything else you'd like to add to it?**
-
+```text
+UUMIS/
+│
+├── frontend/        # Angular frontend application
+├── backend/         # Spring Boot backend application
+├── docker-compose.yml
+├── README.md
+└── nginx.conf
 ```
+
+The folder names may vary depending on the final project structure.
+
+---
+
+## 📌 Deployment Status
+
+The system is currently deployed online at:
+
+**https://uumis.com.my**
+
+The online version is intended for demonstration, testing, and evaluation purposes.
+
+---
+
+## 👩‍💻 Developer
+
+**Neoh Chia Ling**
+Bachelor of Information Technology / Software Engineering
+School of Computing
+Universiti Utara Malaysia
+
+---
+
+## 📄 License
+
+This project was developed for academic purposes as a Final Year Project. Reuse, modification, or redistribution should be done with proper permission from the project owner.
